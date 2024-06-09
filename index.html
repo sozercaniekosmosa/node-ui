@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body {
+            overflow: hidden;
+            margin: 0;
+        }
+
+        .selected {
+            stroke: #c4eef5 !important;
+            stroke-width: 2;
+        }
+
+        .link {
+            stroke: #505050;
+            stroke-width: 4;
+            pointer-events: none;
+            fill: transparent;
+        }
+
+        .canvas {
+            width: 500px;
+            height: 500px;
+        }
+
+        svg {
+            border: 1px solid #222222;
+        }
+    </style>
+    <script src="./dist/node-ui.js" type="module" defer></script>
+</head>
+<body>
+<div class="canvas"></div>
+</body>
+</html>

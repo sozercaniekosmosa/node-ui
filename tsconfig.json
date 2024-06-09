@@ -1,0 +1,49 @@
+{
+  "compilerOptions": {
+    /* Visit https://aka.ms/tsconfig to read more about this file */
+    "target": "es2021",
+    "lib": [
+      "es2020",
+      "DOM.Iterable",
+      "ESNext",
+      "dom"
+    ],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "noLib": false,
+    "moduleDetection": "auto",
+    "module": "es2015",
+    "rootDir": "./src",
+    "moduleResolution": "node",
+    "baseUrl": "./src",
+//    "allowJs": true,
+//    "checkJs": false,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "removeComments": true,
+
+    "noEmitOnError": true,
+
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+
+    "noImplicitAny": false,
+
+    "useUnknownInCatchVariables": true,
+    "noUnusedLocals": false, // dev
+    "skipLibCheck": true,
+
+//    "declaration": true,
+    "allowSyntheticDefaultImports": true,
+    "incremental": true,
+    "strictNullChecks": false,
+    "strictBindCallApply": false,
+    "noFallthroughCasesInSwitch": false,
+    "preserveConstEnums": false
+  },
+
+  "exclude": [
+    "node_modules"
+  ]
+}
