@@ -3,17 +3,11 @@ export type TPoint = {
     y: number;
 }
 
-export type TSize = {
-    width: number;
-    height: number;
-}
-
 export type TMouseEvent = {
     target: EventTarget,
     _p: Point,
     p: Point,
     delta: Point,
-    __start: Point,
     start: Point,
     end: Point,
     targetDownCentre: Point,
@@ -152,6 +146,10 @@ export class Point {
 export interface INodeProp {
     x?: number,
     y?: number,
+    x1?: number,
+    y1?: number,
+    x2?: number,
+    y2?: number,
     cx?: number,
     cy?: number,
     r?: number,
@@ -183,6 +181,7 @@ export class Svg {
     public height: number;
 
     private readonly mouse: TMouseEvent;
+    private startPoint: Point;
 
     constructor(dest: HTMLElement = document.body) {
         this.node = this.createSvg({
@@ -191,9 +190,6 @@ export class Svg {
         })
         this.width = dest.clientWidth;
         this.height = dest.clientHeight;
-
-        this.off = this.getElementPos(this.node);
-        console.log(this.off)
 
         this.mouse = {
             _p: new Point(), p: new Point(), start: new Point(), end: new Point(), delta: new Point(),
@@ -205,9 +201,13 @@ export class Svg {
         this.node.addEventListener('mousemove', e => this.handlerMouseMove(e));
     }
 
-    getElementPos(node) {
-        var {top, left} = node.getBoundingClientRect();
-        return new Point({x: top + window.scrollY, y: left + window.scrollX});
+    /**
+     * Получить позицию и размеры node
+     * @param node
+     */
+    public getBox(node) {
+        const {x, y, width, height} = node.getBoundingClientRect();
+        return {x: x - this.off.x, y: y - this.off.y, width, height};
     }
 
     private updateZoom() {
@@ -216,6 +216,10 @@ export class Svg {
         this.kZoom = new Point(+width / this.width, +height / this.height);
     }
 
+    /**
+     * Для пересчета p:Point позиции с учетом zoom
+     * @param p
+     */
     getPosZoom(p: Point) {
         const vp = new Point(this.viewBox);
         const kz = this.kZoom;
@@ -272,11 +276,10 @@ export class Svg {
 
     public group(prop: INodeProp): SVGElement {
         prop.transform = (!prop?.x || !prop?.y) ? `translate(${0},${0})` : `translate(${prop.x},${prop.y})`;
-        const node = this.createElement('g', prop);
-        return node;
+        return this.createElement('g', prop);
     }
 
-    public updateLink(nodeSpline: SVGElement, sp: TPoint, ep: TPoint, prop?: INodeProp): void;
+    public updateLink(nodeSpline: SVGElement, sp: Point, ep: Point, prop?: INodeProp): void;
     public updateLink(nodeSpline: SVGElement, sx: number, sy: number, ex: number, ey: number, prop?: INodeProp): void;
 
     public updateLink(...args: any[]): void {
@@ -293,17 +296,25 @@ export class Svg {
         this.setProperty(nodeSpline, {...prop, d: path});
     }
 
+    // newLine.setAttribute('id','line2');
+    // newLine.setAttribute('x1','0');
+    // newLine.setAttribute('y1','0');
+    // newLine.setAttribute('x2','200');
+    // newLine.setAttribute('y2','200');
+
+    public line(sx: number, sy: number, ex: number, ey: number, prop?: INodeProp): SVGElement {
+        return this.createElement('line', {...prop, x1: sx, y1: sy, x2: ex, y2: ey});
+    }
+
     public link(sx: number, sy: number, ex: number, ey: number, prop?: INodeProp): SVGElement {
         const path = this.pathCalc(sx, ex, sy, ey);
-        const node = this.createElement('path', {...prop, d: path});
-        return node;
+        return this.createElement('path', {...prop, d: path});
     }
 
     private pathCalc(sx, ex, sy, ey) {
         const controlPoint1 = {x: sx + (ex - sx) / 3, y: sy};
         const controlPoint2 = {x: ex - (ex - sx) / 3, y: ey};
-        const path = `M${sx} ${sy} C ${controlPoint1.x} ${controlPoint1.y}, ${controlPoint2.x} ${controlPoint2.y}, ${ex} ${ey}`;
-        return path;
+        return `M${sx} ${sy} C ${controlPoint1.x} ${controlPoint1.y}, ${controlPoint2.x} ${controlPoint2.y}, ${ex} ${ey}`;
     }
 
     private handlerMouseWheel(e: WheelEvent) {
@@ -322,6 +333,9 @@ export class Svg {
         this.setView(off.x, off.y, newSize.x, newSize.y);
 
         this.mouse.zoomDirection = zoomDirection;
+
+        if (this?.startPoint) this.mouse.start = this.getPosZoom(this.startPoint); //zoom изменился => обновляем позицию
+
         this.node.dispatchEvent(new CustomEvent('svgwheel', {detail: {...this.mouse}}))
     }
 
@@ -329,10 +343,11 @@ export class Svg {
         this.updateZoom();
 
         this.mouse.target = e.target;
-        this.mouse.__start = new Point(e.clientX, e.clientY).add(this.off);
-        this.mouse.start = this.getPosZoom(this.mouse.__start);
+        this.startPoint = new Point(e.offsetX, e.offsetY); //сохраняем позицию что бы обновить её если изменится zoom
+        this.mouse.start = this.getPosZoom(this.startPoint);
 
-        const {x, y, width, height} = (e.target as Element).getBoundingClientRect();
+        //считаем центр target
+        const {x, y, width, height} = this.getBox(e.target);
         const pCentre = new Point(width, height).mul(.5).add(x, y);
         this.mouse.targetDownCentre = this.getPosZoom(pCentre);
 
@@ -342,23 +357,23 @@ export class Svg {
     private handlerMouseUp(e: MouseEvent) {
         this.updateZoom();
         this.mouse.target = e.target;
-        this.mouse.end = this.getPosZoom(new Point(e.clientX, e.clientY).add(this.off));
+        this.mouse.end = this.getPosZoom(new Point(e.offsetX, e.offsetY));
 
-        const {x, y, width, height} = (e.target as Element).getBoundingClientRect();
+        //считаем центр target
+        const {x, y, width, height} = this.getBox(e.target);
         const pCentre = new Point(width, height).mul(.5).add(x, y);
         this.mouse.targetUpCentre = this.getPosZoom(pCentre);
 
         this.node.dispatchEvent(new CustomEvent('svgmouseup', {detail: {...this.mouse}}))
-
     }
 
     private handlerMouseMove(e: MouseEvent) {
         this.updateZoom();
         this.mouse.target = e.target;
 
-        if (this.mouse?.__start) this.mouse.start = this.getPosZoom(this.mouse.__start);
+        this.off = new Point(e.clientX - e.offsetX, e.clientY - e.offsetY);
 
-        this.mouse.p = new Point(e.clientX, e.clientY).add(this.off)
+        this.mouse.p = new Point(e.offsetX, e.offsetY)
         if (!this.mouse._p) this.mouse._p = this.mouse.p.clone();
         this.mouse.delta = this.mouse.p.clone().add(this.mouse._p.neg());
         this.mouse._p = this.mouse.p.clone();

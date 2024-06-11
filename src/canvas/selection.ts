@@ -27,7 +27,12 @@ export class Selection {
         return startPoint;
     };
 
-    public getSelected(isDragTarget: boolean, sx: number, sy: number, ex: number, ey: number): Element[] {
+    public getSelected(dragTarget: Element, sx: number, sy: number, ex: number, ey: number): Element[] {
+        if (dragTarget && !dragTarget.classList.contains(NodeSelector.selected)) { // если по не выделенному то
+            this.clearSelection(); //сбраываем все выделение
+            dragTarget.classList.add(NodeSelector.selected);//и выделяем который под курсором
+            return this.arrSelected = [dragTarget];
+        }
         if (!this.selectionRect) return this.arrSelected;
         const [x, y, width, height] = [Math.min(sx, ex), Math.min(sy, ey), Math.abs(ex - sx), Math.abs(ey - sy)];
 
@@ -43,7 +48,7 @@ export class Selection {
             if (rect.x <= x + nw && rect.x + rect.width >= x && rect.y <= y + nh && rect.y + rect.height >= y) {
                 if (!node.classList.contains(NodeSelector.selected)) node.classList.add(NodeSelector.selected);
             } else {
-                if (!isDragTarget) node.classList.remove(NodeSelector.selected);
+                if (!dragTarget) node.classList.remove(NodeSelector.selected);
             }
         });
         this.arrSelected = Array.from(this.svgNode.querySelectorAll('.selected'));
