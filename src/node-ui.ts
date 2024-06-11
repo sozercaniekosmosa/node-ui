@@ -1,4 +1,4 @@
-import {CanvasNodeUi, ObjectState} from "./canvas/canvas.js";
+import {CanvasNodeUi, NodeSelector} from "./canvas/canvas.js";
 import {Svg} from "./svg.js";
 import {getID} from "./utils.js";
 
@@ -40,20 +40,20 @@ class NodeUI {
         const fillNode: string = '#d7d7d7';
         const stroke: string = '#25334b';
 
-        const nodeGroup = this.svg.group({x, y, class: ObjectState.node, data: {type}});
-        const rect = this.svg.rectangle({
+        const nodeGroup = this.svg.group({x, y, class: NodeSelector.node, data: {type}});
+        const nodeRect = this.svg.rectangle({
             x: 0, y: 0, width, height, rx,
             stroke, fill: fillNode,
             to: nodeGroup,
-            class: ObjectState.handle
+            class: NodeSelector.handle
         });
-        rect.id = id;
+        nodeRect.id = id;
 
         for (let i = 0, offY = 0; i < quantIn; i++, offY += r * 2 + step) {
             this.svg.circle(
                 {
                     cx: inX, cy: inY + offY, r, stroke, fill: fillIn,
-                    to: nodeGroup, class: [ObjectState.pinIn],
+                    to: nodeGroup, class: [NodeSelector.pinIn],
                     id: getID()
                 });
         }
@@ -61,7 +61,7 @@ class NodeUI {
             this.svg.circle(
                 {
                     cx: outX, cy: outY + offY, r, stroke, fill: fillOut,
-                    to: nodeGroup, class: [ObjectState.pinOut],
+                    to: nodeGroup, class: [NodeSelector.pinOut],
                     id: getID()
                 });
         }

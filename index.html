@@ -27,12 +27,24 @@
         }
 
         svg {
+            margin: 5px;
             border: 1px solid #222222;
+        }
+
+        .left {
+            width: 100px;
+        }
+
+        .main {
+            display: flex;
         }
     </style>
     <script src="./dist/node-ui.js" type="module" defer></script>
 </head>
 <body>
-<div class="canvas"></div>
+<div class="main">
+    <div class="left"></div>
+    <div class="canvas"></div>
+</div>
 </body>
 </html>

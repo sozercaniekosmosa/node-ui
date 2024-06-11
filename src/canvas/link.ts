@@ -1,12 +1,12 @@
 import {base64to, toBase64} from "../utils.js";
-import {ObjectState} from "./canvas.js";
-import {IPoint, Svg, Point} from "../svg.js";
+import {NodeSelector} from "./canvas.js";
+import {TPoint, Svg, Point, TMouseEvent} from "../svg.js";
 
 export class Link {
 
 
-    public nodeConnectorStart: SVGElement | null = null;
-    private startPos: IPoint | null = null;
+    public nodeStart: SVGElement | null = null;
+    private startPos: TPoint | null = null;
     private nodeLink: SVGElement | null = null;
 
     private nodeUnitDrag: SVGElement | null = null;
@@ -33,96 +33,75 @@ export class Link {
 
     public updateConnection(node: SVGElement) {
 
-        this.svg.updateZoom();
-
-        const arrInNodeDestConn = node.parentElement.querySelectorAll(`.${ObjectState.pinIn}`) as NodeListOf<HTMLElement>;
-        const arrOutNodeDestConn = node.parentElement.querySelectorAll(`.${ObjectState.pinOut}`) as NodeListOf<HTMLElement>;
+        const arrInNodeDestConn = node.parentElement.querySelectorAll(`.${NodeSelector.pinIn}`) as NodeListOf<HTMLElement>;
+        const arrOutNodeDestConn = node.parentElement.querySelectorAll(`.${NodeSelector.pinOut}`) as NodeListOf<HTMLElement>;
 
         [...arrInNodeDestConn, ...arrOutNodeDestConn].forEach(({id, dataset}) => {
             if (dataset.to) {
-                const arrTo = new Set(JSON.parse(dataset.to));
+                // const arrTo = new Set(JSON.parse(dataset.to));
+                const arrTo = new Set(dataset.to.split(' '));
                 arrTo.forEach(idTo => {
                     const [nodeSrcConn, nodeDestConn] = this.svgNode.querySelectorAll(`#${id},#${idTo}`);
                     const nodeLink = this.svgNode.querySelector(`#${id}-${idTo},#${idTo}-${id}`);
 
                     let {x: sx, y: sy, width: sw, height: sh} = nodeSrcConn.getBoundingClientRect();
-                    const s = this.svg.getPosZoom(sx + sw * .5, sy + sh * .5);
                     let {x: ex, y: ey, width: ew, height: eh} = nodeDestConn.getBoundingClientRect();
-                    const e = this.svg.getPosZoom(ex + ew * .5, ey + eh * .5);
-                    this.svg.updateLink(nodeLink as SVGElement, s.x, s.y, e.x, e.y, {})
+                    const s = this.svg.getPosZoom(new Point(sw, sh).mul(.5).add(sx, sy));
+                    const e = this.svg.getPosZoom(new Point(ew, eh).mul(.5).add(ex, ey));
+                    this.svg.updateLink(nodeLink as SVGElement, s, e)
                 })
             }
         })
     }
 
-    public handlerMouseDown(e: MouseEvent): any {
-        const clickTarget = e.target as SVGElement;
-        this.nodeUnitDrag = clickTarget.parentElement?.querySelector('.' + ObjectState.handle) as SVGElement;
-        if (clickTarget.classList.contains(ObjectState.pinIn) || clickTarget.classList.contains(ObjectState.pinOut)) {
-            e.preventDefault();
-            this.nodeConnectorStart = clickTarget; //запоминаем коннектор
-            const {x, y, width, height} = clickTarget.getBoundingClientRect();
-            this.startPos = new Point(width, height).mul(.5).add(x, y);
-
-            this.svg.updateZoom();
-            const {x: ox, y: oy} = this.svg.getPosZoom(e.clientX, e.clientY)
-            this.nodeLink = this.svg.link(ox, oy, ox, oy, {
-                class: ObjectState.link,
-                strokeLinecap: 'round',
-            })
+    public handlerMouseDown({p, target, targetDownCentre: c}: TMouseEvent): any {
+        const clickTarget = target as SVGElement;
+        this.nodeUnitDrag = clickTarget.parentElement?.querySelector('.' + NodeSelector.handle) as SVGElement;
+        if (clickTarget.classList.contains(NodeSelector.pinIn) || clickTarget.classList.contains(NodeSelector.pinOut)) {
+            this.nodeStart = clickTarget; //запоминаем коннектор
+            this.nodeLink = this.svg.link(c.x, c.y, c.x, c.y, {class: NodeSelector.link, strokeLinecap: 'round',})
         }
     }
 
-    public handlerMouseMove(e: MouseEvent): any {
-        if (this.nodeConnectorStart) {
-            this.svg.updateZoom();
-
-            var {x, y} = this.startPos as IPoint;
-            var {x: ax, y: ay} = this.svg.getPosZoom(x, y);
-            var {x: bx, y: by} = this.svg.getPosZoom(e.clientX, e.clientY);
-
-            this.svg.updateLink(this.nodeLink as SVGElement, ax, ay, bx, by, {})
+    public handlerMouseMove({p, start: s, targetDownCentre: c}: TMouseEvent): any {
+        if (this.nodeStart) {
+            this.svg.updateLink(this.nodeLink as SVGElement, c, p)
         } else if (this.nodeUnitDrag) {
             this.updateConnection(this.nodeUnitDrag)
         }
     }
 
-    public handlerMouseUp(e: MouseEvent): any {
+    public handlerMouseUp({target, targetDownCentre: sc, targetUpCentre: ec}: TMouseEvent): any {
 
-        if (!this.nodeConnectorStart) return;
+        if (!this.nodeStart) return;
 
-        const clickTarget = e.target as SVGElement;
+        const clickTarget = target as SVGElement;
 
-        const isEndOut = clickTarget.classList.contains(ObjectState.pinOut);
-        const isEndIn = clickTarget.classList.contains(ObjectState.pinIn);
-        const isStartIn = this.nodeConnectorStart.classList.contains(ObjectState.pinIn);
-        const isStartOut = this.nodeConnectorStart.classList.contains(ObjectState.pinOut);
+        const isEndOut = clickTarget.classList.contains(NodeSelector.pinOut);
+        const isEndIn = clickTarget.classList.contains(NodeSelector.pinIn);
+        const isStartIn = this.nodeStart.classList.contains(NodeSelector.pinIn);
+        const isStartOut = this.nodeStart.classList.contains(NodeSelector.pinOut);
 
         if ((isStartIn && isEndOut) || (isStartOut && isEndIn)) { // подключение к пину
-            e.preventDefault();
 
-            this.svg.updateZoom();
-            const nodeConnectorEnd = clickTarget;
-            const {x, y, width, height} = clickTarget.getBoundingClientRect();
-            const {x: sx, y: sy} = this.svg.getPosZoom(this.startPos.x, this.startPos.y)
-            const {x: ex, y: ey} = this.svg.getPosZoom(x + width * .5, y + height * .5)
-            this.svg.updateLink(this.nodeLink as SVGElement, sx, sy, ex, ey, {})
+            const nodeEnd = clickTarget;
+            this.svg.updateLink(this.nodeLink as SVGElement, sc, ec)
 
-            const setEndTo = new Set(nodeConnectorEnd.dataset?.to ? JSON.parse(nodeConnectorEnd?.dataset.to) : []);
-            setEndTo.add(this.nodeConnectorStart.id)
-            nodeConnectorEnd.dataset.to = JSON.stringify([...setEndTo]);
+            const setEndTo = new Set(nodeEnd.dataset?.to ? nodeEnd?.dataset.to.split(' ') : []);
+            setEndTo.add(this.nodeStart.id)
+            nodeEnd.dataset.to = [...setEndTo].join(' ');
 
-            const setStartTo = new Set(this.nodeConnectorStart.dataset?.to ? JSON.parse(this.nodeConnectorStart?.dataset.to) : []);
-            setStartTo.add(nodeConnectorEnd.id)
-            this.nodeConnectorStart.dataset.to = JSON.stringify([...setStartTo]);
+            const setStartTo = new Set(this.nodeStart.dataset?.to ? this.nodeStart?.dataset.to.split(' ') : []);
+            setStartTo.add(nodeEnd.id)
+            this.nodeStart.dataset.to = [...setStartTo].join(' ');
 
-            this.nodeLink.id = clickTarget.classList.contains(ObjectState.pinIn) ? this.nodeConnectorStart.id + '-' + nodeConnectorEnd.id : nodeConnectorEnd.id + '-' + this.nodeConnectorStart.id;
+            this.nodeLink.id = clickTarget.classList.contains(NodeSelector.pinIn) ? this.nodeStart.id + '-' + nodeEnd.id : nodeEnd.id + '-' + this.nodeStart.id;
 
         } else {
             this.removeConnection(this.nodeLink)
         }
         this.nodeLink = null;
-        this.nodeConnectorStart = null;
+        this.nodeStart = null;
         this.nodeUnitDrag = null;
     }
 }

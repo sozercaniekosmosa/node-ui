@@ -1,4 +1,4 @@
-import {IPoint, Svg, Point} from "../svg.js";
+import {TPoint, Svg, Point, TMouseEvent} from "../svg.js";
 import {Selection} from "./selection.js";
 import {Link} from "./link.js";
 
@@ -9,11 +9,10 @@ export type TViewBox = {
     width: number
 }
 
-export const ObjectState = {
+export const NodeSelector = {
     selected: 'selected',
     node: 'node',
     handle: 'handle',
-    rect: 'rect',
     link: 'link',
     pinIn: 'pin-in',
     pinOut: 'pin-out',
@@ -31,7 +30,7 @@ export class CanvasNodeUi {
     private clickTarget: Element | boolean = false;
 
     private arrSelected: Element[] = [];
-    private _pos: IPoint | false = false;
+    private _pos: TPoint | false = false;
     private pos: Point = new Point({x: 0, y: 0});
     private deltaPos: Point = new Point({x: 0, y: 0});
     private selection: Selection;
@@ -42,7 +41,7 @@ export class CanvasNodeUi {
         this.svgNode = this.svg.node
         this.createNodeUICanvas();
         this.selection = new Selection(this.svg);
-        this.link = new Link(this.svg)
+        this.link = new Link(this.svg);
     }
 
     private createNodeUICanvas() {
@@ -56,10 +55,9 @@ export class CanvasNodeUi {
 
         document.addEventListener('keydown', e => this.handlerKeyDown(e));
         document.addEventListener('keyup', e => this.handlerKeyUp(e));
-        this.svgNode.addEventListener('wheel', e => this.handlerMouseWheel(e));
-        this.svgNode.addEventListener('mousedown', e => this.handlerMouseDown(e));
-        this.svgNode.addEventListener('mouseup', (e) => this.handlerMouseUp(e));
-        this.svgNode.addEventListener('mousemove', e => this.handlerMouseMove(e));
+        this.svgNode.addEventListener('svgmousedown', (e: CustomEventInit) => this.handlerMouseDown(e.detail));
+        this.svgNode.addEventListener('svgmouseup', (e: CustomEventInit) => this.handlerMouseUp(e.detail));
+        this.svgNode.addEventListener('svgmousemove', (e: CustomEventInit) => this.handlerMouseMove(e.detail));
     }
 
     private handlerKeyUp(e: KeyboardEvent) {
@@ -74,86 +72,53 @@ export class CanvasNodeUi {
         }
     }
 
-
-    private handlerMouseUp(e) {
+    private handlerMouseUp(e: TMouseEvent) {
         this.link.handlerMouseUp(e);
-        this.selection.clearSelection();
+        this.selection.clearRectSelection();
         this.isPanning = false;
         this.dragTarget = false;
-    };
+    }
 
+    private handlerMouseDown(e: TMouseEvent) {
+        const {delta: d, start: s, p, target} = e;
 
-    private handlerMouseWheel(e: WheelEvent) {
-        e.preventDefault();
-        const zoomFactor = 1.3;
-        const {offsetX, offsetY, deltaY} = e;
-
-        const offset = new Point(offsetX, offsetY);
-        const zoomDirection = deltaY < 0 ? 1 / zoomFactor : zoomFactor;
-        let {x, width, y, height} = this.svg.getView()
-        const mp = new Point(offset.x, offset.y).mul(1 / this.svgNode.clientWidth, 1 / this.svgNode.clientHeight).mul(width, height).add(x, y)
-        width *= zoomDirection;
-        height *= zoomDirection;
-        x = mp.x - (offsetX / this.svgNode.clientWidth) * width;
-        y = mp.y - (offsetY / this.svgNode.clientHeight) * height;
-        this.svg.setView(x, y, width, height)
-    };
-
-    private handlerMouseDown(e: MouseEvent) {
-        this.clickTarget = (e.target as Element);
-        const target = this.clickTarget.closest('.' + ObjectState.node);
-        const isHandle = this.clickTarget.classList.contains(ObjectState.handle);
-        const isSvg = e.target === this.svgNode;
+        this.clickTarget = (target as Element);
+        const targetDown = this.clickTarget.closest('.' + NodeSelector.node);
+        const isHandle = this.clickTarget.classList.contains(NodeSelector.handle);
+        const isSvg = target === this.svgNode;
 
         this.link.handlerMouseDown(e);
 
         if (this.isPressSpace) { //pan
             this.isPanning = true;
-        } else if (target && isHandle) { //select
-            this.dragTarget = target;
-            this.mouseDownPoint = this.selection.startSelection(e.clientX, e.clientY);
-            if (!this.dragTarget.classList.contains(ObjectState.selected)) {
-                this.arrSelected.forEach(el => el.classList.remove(ObjectState.selected));
-                this.arrSelected = [];
-            }
-            this.arrSelected = this.getSelection(e);
+        } else if (targetDown && isHandle) { //select
+            this.dragTarget = targetDown;
+            this.mouseDownPoint = this.selection.startSelection(p.x, p.y);
+            if (!this.dragTarget.classList.contains(NodeSelector.selected)) this.selection.clearSelection();
+            this.arrSelected = this.selection.getSelected(Boolean(this.dragTarget), s.x, s.y, p.x, p.y);
         } else if (isSvg) {//reset|new selection
-            this.mouseDownPoint = this.selection.startSelection(e.clientX, e.clientY);
-            this.arrSelected.forEach(el => el.classList.remove(ObjectState.selected));
-            this.arrSelected = [];
+            this.mouseDownPoint = this.selection.startSelection(p.x, p.y);
+            this.selection.clearSelection();
         }
 
-        this.mouseDownPoint = new Point({x: e.clientX, y: e.clientY});
-    };
+        this.mouseDownPoint = p;
+    }
 
-    private handlerMouseMove(e: MouseEvent) {
-
-        if (!this._pos) this._pos = {x: e.clientX, y: e.clientY};
-        this.pos = this.pos.set({x: e.clientX, y: e.clientY});
-        this.deltaPos = this.pos.clone().add(-this._pos.x, -this._pos.y);
-        this._pos = this.pos.point();
-
-        let {x, y, width, height} = this.svg.getView()
-        let {x: dx, y: dy} = this.deltaPos.mul(width / this.svg.width, height / this.svg.height)
+    private handlerMouseMove(e: TMouseEvent) {
+        const {delta: d, start: s, p} = e;
+        let {x: vx, y: vy, width: vw, height: vh} = this.svg.getView();
+        let {x: dx, y: dy} = d.mul(vw / this.svg.width, vh / this.svg.height)
 
         if (this.isPanning && this.isPressSpace) { //paning
-            this.svg.setView(x - dx, y - dy, width, height)
+            this.svg.setView(vx - dx, vy - dy, vw, vh)
         } else if (this.dragTarget) {//drag node
             this.arrSelected.forEach(node => {
-                // if (node.tagName !== 'g') return
-                let {x, y} = this.svg.getTranformPos(node as SVGElement);
+                let {x, y} = this.svg.getTransformPoint(node as SVGElement);
                 node.setAttribute('transform', `translate(${x + dx},${y + dy})`);
             })
         } else {
-            this.arrSelected = this.getSelection(e);
+            this.arrSelected = this.selection.getSelected(Boolean(this.dragTarget), s.x, s.y, p.x, p.y);
         }
         this.link.handlerMouseMove(e);
-    };
-
-    private getSelection(e: MouseEvent) {
-        this.svg.updateZoom();
-        let {x: startX, y: startY} = this.svg.getPosZoom(this.mouseDownPoint.x, this.mouseDownPoint.y);
-        let {x: endX, y: endY} = this.svg.getPosZoom(e.clientX, e.clientY);
-        return this.selection.updateSelection(Boolean(this.dragTarget), startX, startY, endX, endY);
     }
 }
