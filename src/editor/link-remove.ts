@@ -1,0 +1,88 @@
+import {Point, Svg, TMouseEvent} from "../svg.js";
+import {NodeSelector, NodeUI} from "../node-ui.js";
+
+export class LinkRemove {
+
+    public nodeStart: SVGElement | null = null;
+    private nodeRemove: SVGElement | null = null;
+    private readonly svg: SVGElement;
+
+    constructor(private nu: NodeUI) {
+        this.svg = nu.svg;
+
+        this.svg.addEventListener('svgmousedown', (e: CustomEventInit) => this.handlerMouseDown(e.detail));
+        this.svg.addEventListener('svgmouseup', (e: CustomEventInit) => this.handlerMouseUp(e.detail));
+        this.svg.addEventListener('svgmousemove', (e: CustomEventInit) => this.handlerMouseMove(e.detail));
+        this.svg.addEventListener('dblclick', (e: MouseEvent) => this.handlerDblClick(e));
+    }
+
+    public removeNode(node: SVGElement) {
+        if (node?.id) {
+            const [startConnId, endConnId] = node.id.split('-');
+            const [nodeSrcConn, nodeDestConn] = this.svg.querySelectorAll(`#${startConnId},#${endConnId}`) as NodeListOf<HTMLElement>;
+            let setStart = new Set(nodeSrcConn.dataset.to.split(' '));
+            setStart.delete(endConnId);
+            nodeSrcConn.dataset.to = [...setStart].join(' ');
+
+            let setEnd = new Set(nodeDestConn.dataset.to.split(' '));
+            setEnd.delete(startConnId);
+            nodeDestConn.dataset.to = [...setEnd].join(' ');
+        }
+        node && this.svg.removeChild(node as Element);
+    }
+
+    public handlerMouseDown({p, target}: TMouseEvent): void {
+        if (this.nu.key['altleft']) this.nu.setMode('link-remove');
+        if (!this.nu.isMode('link-remove')) return;
+
+        if (target == this.svg) {
+            this.nodeRemove = this.nu.line(p.x, p.y, p.x, p.y, {class: NodeSelector.linkRemove})
+        }
+    }
+
+    public handlerMouseMove({p, start: s}: TMouseEvent): void {
+        if (!this.nu.key['altleft']) this.nu.resetMode('link-remove');
+        if (!this.nu.isMode('link-remove')) return;
+
+        if (this.nodeRemove) {
+            this.nu.setProperty(this.nodeRemove, {x1: s.x, y1: s.y, x2: p.x, y2: p.y, class: NodeSelector.linkRemove})
+        }
+    }
+
+    public handlerMouseUp({start, end}: TMouseEvent): void {
+
+        if (this.nodeRemove) {
+
+            // получаем все link
+            const arrLink = [...this.svg.querySelectorAll('.' + NodeSelector.link)];
+
+            const lineRemove = [start, end]; //задаем позиции для секущей линии
+
+            //задаем позиции для каждой link
+            const arrLine = arrLink.map((node: any) => [node.getPointAtLength(0), node.getPointAtLength(node.getTotalLength()), node]);
+
+            //перебираем все links ищем пересечение с линией удаления
+            arrLine.forEach(line => this.isIntersectLines(line, lineRemove) && this.removeNode(line[2]));
+            this.removeNode(this.nodeRemove)
+            this.nodeRemove = null;
+        }
+    }
+
+    private isIntersectLines(p1, p2) {
+        const {x: x1, y: y1} = p1[0];
+        const {x: x2, y: y2} = p1[1];
+        const {x: x3, y: y3} = p2[0];
+        const {x: x4, y: y4} = p2[1];
+
+        const orient1 = (x3 - x1) * (y2 - y1) - (x2 - x1) * (y3 - y1);
+        const orient2 = (x4 - x1) * (y2 - y1) - (x2 - x1) * (y4 - y1);
+        const orient3 = (x1 - x3) * (y4 - y3) - (x4 - x3) * (y1 - y3);
+        const orient4 = (x2 - x3) * (y4 - y3) - (x4 - x3) * (y2 - y3);
+
+        return (orient1 * orient2 < 0) && (orient3 * orient4 < 0);
+    }
+
+    private handlerDblClick(e: MouseEvent) {
+        this.removeNode(e.target as SVGElement)
+    }
+}

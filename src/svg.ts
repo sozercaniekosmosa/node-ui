@@ -4,7 +4,8 @@ export type TPoint = {
 }
 
 export type TMouseEvent = {
-    target: EventTarget,
+    button: boolean[],
+    target: EventTarget | Element | SVGElement,
     _p: Point,
     p: Point,
     delta: Point,
@@ -13,6 +14,7 @@ export type TMouseEvent = {
     targetDownCentre: Point,
     targetUpCentre: Point,
     zoomDirection: number,
+    distance: number,
 }
 
 export class Point {
@@ -128,6 +130,10 @@ export class Point {
         }
     }
 
+    len(p?: Point): number {
+        return p ? Math.sqrt(p.x * p.x + p.y * p.y) : Math.sqrt(this.x * this.x + this.y * this.y);
+    }
+
     neg(): Point {
         this.x *= -1;
         this.y *= -1;
@@ -175,7 +181,7 @@ export class Svg {
 
     private viewBox: { x: number; width: number; y: number; height: number };
     private kZoom: Point;
-    public node: SVGElement;
+    public svg: SVGElement;
     private off: Point;
     public width: number;
     public height: number;
@@ -184,34 +190,47 @@ export class Svg {
     private startPoint: Point;
 
     constructor(dest: HTMLElement = document.body) {
-        this.node = this.createSvg({
+        this.svg = this.createSvg({
             width: dest.clientWidth, height: dest.clientHeight, to: dest,
             // shapeRendering: "crispEdges"
         })
+
+        this.setView(0, 0, dest.clientWidth, dest.clientHeight);
+
         this.width = dest.clientWidth;
         this.height = dest.clientHeight;
 
         this.mouse = {
-            _p: new Point(), p: new Point(), start: new Point(), end: new Point(), delta: new Point(),
+            _p: new Point(), p: new Point(), start: new Point(), end: new Point(), delta: new Point(), button: [false, false, false]
         } as TMouseEvent;
 
-        this.node.addEventListener('wheel', e => this.handlerMouseWheel(e));
-        this.node.addEventListener('mousedown', e => this.handlerMouseDown(e));
-        this.node.addEventListener('mouseup', e => this.handlerMouseUp(e));
-        this.node.addEventListener('mousemove', e => this.handlerMouseMove(e));
+        this.svg.addEventListener('wheel', e => this.handlerMouseWheel(e));
+        this.svg.addEventListener('mousedown', e => this.handlerMouseDown(e));
+        this.svg.addEventListener('mouseup', e => this.handlerMouseUp(e));
+        this.svg.addEventListener('mousemove', e => this.handlerMouseMove(e));
     }
 
     /**
      * Получить позицию и размеры node
      * @param node
      */
-    public getBox(node) {
+    private getBox(node) {
         const {x, y, width, height} = node.getBoundingClientRect();
         return {x: x - this.off.x, y: y - this.off.y, width, height};
     }
 
+    /**
+     * Получить центр node
+     * @param nodeSrcConn
+     * @private
+     */
+    public getCentrePos(nodeSrcConn: Element) {
+        var {x, y, width, height} = this.getBox(nodeSrcConn);
+        return this.getPosZoom(new Point(width, height).mul(.5).add(x, y));
+    }
+
     private updateZoom() {
-        const [x, y, width, height] = this.node.getAttribute('viewBox').split(' ').map(it => +it);
+        const [x, y, width, height] = this.svg.getAttribute('viewBox').split(' ').map(it => +it);
         this.viewBox = {x, y, width, height}
         this.kZoom = new Point(+width / this.width, +height / this.height);
     }
@@ -220,33 +239,37 @@ export class Svg {
      * Для пересчета p:Point позиции с учетом zoom
      * @param p
      */
-    getPosZoom(p: Point) {
+    private getPosZoom(p: Point) {
         const vp = new Point(this.viewBox);
         const kz = this.kZoom;
         return new Point(p).mul(kz).add(vp)
     }
 
-    getView() {
-        const [x, y, width, height] = this.node.getAttribute('viewBox').split(' ').map(it => +it);
+    public getView() {
+        const [x, y, width, height] = this.svg.getAttribute('viewBox').split(' ').map(it => +it);
         return {x, y, width, height};
     }
 
-    setView(x, y, width, height) {
-        this.node.setAttribute('viewBox', `${x} ${y} ${width} ${height}`);
+    public setView(x, y, width, height) {
+        this.svg.setAttribute('viewBox', `${x} ${y} ${width} ${height}`);
     }
 
-    camelToKebab(camelCaseString: string): string {
+    public camelToKebab(camelCaseString: string): string {
         return camelCaseString.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
     }
 
-    getTransformPoint(node: SVGElement) {
+    public getTransformPoint(node: SVGElement): Point {
         let transformValue = node.getAttribute('transform');
         let translateValues = transformValue!.match(/translate\(([^)]+)\)/);
         const [x, y] = translateValues ? translateValues[1].split(',').map(Number) : [0, 0];
-        return {x, y};
+        return new Point(x, y);
     }
 
-    setProperty(node: Element, arg: INodeProp) {
+    public setTransformPoint(node: SVGElement, p: Point) {
+        node.setAttribute('transform', `translate(${p.x},${p.y})`);
+    }
+
+    public setProperty(node: Element, arg: INodeProp) {
         Object.entries(arg).forEach(([key, val]) => {
             if (key == 'to') {
                 (val as SVGElement).append(node);
@@ -263,7 +286,7 @@ export class Svg {
     }
 
     private createElement(nameNode: string, prop: INodeProp) {
-        if (!prop?.to) prop.to = this.node;
+        if (!prop?.to) prop.to = this.svg;
         const node = document.createElementNS('http://www.w3.org/2000/svg', nameNode);
         this.setProperty(node, prop);
         return node;
@@ -281,7 +304,6 @@ export class Svg {
 
     public updateLink(nodeSpline: SVGElement, sp: Point, ep: Point, prop?: INodeProp): void;
     public updateLink(nodeSpline: SVGElement, sx: number, sy: number, ex: number, ey: number, prop?: INodeProp): void;
-
     public updateLink(...args: any[]): void {
         let nodeSpline, sx, sy, ex, ey, prop, sp, ep;
         if (typeof args[1] === 'number') {
@@ -295,12 +317,6 @@ export class Svg {
         const path = this.pathCalc(sx, ex, sy, ey);
         this.setProperty(nodeSpline, {...prop, d: path});
     }
-
-    // newLine.setAttribute('id','line2');
-    // newLine.setAttribute('x1','0');
-    // newLine.setAttribute('y1','0');
-    // newLine.setAttribute('x2','200');
-    // newLine.setAttribute('y2','200');
 
     public line(sx: number, sy: number, ex: number, ey: number, prop?: INodeProp): SVGElement {
         return this.createElement('line', {...prop, x1: sx, y1: sy, x2: ex, y2: ey});
@@ -318,7 +334,7 @@ export class Svg {
     }
 
     private handlerMouseWheel(e: WheelEvent) {
-        const zoomFactor = 1.3;
+        const zoomFactor = 1.5;
         const {offsetX, offsetY, deltaY} = e;
 
         const zoomDirection = deltaY < 0 ? 1 / zoomFactor : zoomFactor;
@@ -336,12 +352,13 @@ export class Svg {
 
         if (this?.startPoint) this.mouse.start = this.getPosZoom(this.startPoint); //zoom изменился => обновляем позицию
 
-        this.node.dispatchEvent(new CustomEvent('svgwheel', {detail: {...this.mouse}}))
+        this.svg.dispatchEvent(new CustomEvent('svgwheel', {detail: {...this.mouse}}))
     }
 
     private handlerMouseDown(e: MouseEvent) {
         this.updateZoom();
 
+        this.mouse.button[0] = true;
         this.mouse.target = e.target;
         this.startPoint = new Point(e.offsetX, e.offsetY); //сохраняем позицию что бы обновить её если изменится zoom
         this.mouse.start = this.getPosZoom(this.startPoint);
@@ -351,10 +368,11 @@ export class Svg {
         const pCentre = new Point(width, height).mul(.5).add(x, y);
         this.mouse.targetDownCentre = this.getPosZoom(pCentre);
 
-        this.node.dispatchEvent(new CustomEvent('svgmousedown', {detail: {...this.mouse}}))
+        this.svg.dispatchEvent(new CustomEvent('svgmousedown', {detail: {...this.mouse}}))
     }
 
     private handlerMouseUp(e: MouseEvent) {
+        this.mouse.button[0] = false;
         this.updateZoom();
         this.mouse.target = e.target;
         this.mouse.end = this.getPosZoom(new Point(e.offsetX, e.offsetY));
@@ -364,7 +382,7 @@ export class Svg {
         const pCentre = new Point(width, height).mul(.5).add(x, y);
         this.mouse.targetUpCentre = this.getPosZoom(pCentre);
 
-        this.node.dispatchEvent(new CustomEvent('svgmouseup', {detail: {...this.mouse}}))
+        this.svg.dispatchEvent(new CustomEvent('svgmouseup', {detail: {...this.mouse}}))
     }
 
     private handlerMouseMove(e: MouseEvent) {
@@ -375,11 +393,14 @@ export class Svg {
 
         this.mouse.p = new Point(e.offsetX, e.offsetY)
         if (!this.mouse._p) this.mouse._p = this.mouse.p.clone();
-        this.mouse.delta = this.mouse.p.clone().add(this.mouse._p.neg());
+        // this.mouse.delta = this.mouse.p.clone().add(this.mouse._p.neg());
+        this.mouse.delta = this.mouse.p.clone().add(this.mouse._p.neg()).mul(this.kZoom);
         this.mouse._p = this.mouse.p.clone();
         this.mouse.p = this.getPosZoom(this.mouse.p);
 
-        this.node.dispatchEvent(new CustomEvent('svgmousemove', {detail: {...this.mouse}}))
+        this.mouse.distance = this.mouse.start && this.mouse.button[0] ? this.mouse.start.clone().sub(this.mouse.p).len() : 0;
+
+        this.svg.dispatchEvent(new CustomEvent('svgmousemove', {detail: {...this.mouse}}))
 
     }
 }
