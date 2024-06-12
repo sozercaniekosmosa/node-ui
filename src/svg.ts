@@ -318,10 +318,6 @@ export class Svg {
         this.setProperty(nodeSpline, {...prop, d: path});
     }
 
-    public line(sx: number, sy: number, ex: number, ey: number, prop?: INodeProp): SVGElement {
-        return this.createElement('line', {...prop, x1: sx, y1: sy, x2: ex, y2: ey});
-    }
-
     public link(sx: number, sy: number, ex: number, ey: number, prop?: INodeProp): SVGElement {
         const path = this.pathCalc(sx, ex, sy, ey);
         return this.createElement('path', {...prop, d: path});
@@ -331,6 +327,10 @@ export class Svg {
         const controlPoint1 = {x: sx + (ex - sx) / 3, y: sy};
         const controlPoint2 = {x: ex - (ex - sx) / 3, y: ey};
         return `M${sx} ${sy} C ${controlPoint1.x} ${controlPoint1.y}, ${controlPoint2.x} ${controlPoint2.y}, ${ex} ${ey}`;
+    }
+
+    public line(sx: number, sy: number, ex: number, ey: number, prop?: INodeProp): SVGElement {
+        return this.createElement('line', {...prop, x1: sx, y1: sy, x2: ex, y2: ey});
     }
 
     private handlerMouseWheel(e: WheelEvent) {

@@ -1,10 +1,11 @@
 import {Svg} from "./svg.js";
 import {getID} from "./utils.js";
-import {LinkCreate} from "./editor/link-create.js";
-import {LinkRemove} from "./editor/link-remove.js";
-import {Drag} from "./editor/drag.js";
-import {Selection} from "./editor/selection.js";
-import {Pan} from "./editor/pan.js";
+import {EditorLinkCreate} from "./editor.link-create.js";
+import {EditorLinkRemove} from "./editor.link-remove.js";
+import {EditorDrag} from "./editor.drag.js";
+import {EditorSelection} from "./editor.selection.js";
+import {EditorPan} from "./editor.pan.js";
+import {Calc} from "./calc.js";
 
 export const NodeSelector = {
     selected: 'selected',
@@ -20,33 +21,28 @@ export class NodeUI extends Svg {
     private mode: string = '';
     public key: string[] = [];
 
-    // private width: number = 0;
-    // private height: number = 0;
-
-    // private readonly svg: SVGElement;
-    private selection: Selection;
-    private linkCreate: LinkCreate;
-    private linkRemove: LinkRemove;
-    private drag: Drag;
-    private pan: Pan;
+    private selection: EditorSelection;
+    private linkCreate: EditorLinkCreate;
+    private linkRemove: EditorLinkRemove;
+    private drag: EditorDrag;
+    private pan: EditorPan;
+    private calc: Calc;
 
     constructor(dest: HTMLElement) {
         super(dest);
 
-        this.pan = new Pan(this);
-        this.selection = new Selection(this);
-        this.drag = new Drag(this);
-        this.linkCreate = new LinkCreate(this);
-        this.linkRemove = new LinkRemove(this);
-
+        //building editor
+        this.pan = new EditorPan(this);
+        this.selection = new EditorSelection(this);
+        this.drag = new EditorDrag(this);
+        this.linkCreate = new EditorLinkCreate(this);
+        this.linkRemove = new EditorLinkRemove(this);
 
         document.addEventListener('keydown', e => this.handlerKeyDown(e));
         document.addEventListener('keyup', e => this.handlerKeyUp(e));
 
         //@ts-ignore
         window.removeConnection = this.removeConnection;
-
-        console.log('!!')
     }
 
     public setMode(mode: string): void {
@@ -115,10 +111,10 @@ export class NodeUI extends Svg {
     }
 
     private handlerKeyDown(e: KeyboardEvent) {
-        e.preventDefault();
         this.key[e.code.toLowerCase()] = true;
         if (this.key['escape']) this.resetMode(this.mode);
         // console.log(this.key)
+        if (!this.key['f5']) e.preventDefault();
     }
 
     private handlerKeyUp(e: KeyboardEvent) {
@@ -127,10 +123,15 @@ export class NodeUI extends Svg {
 }
 
 const nui = new NodeUI(document.querySelector('.canvas'))
-nui.createNode(50, 50, 0, 1, 'value')
-nui.createNode(50, 80, 0, 1, 'value')
-nui.createNode(200, 50, 2, 1, 'sum')
+nui.svg.innerHTML = '<g x="50" y="50" class="node" data-node="value" transform="translate(50,50)" id="ufv10Ga"><rect x="0" y="0" width="80" height="24" rx="2" stroke="#25334b" fill="#d7d7d7" class="handle"></rect><circle cx="80" cy="12" r="4" stroke="#25334b" fill="#ffc69a" class="pin-out" id="ufv10Gc" data-to="ufv10Gg"></circle></g><g x="50" y="80" class="node" data-node="value" transform="translate(50,80)" id="ufv10Gd"><rect x="0" y="0" width="80" height="24" rx="2" stroke="#25334b" fill="#d7d7d7" class="handle"></rect><circle cx="80" cy="12" r="4" stroke="#25334b" fill="#ffc69a" class="pin-out" id="ufv10Ge" data-to="ufv10Gh"></circle></g><g x="200" y="50" class="node selected" data-node="sum" transform="translate(161,58)" id="ufv10Gf"><rect x="0" y="0" width="80" height="40" rx="2" stroke="#25334b" fill="#d7d7d7" class="handle"></rect><circle cx="0" cy="12" r="4" stroke="#25334b" fill="#bcffd6" class="pin-in" id="ufv10Gg" data-to="ufv10Gc"></circle><circle cx="0" cy="28" r="4" stroke="#25334b" fill="#bcffd6" class="pin-in" id="ufv10Gh" data-to="ufv10Ge"></circle><circle cx="80" cy="20" r="4" stroke="#25334b" fill="#ffc69a" class="pin-out" id="ufv10Gi"></circle></g><path class="link" stroke-linecap="round" d="M130 62 C 140.33333333333334 62, 150.66666666666666 70, 161 70" id="ufv10Gc-ufv10Gg"></path><path class="link" stroke-linecap="round" d="M130 92 C 140.33333333333334 92, 150.66666666666666 86, 161 86" id="ufv10Ge-ufv10Gh"></path>'
+
+// nui.createNode(50, 50, 0, 1, 'value')
+// nui.createNode(50, 80, 0, 1, 'value')
+// nui.createNode(200, 50, 2, 1, 'sum')
 
 // nui.createNode(50, 150, 0, 1, 'value')
 // nui.createNode(50, 180, 0, 1, 'value')
 // nui.createNode(200, 150, 2, 1, 'sum')
+
+let btnRun = document.querySelector('#cmd-run');
+new Calc(nui, btnRun);

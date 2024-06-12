@@ -1,7 +1,7 @@
-import {Svg, TMouseEvent} from "../svg.js";
-import {NodeUI} from "../node-ui.js";
+import {Svg, TMouseEvent} from "./svg.js";
+import {NodeUI} from "./node-ui.js";
 
-export class Pan {
+export class EditorPan {
     private readonly svg: SVGElement;
     private dragTarget: SVGElement | Element | null = null;
     private arrSelected: SVGElement[] | null = null;

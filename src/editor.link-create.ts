@@ -1,7 +1,7 @@
-import {Point, Svg, TMouseEvent} from "../svg.js";
-import {NodeSelector, NodeUI} from "../node-ui.js";
+import {Point, Svg, TMouseEvent} from "./svg.js";
+import {NodeSelector, NodeUI} from "./node-ui.js";
 
-export class LinkCreate {
+export class EditorLinkCreate {
 
 
     public nodeStart: SVGElement | null = null;
