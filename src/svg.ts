@@ -167,6 +167,7 @@ export interface INodeProp {
     stroke?: string,
     strokeDasharray?: string,
     strokeWidth?: number,
+    opacity?: number,
     d?: string,
     transform?: string,
     to?: Element,
@@ -175,6 +176,7 @@ export interface INodeProp {
     id?: string,
     strokeLinecap?: string,
     shapeRendering?: string,
+    text?: string,
 }
 
 export class Svg {
@@ -188,6 +190,7 @@ export class Svg {
 
     private readonly mouse: TMouseEvent;
     private startPoint: Point;
+    private tempNodeForWidthText: SVGGraphicsElement;
 
     constructor(dest: HTMLElement = document.body) {
         this.svg = this.createSvg({
@@ -201,7 +204,12 @@ export class Svg {
         this.height = dest.clientHeight;
 
         this.mouse = {
-            _p: new Point(), p: new Point(), start: new Point(), end: new Point(), delta: new Point(), button: [false, false, false]
+            _p: new Point(),
+            p: new Point(),
+            start: new Point(),
+            end: new Point(),
+            delta: new Point(),
+            button: [false, false, false]
         } as TMouseEvent;
 
         this.svg.addEventListener('wheel', e => this.handlerMouseWheel(e));
@@ -269,12 +277,14 @@ export class Svg {
         node.setAttribute('transform', `translate(${p.x},${p.y})`);
     }
 
-    public setProperty(node: Element, arg: INodeProp) {
+    public setProperty(node: Element, arg: INodeProp): Element {
         Object.entries(arg).forEach(([key, val]) => {
             if (key == 'to') {
                 (val as SVGElement).append(node);
             } else if (key == 'data') {
                 Object.entries(val).forEach(([k, v]) => (node as HTMLElement).dataset[k] = String(v));
+            } else if (key == 'text') {
+                node.textContent = val;
             } else if (key == 'id') {
                 node.id = val;
             } else if (key == 'class') {
@@ -283,6 +293,7 @@ export class Svg {
                 node.setAttribute(this.camelToKebab(key), val)
             }
         });
+        return node;
     }
 
     private createElement(nameNode: string, prop: INodeProp) {
@@ -293,7 +304,15 @@ export class Svg {
     }
 
     private createSvg = (prop: INodeProp): SVGElement => this.createElement('svg', prop);
-    private createText = (prop: INodeProp): SVGElement => this.createElement('svg', prop);
+    public text = (prop: INodeProp): SVGElement => this.createElement('text', prop);
+
+    public calculateTextWidth(text, css) {
+        // Создаем текстовый элемент и добавляем его в SVG
+        let prop = {x: 0, y: 0, class: css, text, opacity: 0};
+        this.tempNodeForWidthText = (this.tempNodeForWidthText ? this.setProperty(this.tempNodeForWidthText, prop) : this.text(prop)) as SVGGraphicsElement
+        return this.tempNodeForWidthText.getBBox().width;
+    }
+
     public circle = (prop: INodeProp): SVGElement | SVGGraphicsElement => this.createElement('circle', prop);
     public rectangle = (prop: INodeProp): SVGElement | SVGGraphicsElement => this.createElement('rect', prop);
 

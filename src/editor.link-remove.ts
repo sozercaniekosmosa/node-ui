@@ -13,7 +13,7 @@ export class EditorLinkRemove {
         this.svg.addEventListener('svgmousedown', (e: CustomEventInit) => this.handlerMouseDown(e.detail));
         this.svg.addEventListener('svgmouseup', (e: CustomEventInit) => this.handlerMouseUp(e.detail));
         this.svg.addEventListener('svgmousemove', (e: CustomEventInit) => this.handlerMouseMove(e.detail));
-        this.svg.addEventListener('dblclick', (e: MouseEvent) => this.handlerDblClick(e));
+        // this.svg.addEventListener('dblclick', (e: MouseEvent) => this.handlerDblClick(e));
     }
 
     public removeNode(node: SVGElement) {
@@ -82,7 +82,7 @@ export class EditorLinkRemove {
         return (orient1 * orient2 < 0) && (orient3 * orient4 < 0);
     }
 
-    private handlerDblClick(e: MouseEvent) {
-        this.removeNode(e.target as SVGElement)
-    }
+    // private handlerDblClick(e: MouseEvent) {
+    //     this.removeNode(e.target as SVGElement)
+    // }
 }
