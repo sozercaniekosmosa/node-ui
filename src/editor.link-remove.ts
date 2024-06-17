@@ -13,13 +13,13 @@ export class EditorLinkRemove {
         this.svg.addEventListener('svgmousedown', (e: CustomEventInit) => this.handlerMouseDown(e.detail));
         this.svg.addEventListener('svgmouseup', (e: CustomEventInit) => this.handlerMouseUp(e.detail));
         this.svg.addEventListener('svgmousemove', (e: CustomEventInit) => this.handlerMouseMove(e.detail));
-        // this.svg.addEventListener('dblclick', (e: MouseEvent) => this.handlerDblClick(e));
     }
 
     public removeNode(node: SVGElement) {
         if (node?.id) {
             const [startConnId, endConnId] = node.id.split('-');
-            const [nodeSrcConn, nodeDestConn] = this.svg.querySelectorAll(`#${startConnId},#${endConnId}`) as NodeListOf<HTMLElement>;
+            const nodeSrcConn = this.svg.querySelector('#' + startConnId) as HTMLElement;
+            const nodeDestConn = this.svg.querySelector('#' + endConnId) as HTMLElement;
             let setStart = new Set(nodeSrcConn.dataset.to.split(' '));
             setStart.delete(endConnId);
             nodeSrcConn.dataset.to = [...setStart].join(' ');

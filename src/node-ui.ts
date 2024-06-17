@@ -18,11 +18,11 @@ export const NodeSelector = {
     pinText: 'pin-text',
 }
 
-interface INodeParam {
+interface TNodeParam {
     x?: number;
     y?: number;
-    width?: number;
-    node?: string;
+    widthEmpty?: number;
+    nodeName?: string;
     arrIn?: string[];
     arrOut?: string[];
     id?: string;
@@ -58,7 +58,7 @@ export class NodeUI extends Svg {
 
     public setMode(mode: string): void {
         if (this.mode == '') this.mode = mode;
-        console.log(this.mode)
+        // console.log(this.mode)
     }
 
     public isMode(mode: string): boolean {
@@ -69,7 +69,7 @@ export class NodeUI extends Svg {
         if (this.mode == mode) this.mode = '';
     }
 
-    public createNode({x = 50, y = 50, width = 0, node = 'empty', arrIn = [], arrOut = [], id = getID()}: INodeParam) {
+    public createNode({x = 50, y = 50, widthEmpty = 0, nodeName = 'empty', arrIn = [], arrOut = [], id = getID()}: TNodeParam) {
         const quantIn: number = arrIn.length;
         const quantOut: number = arrOut.length;
 
@@ -80,18 +80,21 @@ export class NodeUI extends Svg {
 
         const maxQuant: number = Math.max(quantIn, quantOut);
 
-        let arrWidthIn = arrIn.length ? arrIn.map(it => this.calculateTextWidth(it, NodeSelector.pinText)) : [0];
-        let arrWidthOut = arrOut.length ? arrOut.map(it => this.calculateTextWidth(it, NodeSelector.pinText)) : [0];
+        let arrWidthIn = arrIn.length ? arrIn.map(it => this.calculateTextBox(it, NodeSelector.pinText).width) : [0];
+        let arrWidthOut = arrOut.length ? arrOut.map(it => this.calculateTextBox(it, NodeSelector.pinText).width) : [0];
         const maxWidthIn: number = Math.max(...arrWidthIn)
         const maxWidthOut: number = Math.max(...arrWidthOut)
+        const boxNodeDesc: DOMRect = this.calculateTextBox(nodeName, NodeSelector.pinText)
 
-        console.log(maxWidthIn, maxWidthOut)
-        let maxWidth = maxWidthIn + maxWidthOut + offEdge * 3 + width;
+        // console.log(maxWidthIn, maxWidthOut)
+        const descMarg = 4;
+        const descPad = 2;
+        let width = Math.max(maxWidthIn + maxWidthOut + offEdge * 3 + widthEmpty, boxNodeDesc.width);
         let height = offEdge + maxQuant * (r * 2 + step);
 
         const inX: number = 0;//r + offEdge;
         const inY: number = height * .5 - quantIn * (r * 2 + step) * .5 + step;
-        const outX: number = maxWidth;// - r - offEdge;
+        const outX: number = width;// - r - offEdge;
         const outY: number = height * .5 - quantOut * (r * 2 + step) * .5 + step;
 
         const fillIn: string = '#bcffd6';
@@ -99,9 +102,10 @@ export class NodeUI extends Svg {
         const fillNode: string = '#d7d7d7';
         const stroke: string = '#25334b';
 
-        const nodeGroup = this.group({x, y, class: NodeSelector.node, data: {node}});
-        const nodeRect = this.rectangle({
-            x: 0, y: 0, width: maxWidth, height, rx,
+        const nodeGroup = this.group({x, y, class: NodeSelector.node, data: {node: nodeName}});
+
+        this.rectangle({
+            x: 0, y: 0, width, height, rx,
             stroke, fill: fillNode,
             to: nodeGroup,
             class: NodeSelector.handle
@@ -113,7 +117,7 @@ export class NodeUI extends Svg {
                 {
                     cx: inX, cy: inY + offY, r, stroke, fill: fillIn,
                     to: nodeGroup, class: [NodeSelector.pinIn],
-                    id: getID()
+                    id: getID(), data: {name: arrIn[i]}
                 });
             this.text({
                 x: inX + offEdge, y: inY + offY + 3,
@@ -126,7 +130,7 @@ export class NodeUI extends Svg {
                 {
                     cx: outX, cy: outY + offY, r, stroke, fill: fillOut,
                     to: nodeGroup, class: [NodeSelector.pinOut],
-                    id: getID()
+                    id: getID(), data: {name: arrOut[i]}
                 });
             this.text({
                 x: outX - offEdge - arrWidthOut[i], y: outY + offY + 3,
@@ -134,6 +138,12 @@ export class NodeUI extends Svg {
                 to: nodeGroup, class: [NodeSelector.pinText],
             })
         }
+
+        this.text({
+            x: 0, y: -2,
+            text: nodeName,
+            to: nodeGroup, class: [NodeSelector.pinText],
+        })
     }
 
     private handlerKeyDown(e: KeyboardEvent) {
@@ -152,9 +162,9 @@ const nui = new NodeUI(document.querySelector('.canvas'))
 //language=HTML
 // nui.svg.innerHTML = '<text x="0" y="0" class="pinText" opacity="0">out</text><g x="50" y="50" class="node" data-node="value" transform="translate(50,50)" id="ufFCx6a"><rect x="0" y="0" width="37.0107421875" height="24" rx="2" stroke="#25334b" fill="#d7d7d7" class="handle"></rect><circle cx="37.0107421875" cy="12" r="4" stroke="#25334b" fill="#ffc69a" class="pin-out" id="ufFCx6c" data-to="ufFCx6i"></circle><text x="16" y="15" class="pinText">out</text></g><g x="50" y="80" class="node" data-node="value" transform="translate(50,80)" id="ufFCx6d"><rect x="0" y="0" width="37.0107421875" height="24" rx="2" stroke="#25334b" fill="#d7d7d7" class="handle"></rect><circle cx="37.0107421875" cy="12" r="4" stroke="#25334b" fill="#ffc69a" class="pin-out" id="ufFCx6f" data-to="ufFCx6j"></circle><text x="16" y="15" class="pinText">out</text></g><g x="120" y="50" class="node" data-node="sum" transform="translate(120,50)" id="ufFCx6g"><rect x="0" y="0" width="45.0107421875" height="40" rx="2" stroke="#25334b" fill="#d7d7d7" class="handle"></rect><circle cx="0" cy="12" r="4" stroke="#25334b" fill="#bcffd6" class="pin-in" id="ufFCx6i" data-to="ufFCx6c"></circle><text x="8" y="15" class="pinText">A</text><circle cx="0" cy="28" r="4" stroke="#25334b" fill="#bcffd6" class="pin-in" id="ufFCx6j" data-to="ufFCx6f"></circle><text x="8" y="31" class="pinText">B</text><circle cx="45.0107421875" cy="20" r="4" stroke="#25334b" fill="#ffc69a" class="pin-out" id="ufFCx6k"></circle><text x="24" y="23" class="pinText">out</text></g><path class="link" stroke-linecap="round" d="M87.0107421875 62 C 98.00716145833333 62, 109.00358072916667 62, 120 62" id="ufFCx6c-ufFCx6i"></path><path class="link" stroke-linecap="round" d="M120 78 C 109.00358072916667 78, 98.00716145833333 92, 87.0107421875 92" id="ufFCx6f-ufFCx6j"></path>'
 
-nui.createNode({x: 50, y: 50, node: 'value', arrOut: ['out']})
-nui.createNode({x: 50, y: 80, node: 'value', arrOut: ['out']})
-nui.createNode({x: 120, y: 50, node: 'sum', arrIn: ['A', 'B'], arrOut: ['out']})
+nui.createNode({x: 120, y: 50, nodeName: 'sum', arrIn: ['A', 'B'], arrOut: ['out']})
+nui.createNode({x: 50, y: 50, nodeName: 'value', arrOut: ['out']})
+nui.createNode({x: 50, y: 90, nodeName: 'value', arrOut: ['out']})
 
 // nui.createNode(50, 150, 0, 1, 'value')
 // nui.createNode(50, 180, 0, 1, 'value')

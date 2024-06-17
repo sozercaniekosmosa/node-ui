@@ -193,15 +193,16 @@ export class Svg {
     private tempNodeForWidthText: SVGGraphicsElement;
 
     constructor(dest: HTMLElement = document.body) {
+        let {width, height} = dest.getBoundingClientRect();
         this.svg = this.createSvg({
-            width: dest.clientWidth, height: dest.clientHeight, to: dest,
+            width: width, height: height, to: dest,
             // shapeRendering: "crispEdges"
         })
 
-        this.setView(0, 0, dest.clientWidth, dest.clientHeight);
+        this.setView(0, 0, width, height);
 
-        this.width = dest.clientWidth;
-        this.height = dest.clientHeight;
+        this.width = width;
+        this.height = height;
 
         this.mouse = {
             _p: new Point(),
@@ -306,11 +307,11 @@ export class Svg {
     private createSvg = (prop: INodeProp): SVGElement => this.createElement('svg', prop);
     public text = (prop: INodeProp): SVGElement => this.createElement('text', prop);
 
-    public calculateTextWidth(text, css) {
+    public calculateTextBox(text, css): DOMRect {
         // Создаем текстовый элемент и добавляем его в SVG
         let prop = {x: 0, y: 0, class: css, text, opacity: 0};
         this.tempNodeForWidthText = (this.tempNodeForWidthText ? this.setProperty(this.tempNodeForWidthText, prop) : this.text(prop)) as SVGGraphicsElement
-        return this.tempNodeForWidthText.getBBox().width;
+        return this.tempNodeForWidthText.getBBox();
     }
 
     public circle = (prop: INodeProp): SVGElement | SVGGraphicsElement => this.createElement('circle', prop);
