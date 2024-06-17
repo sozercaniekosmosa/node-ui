@@ -16,25 +16,21 @@
     "rootDir": "./src",
     "moduleResolution": "node",
     "baseUrl": "./src",
-//    "allowJs": true,
-//    "checkJs": false,
+    "allowJs": true,
+    //    "checkJs": false,
     "sourceMap": true,
     "outDir": "./dist",
     "removeComments": true,
-
     "noEmitOnError": true,
-
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-
     "noImplicitAny": false,
-
     "useUnknownInCatchVariables": true,
-    "noUnusedLocals": false, // dev
+    "noUnusedLocals": false,
+    // dev
     "skipLibCheck": true,
-
-//    "declaration": true,
+    //    "declaration": true,
     "allowSyntheticDefaultImports": true,
     "incremental": true,
     "strictNullChecks": false,
@@ -42,8 +38,9 @@
     "noFallthroughCasesInSwitch": false,
     "preserveConstEnums": false
   },
-
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "./dist/**/*",
+    "./tmp/**/*"
   ]
 }
