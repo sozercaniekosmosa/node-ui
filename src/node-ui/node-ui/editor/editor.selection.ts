@@ -1,12 +1,12 @@
-import {INodeProp, TPoint, Svg, Point, TMouseEvent} from "./svg.js";
-import {NodeSelector, NodeUI} from "./node-ui.js";
+import {INodeProp, TPoint, Svg, Point, TMouseEvent} from "../svg";
+import {NodeSelector, NodeUI} from "../index";
 
 export class EditorSelection {
 
     private selectionRect: Element | boolean = false;
-    private svg: SVGElement;
-    private clickTarget: Element;
-    private dragTarget: Element;
+    private readonly svg: SVGElement;
+    private clickTarget: Element | null = null;
+    private dragTarget: Element | null = null;
 
     constructor(private nu: NodeUI) {
         this.svg = nu.svg;

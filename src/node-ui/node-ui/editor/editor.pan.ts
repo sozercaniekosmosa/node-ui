@@ -1,5 +1,5 @@
-import {Svg, TMouseEvent} from "./svg.js";
-import {NodeUI} from "./node-ui.js";
+import {Svg, TMouseEvent} from "../svg";
+import {NodeUI} from "../index";
 
 export class EditorPan {
     private readonly svg: SVGElement;

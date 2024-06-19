@@ -1,5 +1,5 @@
-import {Svg, TMouseEvent} from "./svg.js";
-import {NodeSelector, NodeUI} from "./node-ui.js";
+import {Svg, TMouseEvent} from "../svg";
+import {NodeSelector, NodeUI} from "../index";
 
 export class EditorDrag {
     private readonly svg: SVGElement;
@@ -34,7 +34,7 @@ export class EditorDrag {
         if (!this.nu.isMode('drag')) return;
 
         if (this.dragTarget) {//drag node
-            this.arrSelected.forEach(node => {
+            this.arrSelected?.forEach(node => {
                 var p = this.nu.getTransformPoint(node);
                 this.nu.setTransformPoint(node, p.add(d))
             })

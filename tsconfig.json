@@ -1,46 +1,27 @@
 {
   "compilerOptions": {
-    /* Visit https://aka.ms/tsconfig to read more about this file */
-    "target": "es2021",
+    "target": "ES2015",
     "lib": [
-      "es2020",
-      "DOM.Iterable",
-      "ESNext",
-      "dom"
+      "dom",
+      "dom.iterable",
+      "esnext",
+      "ES2015"
     ],
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "noLib": false,
-    "moduleDetection": "auto",
-    "module": "es2015",
-    "rootDir": "./src",
-    "moduleResolution": "node",
-    "baseUrl": "./src",
     "allowJs": true,
-    //    "checkJs": false,
-    "sourceMap": true,
-    "outDir": "./dist",
-    "removeComments": true,
-    "noEmitOnError": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "noImplicitAny": false,
-    "useUnknownInCatchVariables": true,
-    "noUnusedLocals": false,
-    // dev
     "skipLibCheck": true,
-    //    "declaration": true,
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "incremental": true,
-    "strictNullChecks": false,
-    "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false,
-    "preserveConstEnums": false
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx"
   },
-  "exclude": [
-    "node_modules",
-    "./dist/**/*",
-    "./tmp/**/*"
+  "include": [
+    "src"
   ]
 }

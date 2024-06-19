@@ -1,5 +1,5 @@
-import {Point, Svg, TMouseEvent} from "./svg.js";
-import {NodeSelector, NodeUI} from "./node-ui.js";
+import {Point, Svg, TMouseEvent} from "../svg";
+import {NodeSelector, NodeUI} from "../index";
 
 export class EditorLinkRemove {
 
@@ -20,11 +20,11 @@ export class EditorLinkRemove {
             const [startConnId, endConnId] = node.id.split('-');
             const nodeSrcConn = this.svg.querySelector('#' + startConnId) as HTMLElement;
             const nodeDestConn = this.svg.querySelector('#' + endConnId) as HTMLElement;
-            let setStart = new Set(nodeSrcConn.dataset.to.split(' '));
+            let setStart = new Set(nodeSrcConn.dataset.to?.split(' '));
             setStart.delete(endConnId);
             nodeSrcConn.dataset.to = [...setStart].join(' ');
 
-            let setEnd = new Set(nodeDestConn.dataset.to.split(' '));
+            let setEnd = new Set(nodeDestConn.dataset.to?.split(' '));
             setEnd.delete(startConnId);
             nodeDestConn.dataset.to = [...setEnd].join(' ');
         }
@@ -68,7 +68,7 @@ export class EditorLinkRemove {
         }
     }
 
-    private isIntersectLines(p1, p2) {
+    private isIntersectLines(p1:any, p2:any) {
         const {x: x1, y: y1} = p1[0];
         const {x: x2, y: y2} = p1[1];
         const {x: x3, y: y3} = p2[0];

@@ -1,5 +1,5 @@
-import {Point, Svg, TMouseEvent} from "./svg.js";
-import {NodeSelector, NodeUI} from "./node-ui.js";
+import {Point, Svg, TMouseEvent} from "../svg";
+import {NodeSelector, NodeUI} from "../index";
 
 export class EditorLinkCreate {
 
@@ -21,12 +21,13 @@ export class EditorLinkCreate {
     public removeNode(node: SVGElement) {
         if (node?.id) {
             const [startConnId, endConnId] = node.id.split('-');
-            const [nodeSrcConn, nodeDestConn] = this.svg.querySelectorAll(`#${startConnId},#${endConnId}`) as NodeListOf<HTMLElement>;
-            let setStart = new Set(nodeSrcConn.dataset.to.split(' '));
+            const nodeSrcConn = this.svg.querySelector('#' + startConnId) as HTMLElement;
+            const nodeDestConn = this.svg.querySelector('#' + endConnId) as HTMLElement;
+            let setStart = new Set(nodeSrcConn.dataset.to?.split(' '));
             setStart.delete(endConnId);
             nodeSrcConn.dataset.to = [...setStart].join(' ');
 
-            let setEnd = new Set(nodeDestConn.dataset.to.split(' '));
+            let setEnd = new Set(nodeDestConn.dataset.to?.split(' '));
             setEnd.delete(startConnId);
             nodeDestConn.dataset.to = [...setEnd].join(' ');
         }
@@ -100,10 +101,10 @@ export class EditorLinkCreate {
             setStartTo.add(nodeEnd.id)
             this.nodeStart.dataset.to = [...setStartTo].join(' ');
 
-            this.nodeLink.id = idLink;
+            this.nodeLink!.id = idLink;
 
         } else {
-            this.removeNode(this.nodeLink);
+            this.removeNode(this.nodeLink as SVGElement);
         }
         this.nodeLink = null;
         this.nodeStart = null;

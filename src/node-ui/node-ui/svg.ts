@@ -5,7 +5,7 @@ export type TPoint = {
 
 export type TMouseEvent = {
     button: boolean[],
-    target: EventTarget | Element | SVGElement,
+    target: EventTarget | Element | SVGElement | null,
     _p: Point,
     p: Point,
     delta: Point,
@@ -179,18 +179,20 @@ export interface INodeProp {
     text?: string,
 }
 
+type TViewBox = { x: number; width: number; y: number; height: number };
+
 export class Svg {
 
-    private viewBox: { x: number; width: number; y: number; height: number };
-    private kZoom: Point;
+    private viewBox: TViewBox | null = null;
+    private kZoom: Point | null = null;
     public svg: SVGElement;
-    private off: Point;
+    private off: Point | null = null;
     public width: number;
     public height: number;
 
     private readonly mouse: TMouseEvent;
-    private startPoint: Point;
-    private tempNodeForWidthText: SVGGraphicsElement;
+    private startPoint: Point | null = null;
+    private tempNodeForWidthText: SVGGraphicsElement | null = null;
 
     constructor(dest: HTMLElement = document.body) {
         let {width, height} = dest.getBoundingClientRect();
@@ -223,9 +225,9 @@ export class Svg {
      * Получить позицию и размеры node
      * @param node
      */
-    private getBox(node) {
+    private getBox(node: Element) {
         const {x, y, width, height} = node.getBoundingClientRect();
-        return {x: x - this.off.x, y: y - this.off.y, width, height};
+        return {x: x - this.off!.x, y: y - this.off!.y, width, height};
     }
 
     /**
@@ -239,7 +241,7 @@ export class Svg {
     }
 
     private updateZoom() {
-        const [x, y, width, height] = this.svg.getAttribute('viewBox').split(' ').map(it => +it);
+        const [x, y, width, height] = this.svg.getAttribute('viewBox')!.split(' ').map(it => +it);
         this.viewBox = {x, y, width, height}
         this.kZoom = new Point(+width / this.width, +height / this.height);
     }
@@ -249,17 +251,16 @@ export class Svg {
      * @param p
      */
     private getPosZoom(p: Point) {
-        const vp = new Point(this.viewBox);
-        const kz = this.kZoom;
-        return new Point(p).mul(kz).add(vp)
+        const vp = new Point(this.viewBox!.x, this!.viewBox!.y);
+        return new Point(p).mul(this.kZoom!).add(vp)
     }
 
     public getView() {
-        const [x, y, width, height] = this.svg.getAttribute('viewBox').split(' ').map(it => +it);
+        const [x, y, width, height] = this.svg.getAttribute('viewBox')!.split(' ').map(it => +it);
         return {x, y, width, height};
     }
 
-    public setView(x, y, width, height) {
+    public setView(x: number, y: number, width: number, height: number) {
         this.svg.setAttribute('viewBox', `${x} ${y} ${width} ${height}`);
     }
 
@@ -307,7 +308,7 @@ export class Svg {
     private createSvg = (prop: INodeProp): SVGElement => this.createElement('svg', prop);
     public text = (prop: INodeProp): SVGElement => this.createElement('text', prop);
 
-    public calculateTextBox(text, css): DOMRect {
+    public calculateTextBox(text: string, css: string): DOMRect {
         // Создаем текстовый элемент и добавляем его в SVG
         let prop = {x: 0, y: 0, class: css, text, opacity: 0};
         this.tempNodeForWidthText = (this.tempNodeForWidthText ? this.setProperty(this.tempNodeForWidthText, prop) : this.text(prop)) as SVGGraphicsElement
@@ -343,7 +344,7 @@ export class Svg {
         return this.createElement('path', {...prop, d: path});
     }
 
-    private pathCalc(sx, ex, sy, ey) {
+    private pathCalc(sx: number, ex: number, sy: number, ey: number) {
         const controlPoint1 = {x: sx + (ex - sx) / 3, y: sy};
         const controlPoint2 = {x: ex - (ex - sx) / 3, y: ey};
         return `M${sx} ${sy} C ${controlPoint1.x} ${controlPoint1.y}, ${controlPoint2.x} ${controlPoint2.y}, ${ex} ${ey}`;
@@ -384,7 +385,7 @@ export class Svg {
         this.mouse.start = this.getPosZoom(this.startPoint);
 
         //считаем центр target
-        const {x, y, width, height} = this.getBox(e.target);
+        const {x, y, width, height} = this.getBox(e.target as Element);
         const pCentre = new Point(width, height).mul(.5).add(x, y);
         this.mouse.targetDownCentre = this.getPosZoom(pCentre);
 
@@ -398,7 +399,7 @@ export class Svg {
         this.mouse.end = this.getPosZoom(new Point(e.offsetX, e.offsetY));
 
         //считаем центр target
-        const {x, y, width, height} = this.getBox(e.target);
+        const {x, y, width, height} = this.getBox(e.target as Element);
         const pCentre = new Point(width, height).mul(.5).add(x, y);
         this.mouse.targetUpCentre = this.getPosZoom(pCentre);
 
@@ -414,7 +415,7 @@ export class Svg {
         this.mouse.p = new Point(e.offsetX, e.offsetY)
         if (!this.mouse._p) this.mouse._p = this.mouse.p.clone();
         // this.mouse.delta = this.mouse.p.clone().add(this.mouse._p.neg());
-        this.mouse.delta = this.mouse.p.clone().add(this.mouse._p.neg()).mul(this.kZoom);
+        this.mouse.delta = this.mouse.p.clone().add(this.mouse._p.neg()).mul(this.kZoom!);
         this.mouse._p = this.mouse.p.clone();
         this.mouse.p = this.getPosZoom(this.mouse.p);
 
