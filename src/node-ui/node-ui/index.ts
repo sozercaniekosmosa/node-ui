@@ -5,7 +5,6 @@ import {EditorLinkRemove} from "./editor/editor.link-remove";
 import {EditorDrag} from "./editor/editor.drag";
 import {EditorSelection} from "./editor/editor.selection";
 import {EditorPan} from "./editor/editor.pan";
-// import {Calc} from "./calc";
 
 export const NodeSelector = {
     selected: 'selected',
@@ -74,32 +73,29 @@ export class NodeUI extends Svg {
 
     public createNode(
         {x = 50, y = 50, widthEmpty = 0, nodeName = 'empty', arrIn = [], arrOut = [], id = getID()}: TNodeParam) {
-        const quantIn: number = arrIn.length;
-        const quantOut: number = arrOut.length;
+        const numberIn: number = arrIn!.length;
+        const numberOut: number = arrOut!.length;
 
         const r: number = 4;
         const offEdge: number = 8;
         const step: number = 8;
         const rx: number = 2;
 
-        const maxQuant: number = Math.max(quantIn, quantOut);
+        const maxNumber: number = Math.max(numberIn, numberOut);
 
-        let arrWidthIn = arrIn.length ? arrIn.map(it => this.calculateTextBox(it, NodeSelector.pinText).width) : [0];
-        let arrWidthOut = arrOut.length ? arrOut.map(it => this.calculateTextBox(it, NodeSelector.pinText).width) : [0];
+        let arrWidthIn = arrIn?.length ? arrIn.map(it => this.calculateTextBox(it, NodeSelector.pinText).width) : [0];
+        let arrWidthOut = arrOut?.length ? arrOut.map(it => this.calculateTextBox(it, NodeSelector.pinText).width) : [0];
         const maxWidthIn: number = Math.max(...arrWidthIn)
         const maxWidthOut: number = Math.max(...arrWidthOut)
-        const boxNodeDesc: DOMRect = this.calculateTextBox(nodeName, NodeSelector.pinText)
+        const boxNodeDesc: DOMRect = this.calculateTextBox(nodeName!, NodeSelector.pinText)
 
-        // console.log(maxWidthIn, maxWidthOut)
-        const descMarg = 4;
-        const descPad = 2;
         let width = Math.max(maxWidthIn + maxWidthOut + offEdge * 3 + widthEmpty, boxNodeDesc.width);
-        let height = offEdge + maxQuant * (r * 2 + step);
+        let height = offEdge + maxNumber * (r * 2 + step);
 
         const inX: number = 0;//r + offEdge;
-        const inY: number = height * .5 - quantIn * (r * 2 + step) * .5 + step;
+        const inY: number = height * .5 - numberIn * (r * 2 + step) * .5 + step;
         const outX: number = width;// - r - offEdge;
-        const outY: number = height * .5 - quantOut * (r * 2 + step) * .5 + step;
+        const outY: number = height * .5 - numberOut * (r * 2 + step) * .5 + step;
 
         const fillIn: string = '#bcffd6';
         const fillOut: string = '#ffc69a';
@@ -114,31 +110,31 @@ export class NodeUI extends Svg {
             to: nodeGroup,
             class: NodeSelector.handle
         });
-        nodeGroup.id = id;
+        nodeGroup.id = id!;
 
-        for (let i = 0, offY = 0; i < quantIn; i++, offY += r * 2 + step) {
+        for (let i = 0, offY = 0; i < numberIn; i++, offY += r * 2 + step) {
             this.circle(
                 {
                     cx: inX, cy: inY + offY, r, stroke, fill: fillIn,
                     to: nodeGroup, class: [NodeSelector.pinIn],
-                    id: getID(), data: {name: arrIn[i]}
+                    id: getID(), data: {name: arrIn?.[i]}
                 });
             this.text({
                 x: inX + offEdge, y: inY + offY + 3,
-                text: arrIn[i],
+                text: arrIn?.[i],
                 to: nodeGroup, class: [NodeSelector.pinText],
             })
         }
-        for (let i = 0, offY = 0; i < quantOut; i++, offY += r * 2 + step) {
+        for (let i = 0, offY = 0; i < numberOut; i++, offY += r * 2 + step) {
             this.circle(
                 {
                     cx: outX, cy: outY + offY, r, stroke, fill: fillOut,
                     to: nodeGroup, class: [NodeSelector.pinOut],
-                    id: getID(), data: {name: arrOut[i]}
+                    id: getID(), data: {name: arrOut?.[i]}
                 });
             this.text({
                 x: outX - offEdge - arrWidthOut[i], y: outY + offY + 3,
-                text: arrOut[i],
+                text: arrOut?.[i],
                 to: nodeGroup, class: [NodeSelector.pinText],
             })
         }
@@ -156,7 +152,8 @@ export class NodeUI extends Svg {
         this.key[e.code.toLowerCase()] = true;
         if (this.key['escape']) this.resetMode(this.mode);
         // console.log(this.key)
-        if (!this.key['f5']) e.preventDefault();
+        if (this.key['f5'] || this.key['f12']) return
+        e.preventDefault();
     }
 
     private handlerKeyUp(e: KeyboardEvent) {
