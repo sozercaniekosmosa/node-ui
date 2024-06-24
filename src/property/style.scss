@@ -1,14 +1,15 @@
 .property {
 
   position: absolute;
+  top: 0;
   right: 0;
   width: 50vw;
 
+  //noinspection CssInvalidPropertyValue
   height: -webkit-fill-available;
   border: 1px solid gray;
   border-radius: 4px;
-  margin: 1em;
-
+  margin: .7em;
   overflow: auto;
 
   background-color: #fcfcfc;
@@ -18,8 +19,9 @@
     justify-content: space-between;
     align-items: center;
 
-    padding: .2em;
-    //border-bottom: 1px solid rgba(128, 128, 128, 0.5);
+    padding: .2em .4em;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.5);
+    font-size: 0.8em;
   }
 
   &__button {
@@ -39,7 +41,7 @@
   box-sizing: border-box;
   width: 16px;
   height: 16px;
-  padding: 2px;
+  padding: 3px;
 }
 
 .icon {
