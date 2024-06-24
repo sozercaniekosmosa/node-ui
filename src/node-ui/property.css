@@ -1,0 +1,36 @@
+.property {
+  position: absolute;
+  right: 0;
+  width: 50vw;
+  height: -webkit-fill-available;
+  border: 1px solid gray;
+  border-radius: 4px;
+  margin: 1em;
+  overflow: auto;
+  background-color: #fcfcfc;
+}
+.property__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.2em;
+}
+.property__button {
+  padding: 0 0.5em;
+  border: 1px solid gray;
+  border-radius: 4px;
+}
+
+.icon-cross {
+  background-size: cover;
+  background-position: initial;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  padding: 2px;
+  background-image: url("../asset/icon-cross.svg");
+}
+
+/*# sourceMappingURL=property.css.map */

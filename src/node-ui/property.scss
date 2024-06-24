@@ -1,0 +1,51 @@
+.property {
+
+  position: absolute;
+  right: 0;
+  width: 50vw;
+
+  height: -webkit-fill-available;
+  border: 1px solid gray;
+  border-radius: 4px;
+  margin: 1em;
+
+  overflow: auto;
+
+  background-color: #fcfcfc;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: .2em;
+    //border-bottom: 1px solid rgba(128, 128, 128, 0.5);
+  }
+
+  &__button {
+    padding: 0 0.5em;
+    border: 1px solid gray;
+    border-radius: 4px;
+
+  }
+
+}
+
+@mixin icon-init {
+  background-size: cover;
+  background-position: initial;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  padding: 2px;
+}
+
+.icon {
+  &-cross {
+    @include icon-init;
+    background-image: url("../asset/icon-cross.svg");
+  }
+}
+

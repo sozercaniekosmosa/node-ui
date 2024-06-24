@@ -2,6 +2,7 @@ import React, {useEffect, useRef} from 'react';
 import './style.css';
 import {NodeUI as NODEUI} from "./node-ui";
 import {Calc} from "./node-ui/calc";
+import {Property} from "./property";
 
 export default function NodeUI() {
 
@@ -22,7 +23,8 @@ export default function NodeUI() {
 
     }, []);
     return (
-        <div className="App" ref={divRef}>
+        <div className="editor" ref={divRef}>
+            <Property />
         </div>
     );
 }
