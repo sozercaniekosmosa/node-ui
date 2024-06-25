@@ -16,6 +16,15 @@ body {
     height: 100%;
 }
 
+.node{
+    width: inherit;
+    height: inherit;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+}
+
 code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }

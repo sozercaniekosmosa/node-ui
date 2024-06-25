@@ -26,9 +26,11 @@
 
   &__button {
     padding: 0 0.5em;
-    border: 1px solid gray;
+    //border: 1px solid gray;
     border-radius: 4px;
-
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.2);
+    }
   }
 
 }
