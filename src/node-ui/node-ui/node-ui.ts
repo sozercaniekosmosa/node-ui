@@ -1,4 +1,4 @@
-import {Svg} from "./svg";
+import {Point, Svg} from "./svg";
 import {getID} from "./utils";
 import {EditorLinkCreate} from "./editor/editor.link-create";
 import {EditorLinkRemove} from "./editor/editor.link-remove";
@@ -102,7 +102,11 @@ export class NodeUI extends Svg {
         const fillNode: string = '#d7d7d7';
         const stroke: string = '#25334b';
 
+        // this.updateZoom();
+        // const {x: px, y: py} = this.getPosZoom(new Point(x!, y!).sub(this.off!));
+        // const {x: px, y: py} = this.mouse.start;
         const nodeGroup = this.group({x, y, class: NodeSelector.node, data: {node: nodeName}});
+        // const nodeGroup = this.group({x, y, class: NodeSelector.node, data: {node: nodeName}});
 
         this.rectangle({
             x: 0, y: 0, width, height, rx,

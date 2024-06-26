@@ -1,30 +1,33 @@
 import React, {useState} from 'react';
 import ReactDOM from 'react-dom/client';
 import './style.css';
-import NodeUI from './node-ui';
 import {Property} from "./property";
-import {Toolbox} from "./tool-box";
+import {Toolbox} from "./toolbox/toolbox";
+import NODEUI from "./node-ui";
 
 const root = ReactDOM.createRoot(document.querySelector('.root') as HTMLElement);
 
 // root.render(<React.StrictMode><NodeUI/></React.StrictMode>);
 
 function Editor() {
-    const [node, setNode] = useState(null);
-    const [tmpData, seTmpData] = useState(null);
+    const [nodeProp, setNodePropProp] = useState(null);
+    const [nodeDataSelected, setNodeDataSelected] = useState(null);
+    let [reset, setIsReset] = useState(()=>()=>{});
 
     let onDblClick = ({target}) => {
         console.log(target)
-        setNode(target)
+        setNodePropProp(target)
     };
-    let onChosenNode = (data) => {
-        seTmpData(data)
-    };
+
+    let onNodeAdded = () => {
+        setNodeDataSelected(null);
+        reset()
+    }
     return (
         <div className="node " onDoubleClick={onDblClick}>
-            <Toolbox onChosenNode={onChosenNode}/>
-            <NodeUI addNode={tmpData}/>
-            <Property chosenNode={node}/>
+            <Toolbox reset={setIsReset} onNodeSelect={(data) => setNodeDataSelected(data)}/>
+            <NODEUI addNodeToCanvas={nodeDataSelected} onNodeAdded={onNodeAdded}/>
+            <Property chosenNode={nodeProp}/>
         </div>)
 }
 

@@ -1,5 +1,5 @@
 import {INodeProp, TPoint, Svg, Point, TMouseEvent} from "../svg";
-import {NodeSelector, NodeUI} from "../index";
+import {NodeSelector, NodeUI} from "../node-ui";
 
 export class EditorSelection {
 
@@ -26,7 +26,10 @@ export class EditorSelection {
         if (targetDown && isHandle) { //select
             this.dragTarget = targetDown;
             this.startSelection(p);
-            this.getSelected(s.x, s.y, p.x, p.y);
+            if (!targetDown.classList.contains(NodeSelector.selected)) {
+                this.clearSelection();
+                targetDown.classList.add(NodeSelector.selected);
+            }
         } else if (isEmpty) {//reset|new selection
             this.startSelection(p);
             this.clearSelection();

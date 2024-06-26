@@ -1,4 +1,4 @@
-import {NodeSelector, NodeUI} from "./index";
+import {NodeSelector, NodeUI} from "./node-ui";
 
 type TPinsCfgNode = { name: string, id: string, to: string[] }[];
 

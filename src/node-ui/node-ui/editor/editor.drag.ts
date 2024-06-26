@@ -1,5 +1,5 @@
 import {Svg, TMouseEvent} from "../svg";
-import {NodeSelector, NodeUI} from "../index";
+import {NodeSelector, NodeUI} from "../node-ui";
 
 export class EditorDrag {
     private readonly svg: SVGElement;

@@ -186,11 +186,11 @@ export class Svg {
     private viewBox: TViewBox | null = null;
     private kZoom: Point | null = null;
     public svg: SVGElement;
-    private off: Point | null = null;
+    public off: Point | null = new Point();
     public width: number;
     public height: number;
 
-    private readonly mouse: TMouseEvent;
+    protected readonly mouse: TMouseEvent;
     private startPoint: Point | null = null;
     private tempNodeForWidthText: SVGGraphicsElement | null = null;
 
@@ -240,7 +240,7 @@ export class Svg {
         return this.getPosZoom(new Point(width, height).mul(.5).add(x, y));
     }
 
-    private updateZoom() {
+    protected updateZoom() {
         const [x, y, width, height] = this.svg.getAttribute('viewBox')!.split(' ').map(it => +it);
         this.viewBox = {x, y, width, height}
         this.kZoom = new Point(+width / this.width, +height / this.height);
@@ -250,7 +250,7 @@ export class Svg {
      * Для пересчета p:Point позиции с учетом zoom
      * @param p
      */
-    private getPosZoom(p: Point) {
+    protected getPosZoom(p: Point) {
         const vp = new Point(this.viewBox!.x, this!.viewBox!.y);
         return new Point(p).mul(this.kZoom!).add(vp)
     }
@@ -381,6 +381,7 @@ export class Svg {
 
         this.mouse.button[0] = true;
         this.mouse.target = e.target;
+        this.off = new Point(e.clientX - e.offsetX, e.clientY - e.offsetY);
         this.startPoint = new Point(e.offsetX, e.offsetY); //сохраняем позицию что бы обновить её если изменится zoom
         this.mouse.start = this.getPosZoom(this.startPoint);
 

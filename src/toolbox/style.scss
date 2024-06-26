@@ -8,6 +8,7 @@
   //border-radius: 4px;
   //margin: .7em;
   overflow: auto;
+  box-shadow: 0 0 11px -6px rgb(0, 0, 0);
 
   background-color: #fcfcfc;
 
@@ -24,9 +25,9 @@
     }
 
     &--press {
-      //box-shadow: inset 2px 2px 4px 0 #000000;
-      box-shadow: inset 0px 0px 0 1px #0000004f;
-      background-color: rgba(0, 0, 0, 0.3) !important;
+      border: 1px solid black;
+      box-shadow: inset 3px 3px 5px -2px rgba(0,0,0,.8)/*,inset 0px 0px 0 1px rgba(0, 0, 0, 1)*/;
+      background-color: rgba(0, 0, 0, 0.1) !important;
     }
   }
 
