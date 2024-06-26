@@ -4,15 +4,9 @@ import {NodeUI} from "./node-ui/node-ui";
 import {Calc} from "./node-ui/calc";
 import {Point} from "./node-ui/svg";
 
-export default function NODEUI({addNodeToCanvas, onNodeAdded}) {
+export default function Editor({addNodeToCanvas, onNodeAdded}) {
     const nuiRef = useRef<NodeUI | null>(null);
     const divRef = useRef(null);
-
-    useEffect(() => {
-        if (addNodeToCanvas) {
-
-        }
-    }, [addNodeToCanvas])
 
     useEffect(() => {
         const nui = new NodeUI(divRef.current! as HTMLElement)

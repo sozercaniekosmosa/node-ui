@@ -1,18 +1,14 @@
 import "./style.css"
 import React, {useEffect, useState} from "react";
 
-export function Property({chosenNode}) {
+export function Property({setNode}) {
 
     const [arr, setArr] = useState(['Item 1', 'Item 2', 'Item 3']);
 
-    // useEffect(() => {
-    //     console.log(chosenNode)
-    // }, [chosenNode]);
-
-    return(
+    return (
         <div className="property">
             <div className="property__header">
-                <div>Конфигуратор{chosenNode?.nodeName}</div>
+                <div>Конфигуратор{setNode?.nodeName}</div>
                 <div className="property__button icon-cross"></div>
             </div>
             <button onClick={() => {
