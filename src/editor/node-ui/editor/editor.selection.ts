@@ -102,5 +102,4 @@ export class EditorSelection {
         this.svg.removeChild(this.selectionRect as Element);
         this.selectionRect = false;
     }
-
 }

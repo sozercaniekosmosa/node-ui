@@ -284,7 +284,7 @@ export class Svg {
             if (key == 'to') {
                 (val as SVGElement).append(node);
             } else if (key == 'data') {
-                Object.entries(val).forEach(([k, v]) => (node as HTMLElement).dataset[k] = String(v));
+                val && Object.entries(val).forEach(([k, v]) => (node as HTMLElement).dataset[k] = String(v));
             } else if (key == 'text') {
                 node.textContent = val;
             } else if (key == 'id') {

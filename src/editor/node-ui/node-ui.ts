@@ -25,6 +25,7 @@ interface TNodeParam {
     arrIn?: string[];
     arrOut?: string[];
     id?: string;
+    data?: object;
 }
 
 type TKey = Record<string, boolean>;
@@ -72,7 +73,7 @@ export class NodeUI extends Svg {
     }
 
     public createNode(
-        {x = 50, y = 50, widthEmpty = 0, nodeName = 'empty', arrIn = [], arrOut = [], id = getID()}: TNodeParam) {
+        {x = 50, y = 50, widthEmpty = 0, nodeName = 'empty', arrIn = [], arrOut = [], id = getID(), data}: TNodeParam) {
         const numberIn: number = arrIn!.length;
         const numberOut: number = arrOut!.length;
 
@@ -102,17 +103,13 @@ export class NodeUI extends Svg {
         const fillNode: string = '#d7d7d7';
         const stroke: string = '#25334b';
 
-        // this.updateZoom();
-        // const {x: px, y: py} = this.getPosZoom(new Point(x!, y!).sub(this.off!));
-        // const {x: px, y: py} = this.mouse.start;
-        const nodeGroup = this.group({x, y, class: NodeSelector.node, data: {node: nodeName}});
-        // const nodeGroup = this.group({x, y, class: NodeSelector.node, data: {node: nodeName}});
+        const nodeGroup = this.group({x, y, class: NodeSelector.node, data: {node: nodeName, ...data}});
 
         this.rectangle({
             x: 0, y: 0, width, height, rx,
             stroke, fill: fillNode,
             to: nodeGroup,
-            class: NodeSelector.handle
+            class: NodeSelector.handle,
         });
         nodeGroup.id = id!;
 
@@ -152,15 +149,29 @@ export class NodeUI extends Svg {
         return nodeGroup;
     }
 
+    public removeNode(node: Element) {
+        node = node.closest('.' + NodeSelector.node);
+        const arrIn = [...node.querySelectorAll('.pin-in')].map(it => it.id + '-' + it.dataset.to);
+        const arrOut = [...node.querySelectorAll('.pin-out')].map(it => it.id + '-' + it.dataset.to);
+        let arrPath = [...arrIn, ...arrOut];
+        for (let i = 0; i < arrPath.length; i++) {
+            const nodePath = arrPath[i];
+            this.linkRemove.removeNode(nodePath as SVGElement)
+        }
+        this.svg.removeChild(node as Element);
+    }
+
     private handlerKeyDown(e: KeyboardEvent) {
         this.key[e.code.toLowerCase()] = true;
         if (this.key['escape']) this.resetMode(this.mode);
         // console.log(this.key)
         if (this.key['f5'] || this.key['f12']) return
         e.preventDefault();
+        document.dispatchEvent(new CustomEvent('svgkeydown', {detail: {...this.key}}))
     }
 
     private handlerKeyUp(e: KeyboardEvent) {
         this.key[e.code.toLowerCase()] = false;
+        document.dispatchEvent(new CustomEvent('svgkeyup', {detail: {...this.key}}))
     }
 }

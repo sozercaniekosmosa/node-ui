@@ -20,7 +20,8 @@ export function Toolbox({onNodeSelect, getReset}) {
         <div className="toolbox" onMouseDown={onMouseDown}>
             {arrNode.map((it, i) => {
                 return (
-                    <div className={'toolbox__item' + (i == index ? ' toolbox__item--press' : '')} key={i} data-index={i}>
+                    <div className={'toolbox__item' + (i == index ? ' toolbox__item--press' : '')} key={i}
+                         data-index={i}>
                         <div className="toolbox__icon" style={{backgroundImage: it.icon}}></div>
                         <div className="toolbox__desc">{it.name}</div>
                     </div>
@@ -29,6 +30,3 @@ export function Toolbox({onNodeSelect, getReset}) {
         </div>
     )
 }
-
-export const toBase64 = (value: string) => window.btoa(decodeURIComponent((encodeURIComponent(value))));
-export const base64to = (value: string) => window.atob(value);
