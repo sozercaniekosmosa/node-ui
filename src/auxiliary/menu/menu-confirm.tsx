@@ -2,13 +2,13 @@ import {Button} from "../button/button";
 import React, {useEffect, useRef, useState} from "react";
 import "./style.css"
 
-export function MenuConfirm({children, onClickYes, onClickNo, constrolShow}) {
+export function MenuConfirm({children, onClickYes, onClickNo, controlShow}) {
     let refMenu = useRef(null);
 
     const show = (isShow) => refMenu.current.classList[isShow ? 'remove' : 'add']('menu-confirm--hide')
 
     useEffect(() => {
-        constrolShow(() => () => show(true))
+        controlShow && controlShow(() => () => show(true))
     }, [])
 
     return (

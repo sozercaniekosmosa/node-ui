@@ -1,5 +1,8 @@
 .menu {
   border: 1px solid gray;
 }
+.menu, .menu *, .menu * * {
+  user-select: none;
+}
 
 /*# sourceMappingURL=style.css.map */

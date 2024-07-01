@@ -166,7 +166,7 @@ export class NodeUI extends Svg {
         if (this.key['escape']) this.resetMode(this.mode);
         // console.log(this.key)
         if (this.key['f5'] || this.key['f12']) return
-        e.preventDefault();
+        // e.preventDefault();
         document.dispatchEvent(new CustomEvent('svgkeydown', {detail: {...this.key}}))
     }
 

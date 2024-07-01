@@ -8,9 +8,9 @@ export default class {
     inputs = [];
     outputs = ['out'];
     cfg = [
-        ['value', 'number', 0],
-        ['valueA', 'number', 1],
-        ['valueB', 'number', 2],
+        ['value', 'number', 0, 'Значение-0'],
+        ['valueA', 'number', 1, 'Значение-1'],
+        ['valueB', 'number', 2, 'Значение-2'],
     ];
     components = {
         'number': function ({name, val}) {

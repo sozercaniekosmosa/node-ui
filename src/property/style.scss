@@ -1,10 +1,16 @@
+$color-gray: rgba(128, 128, 128, 0.5);
+
 .property {
 
   position: absolute;
   top: 0;
   right: 0;
-  width: 25vw;
+  width: 50vw;
   box-shadow: 0 0 11px -6px rgb(0, 0, 0);
+
+  &, *, * * {
+    user-select: none;
+  }
 
   //noinspection CssInvalidPropertyValue
   height: -webkit-fill-available;
@@ -21,7 +27,64 @@
     align-items: center;
 
     padding: .2em .4em;
-    border-bottom: 1px solid rgba(128, 128, 128, 0.5);
+    border-bottom: 1px solid $color-gray;
     font-size: 0.8em;
+  }
+
+  &__body {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: column;
+    flex-wrap: wrap;
+
+    padding: 1em;
+
+    //border-bottom: 1px solid $color-gray;
+
+    & > * {
+      margin: .2em;
+    }
+  }
+
+  &__node-name {
+    margin: 1em;
+  }
+
+  &__param {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+
+    &__name {
+      min-width: 50px;
+      max-width: 40%;
+      margin-right: 1em;
+    }
+
+    &__number {
+      min-width: 50px;
+      max-width: 40%;
+      //width: 50%;
+    }
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1em;
+
+    & > * {
+      padding: 0.2em 0.5em !important;
+      width: 100% !important;
+      max-width: 20%;
+      min-width: fit-content;
+      margin: 0 0.3em;
+    }
+  }
+
+  &--hide {
+    display: none;
   }
 }
