@@ -19,24 +19,5 @@
   border-bottom: 1px solid rgba(128, 128, 128, 0.5);
   font-size: 0.8em;
 }
-.property__button {
-  padding: 0 0.5em;
-  border-radius: 4px;
-}
-.property__button:hover {
-  background-color: rgba(0, 0, 0, 0.2);
-}
-
-.icon-cross {
-  background-size: cover;
-  background-position: initial;
-  background-repeat: no-repeat;
-  background-origin: content-box;
-  box-sizing: border-box;
-  width: 16px;
-  height: 16px;
-  padding: 3px;
-  background-image: url("../asset/icon-cross.svg");
-}
 
 /*# sourceMappingURL=style.css.map */

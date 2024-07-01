@@ -2,7 +2,7 @@ import "./style.css"
 import React, {useEffect, useState} from "react";
 import {arrNode} from "../nodes/nodes";
 
-export function Menu() {
+export function Header() {
 
     // const [index, setIndex] = useState(-1)
 

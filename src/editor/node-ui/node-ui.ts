@@ -149,16 +149,16 @@ export class NodeUI extends Svg {
         return nodeGroup;
     }
 
-    public removeNode(node: Element) {
-        node = node.closest('.' + NodeSelector.node);
-        const arrIn = [...node.querySelectorAll('.pin-in')].map(it => it.id + '-' + it.dataset.to);
-        const arrOut = [...node.querySelectorAll('.pin-out')].map(it => it.id + '-' + it.dataset.to);
-        let arrPath = [...arrIn, ...arrOut];
-        for (let i = 0; i < arrPath.length; i++) {
-            const nodePath = arrPath[i];
-            this.linkRemove.removeNode(nodePath as SVGElement)
-        }
-        this.svg.removeChild(node as Element);
+    public removeNode() {
+        [...this.svg.querySelectorAll('.' + NodeSelector.selected)].forEach(node => {
+            node = node.closest('.' + NodeSelector.node);
+            const arrIn = [...node.querySelectorAll('.' + NodeSelector.pinIn)].map(it => it.dataset.to + '-' + it.id);
+            const arrOut = [...node.querySelectorAll('.' + NodeSelector.pinOut)].map(it => it.id + '-' + it.dataset.to);
+            let arrPath = [...arrIn, ...arrOut];
+            const ids = '#' + arrPath.join(',#');
+            [...this.svg.querySelectorAll(ids)].forEach(d => this.linkRemove.removeNode(d as SVGElement))
+            this.svg.removeChild(node as Element);
+        })
     }
 
     private handlerKeyDown(e: KeyboardEvent) {

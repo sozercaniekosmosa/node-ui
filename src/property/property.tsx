@@ -1,6 +1,7 @@
 import "./style.css"
 import React, {createElement, useEffect, useState} from "react";
 import {listNode} from "../nodes/nodes";
+import {Button} from "../auxiliary/button/button";
 
 export function Property({setNode}) {
 
@@ -26,7 +27,7 @@ export function Property({setNode}) {
         <div className="property">
             <div className="property__header">
                 <div>Конфигуратор{nodeName}</div>
-                <div className="property__button icon-cross"></div>
+                <Button><div className="icon-cross"></div></Button>
             </div>
             <div className="property__body">
                 {arrCfg.map(([name, type, val], i) => {

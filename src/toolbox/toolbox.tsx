@@ -2,12 +2,12 @@ import "./style.css"
 import React, {useEffect, useState} from "react";
 import {arrNode} from "../nodes/nodes";
 
-export function Toolbox({onNodeSelect, getReset}) {
+export function Toolbox({onNodeSelect, controlReset}) {
 
     const [index, setIndex] = useState(-1)
 
     useEffect(() => {
-        getReset(() => () => setIndex(-1))
+        controlReset(() => () => setIndex(-1))
     }, [])
 
     function onMouseDown({target}) {

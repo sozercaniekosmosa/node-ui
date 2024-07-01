@@ -24,33 +24,4 @@
     border-bottom: 1px solid rgba(128, 128, 128, 0.5);
     font-size: 0.8em;
   }
-
-  &__button {
-    padding: 0 0.5em;
-    //border: 1px solid gray;
-    border-radius: 4px;
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.2);
-    }
-  }
-
 }
-
-@mixin icon-init {
-  background-size: cover;
-  background-position: initial;
-  background-repeat: no-repeat;
-  background-origin: content-box;
-  box-sizing: border-box;
-  width: 16px;
-  height: 16px;
-  padding: 3px;
-}
-
-.icon {
-  &-cross {
-    @include icon-init;
-    background-image: url("../asset/icon-cross.svg");
-  }
-}
-

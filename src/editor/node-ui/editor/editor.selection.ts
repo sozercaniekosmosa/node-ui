@@ -55,6 +55,8 @@ export class EditorSelection {
     public handlerMouseUp(e: TMouseEvent): void {
         this.clearRectSelection();
         this.dragTarget = null;
+        let arrSelected = this.svg.querySelectorAll('.' + NodeSelector.selected);
+        this.svg.dispatchEvent(new CustomEvent('selected', {detail: arrSelected ? [...arrSelected] : null}))
     }
 
     public startSelection(startPoint: Point): Point {
