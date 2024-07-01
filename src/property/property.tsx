@@ -74,5 +74,5 @@ export function Property({setNode, controlShow, onChange}) {
         </div>)
 }
 
-export const toBase64 = (value: string) => window.btoa(decodeURIComponent((encodeURIComponent(value))));
-export const base64to = (value: string) => window.atob(value);
+export const toBase64 = (value: string) => window.btoa(encodeURI(encodeURIComponent(value)));
+export const base64to = (value: string) => decodeURIComponent(decodeURI(window.atob(value)));

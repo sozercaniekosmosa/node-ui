@@ -1,5 +1,5 @@
-export const toBase64 = (value: string) => window.btoa(decodeURIComponent((encodeURIComponent(value))));
-export const base64to = (value: string) => window.atob(value);
+export const toBase64 = (value: string) => window.btoa(encodeURI(encodeURIComponent(value)));
+export const base64to = (value: string) => decodeURIComponent(decodeURI(window.atob(value)));
 const toShortString = (value: number, language = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ') => {
     const len = language.length;
     let acc = "";
