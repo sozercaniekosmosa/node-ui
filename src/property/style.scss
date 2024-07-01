@@ -2,6 +2,7 @@ $color-gray: rgba(128, 128, 128, 0.5);
 
 .property {
 
+  font-size: 0.8em;
   position: absolute;
   top: 0;
   right: 0;
@@ -28,7 +29,6 @@ $color-gray: rgba(128, 128, 128, 0.5);
 
     padding: .2em .4em;
     border-bottom: 1px solid $color-gray;
-    font-size: 0.8em;
   }
 
   &__body {
@@ -63,9 +63,8 @@ $color-gray: rgba(128, 128, 128, 0.5);
     }
 
     &__number {
-      min-width: 50px;
-      max-width: 40%;
-      //width: 50%;
+      min-width: 2em;
+      max-width: 4em;
     }
   }
 

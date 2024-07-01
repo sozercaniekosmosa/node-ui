@@ -15,6 +15,9 @@ let key = [];
 // root.render(<React.StrictMode><NodeUI/></React.StrictMode>);
 
 function Root() {
+
+    window["qwq"] = '!!!'
+
     const refArrSelect = useRef(false);
     const [confirmShow, setConfirmShow] = useState(() => () => true);
     const [propertyShow, setPropertyShow] = useState(() => () => true);
