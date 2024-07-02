@@ -16,10 +16,7 @@ let key = [];
 
 function Root() {
 
-    window["qwq"] = '!!!'
-
     const refArrSelect = useRef(false);
-    const [confirmShow, setConfirmShow] = useState(() => () => true);
     const [propertyShow, setPropertyShow] = useState(() => () => true);
     const [remove, setRemove] = useState(() => () => true);
     const [nodeProp, setNodeProp] = useState(null);
@@ -34,16 +31,6 @@ function Root() {
         }
     };
 
-    function onKeyDown(e) {
-        key[e.code.toLowerCase()] = true;
-        if (key['delete']) refArrSelect.current && confirmShow();
-        if (key['f5'] || key['f12']) return
-    }
-
-    function onKeyUp(e) {
-        key[e.code.toLowerCase()] = false;
-    }
-
     let onNodeAdded = () => {
         setNodeDataSelected(null);
         reset();
@@ -57,7 +44,7 @@ function Root() {
 
     return (<>
         <Header className="menu"/>
-        <div className="node-editor" onDoubleClick={onDblClick} onKeyDown={onKeyDown} onKeyUp={onKeyUp} tabIndex="-1">
+        <div className="node-editor" onDoubleClick={onDblClick}>
             <Toolbox controlReset={setReset} onNodeSelect={(data) => setNodeDataSelected(data)}/>
             <Editor addNodeToCanvas={nodeDataSelected}
                     onNodeAdded={onNodeAdded}
@@ -65,7 +52,6 @@ function Root() {
                     onSelect={onSelect}/>
             <Property setNode={nodeProp} controlShow={setPropertyShow} onChange={onPropertyChange}/>
         </div>
-        <MenuConfirm controlShow={setConfirmShow} onClickYes={() => remove()}>Уверены?</MenuConfirm>
     </>)
 }
 

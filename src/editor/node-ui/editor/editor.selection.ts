@@ -5,8 +5,11 @@ export class EditorSelection {
 
     private selectionRect: Element | boolean = false;
     private readonly svg: SVGElement;
-    private clickTarget: Element | null = null;
+    private targetDown: Element | null = null;
     private dragTarget: Element | null = null;
+    private arrSelected: Element[] | null = [];
+    private isControlLeft: boolean = false;
+    private wasSelected: boolean = false;
 
     constructor(private nu: NodeUI) {
         this.svg = nu.svg;
@@ -14,20 +17,31 @@ export class EditorSelection {
         this.svg.addEventListener('svgmousedown', (e: CustomEventInit) => this.handlerMouseDown(e.detail));
         this.svg.addEventListener('svgmouseup', (e: CustomEventInit) => this.handlerMouseUp(e.detail));
         this.svg.addEventListener('svgmousemove', (e: CustomEventInit) => this.handlerMouseMove(e.detail));
+        document.addEventListener('keydown', (e: EventInit) => this.handlerKeyDown(e));
+        document.addEventListener('keyup', (e: EventInit) => this.handlerKeyUp(e));
+    }
+
+    private handlerKeyDown(e): void {
+        if (e.code == 'ControlLeft') this.isControlLeft = true;
+    }
+
+    private handlerKeyUp(e): void {
+        if (e.code == 'ControlLeft') this.isControlLeft = false;
     }
 
     public handlerMouseDown({target, p, start: s}: TMouseEvent): void {
 
-        this.clickTarget = (target as Element);
-        const targetDown = this.clickTarget.closest('.' + NodeSelector.node);
-        const isHandle = this.clickTarget.classList.contains(NodeSelector.handle);
-        const isEmpty = this.clickTarget === this.svg;
+        this.targetDown = (target as Element);
+        const isEmpty = this.targetDown === this.svg;
+        const targetDown = this.targetDown.closest('.' + NodeSelector.node);
+        const isHandle = this.targetDown.classList.contains(NodeSelector.handle);
 
         if (targetDown && isHandle) { //select
             this.dragTarget = targetDown;
             this.startSelection(p);
-            if (!targetDown.classList.contains(NodeSelector.selected)) {
-                this.clearSelection();
+            this.wasSelected = targetDown.classList.contains(NodeSelector.selected);
+            if (!this.wasSelected) {
+                if (!this.isControlLeft) this.clearSelection();
                 targetDown.classList.add(NodeSelector.selected);
             }
         } else if (isEmpty) {//reset|new selection
@@ -38,7 +52,7 @@ export class EditorSelection {
     }
 
     public handlerMouseMove({distance, start: s, p, button}: TMouseEvent): void {
-        const isEmpty = this.clickTarget === this.svg;
+        const isEmpty = this.targetDown === this.svg;
 
         if (isEmpty && distance > 3 && !this.nu.isMode('select-rect')) {// selection
             this.nu.setMode('select-rect')
@@ -52,11 +66,22 @@ export class EditorSelection {
         }
     }
 
-    public handlerMouseUp(e: TMouseEvent): void {
+    public handlerMouseUp({target, distance}: TMouseEvent): void {
         this.clearRectSelection();
         this.dragTarget = null;
-        let arrSelected = this.svg.querySelectorAll('.' + NodeSelector.selected);
-        this.svg.dispatchEvent(new CustomEvent('selected', {detail: arrSelected ? [...arrSelected] : null}))
+
+        let targetUp = (target as Element);
+
+        if (this.targetDown == targetUp && distance <= 3) {
+            let targetDown = this.targetDown.closest('.' + NodeSelector.node);
+            if (this.isControlLeft && targetDown.classList.contains(NodeSelector.selected) && this.wasSelected) {
+                targetDown.classList.remove(NodeSelector.selected);
+            }
+        }
+
+        let listSelected = this.svg.querySelectorAll('.' + NodeSelector.selected);
+        if (listSelected) this.arrSelected = [...listSelected]
+        this.svg.dispatchEvent(new CustomEvent('selected', {detail: listSelected ? this.arrSelected : null}))
     }
 
     public startSelection(startPoint: Point): Point {
@@ -71,10 +96,10 @@ export class EditorSelection {
     };
 
     public getSelected(sx: number, sy: number, ex: number, ey: number): void {
-        if (this.dragTarget && !this.dragTarget.classList.contains(NodeSelector.selected)) { // если по не выделенному то
-            this.clearSelection(); //сбраываем все выделение
-            this.dragTarget.classList.add(NodeSelector.selected);//и выделяем который под курсором
-        }
+        // if (this.dragTarget && !this.dragTarget.classList.contains(NodeSelector.selected)) { // если по не выделенному то
+        //     this.clearSelection(); //сбраываем все выделение
+        //     this.dragTarget.classList.add(NodeSelector.selected);//и выделяем который под курсором
+        // }
         if (!this.selectionRect) return;
         const [x, y, width, height] = [Math.min(sx, ex), Math.min(sy, ey), Math.abs(ex - sx), Math.abs(ey - sy)];
 
