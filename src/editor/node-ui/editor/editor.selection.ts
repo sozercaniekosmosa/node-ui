@@ -74,7 +74,7 @@ export class EditorSelection {
 
         if (this.targetDown == targetUp && distance <= 3) {
             let targetDown = this.targetDown.closest('.' + NodeSelector.node);
-            if (this.isControlLeft && targetDown.classList.contains(NodeSelector.selected) && this.wasSelected) {
+            if (this.isControlLeft && targetDown?.classList.contains(NodeSelector.selected) && this.wasSelected) {
                 targetDown.classList.remove(NodeSelector.selected);
             }
         }
