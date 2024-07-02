@@ -4,6 +4,7 @@ import React from "react";
 
 export default class {
     name = 'value';
+    description = 'Значение';
     out: number
     inputs = [];
     outputs = ['out'];

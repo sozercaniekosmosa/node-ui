@@ -6,6 +6,7 @@ import {Button} from "../auxiliary/button/button";
 export function Property({setNode, controlShow, onChange}) {
 
     let nodeName: string = ''
+    let description: string = '';
     let arrCfg: [[string, string, any, string]] = [];
 
     let refMenu = useRef(null);
@@ -18,6 +19,7 @@ export function Property({setNode, controlShow, onChange}) {
 
     if (setNode) {
         nodeName = setNode.dataset.node;
+        description = setNode.dataset.description;
         if (setNode.dataset?.cfg) {
             arrCfg = JSON.parse(base64to(setNode.dataset.cfg));
         }
@@ -62,6 +64,7 @@ export function Property({setNode, controlShow, onChange}) {
             </div>
             <div className="property__body">
                 <div className="property__node-name">{nodeName}</div>
+                <div className="property__node-name">{description}</div>
                 {arrCfg.map(([name, type, val, desc], i) => {
                     let comp = listTypeComponent[type] ? listTypeComponent[type] : listNode[nodeName].components[type];
                     return createElement(comp, {name, val, desc, key: i, onChange: onChangeParam});

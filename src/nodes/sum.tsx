@@ -1,6 +1,6 @@
 export default class {
     name = 'sum';
-
+    description = 'Сумма';
     A: number;
     B: number;
     out: number;

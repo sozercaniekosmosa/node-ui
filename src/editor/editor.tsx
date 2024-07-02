@@ -45,6 +45,7 @@ export default function Editor({addNodeToCanvas, onNodeAdded, controlRemove, onS
             nuiRef.current?.createNode({
                 x, y,
                 nodeName: addNodeToCanvas.name,
+                description: addNodeToCanvas.description,
                 arrIn: addNodeToCanvas.inputs,
                 arrOut: addNodeToCanvas.outputs,
                 data
