@@ -1,5 +1,6 @@
 import {Point, Svg, TMouseEvent} from "../svg";
 import {NodeSelector, NodeUI} from "../node-ui";
+import {b} from "vite/dist/node/types.d-aGj9QkWt";
 
 export class EditorLinkRemove {
 
@@ -61,14 +62,21 @@ export class EditorLinkRemove {
             //задаем позиции для каждой link
             const arrLine = arrLink.map((node: any) => [node.getPointAtLength(0), node.getPointAtLength(node.getTotalLength()), node]);
 
+            let didRemove = false;
             //перебираем все links ищем пересечение с линией удаления
-            arrLine.forEach(line => this.isIntersectLines(line, lineRemove) && this.removeNode(line[2]));
+            arrLine.forEach(line => {
+                if (this.isIntersectLines(line, lineRemove)) {
+                    this.removeNode(line[2]);
+                    didRemove = true;
+                }
+            });
             this.removeNode(this.nodeRemove)
             this.nodeRemove = null;
+            if(didRemove) this.svg.dispatchEvent(new CustomEvent('link-remove', {detail: {}}));
         }
     }
 
-    private isIntersectLines(p1:any, p2:any) {
+    private isIntersectLines(p1: any, p2: any): boolean {
         const {x: x1, y: y1} = p1[0];
         const {x: x2, y: y2} = p1[1];
         const {x: x3, y: y3} = p2[0];

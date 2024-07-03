@@ -81,7 +81,7 @@ export class EditorSelection {
 
         let listSelected = this.svg.querySelectorAll('.' + NodeSelector.selected);
         if (listSelected) this.arrSelected = [...listSelected]
-        this.svg.dispatchEvent(new CustomEvent('selected', {detail: listSelected ? this.arrSelected : null}))
+        this.svg.dispatchEvent(new CustomEvent('selected', {detail: listSelected ? this.arrSelected : null}));
     }
 
     public startSelection(startPoint: Point): Point {

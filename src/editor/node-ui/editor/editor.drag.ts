@@ -6,6 +6,7 @@ export class EditorDrag {
     private dragTarget: SVGElement | Element | null = null;
     private arrSelected: SVGElement[] | null = null;
     private clickTarget: SVGElement | Element | null = null;
+    private isDragged: boolean = false;
 
 
     constructor(private nu: NodeUI) {
@@ -29,11 +30,12 @@ export class EditorDrag {
         this.arrSelected = Array.from(this.svg.querySelectorAll('.selected'));
     }
 
-    public handlerMouseMove({delta: d, button}: TMouseEvent): void {
+    public handlerMouseMove({delta: d, button, distance}: TMouseEvent): void {
         if (!button[0]) this.nu.resetMode('drag');
         if (!this.nu.isMode('drag')) return;
 
         if (this.dragTarget) {//drag node
+            if (distance > 3) this.isDragged = true;
             this.arrSelected?.forEach(node => {
                 var p = this.nu.getTransformPoint(node);
                 this.nu.setTransformPoint(node, p.add(d))
@@ -43,6 +45,10 @@ export class EditorDrag {
 
     public handlerMouseUp(e: TMouseEvent): void {
         this.dragTarget = null;
+        if (this.isDragged) {
+            this.svg.dispatchEvent(new CustomEvent('dragged', {detail: {}}));
+            this.isDragged = false;
+        }
     }
 
 }

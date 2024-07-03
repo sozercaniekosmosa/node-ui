@@ -2,18 +2,23 @@ import "./style.css"
 import React, {useEffect, useState} from "react";
 import {arrNode} from "../nodes/nodes";
 
-export function Toolbox({onNodeSelect, controlReset}) {
+export function Toolbox({onNodeSelect}) {
 
     const [index, setIndex] = useState(-1)
 
     useEffect(() => {
-        controlReset(() => () => setIndex(-1))
+        document.addEventListener('click', ({target}) => {
+            if (!(target as Element).classList.contains('toolbox__item')) {
+                setIndex(-1);
+                onNodeSelect && onNodeSelect(null);
+            }
+        })
     }, [])
 
-    function onMouseDown({target}) {
-        let nodeIndex = target.dataset.index;
+    function onMouseDown(e) {
+        let nodeIndex = e.target.dataset.index;
         setIndex(nodeIndex == index ? -1 : nodeIndex);
-        onNodeSelect && onNodeSelect(nodeIndex == index ? null : arrNode[target.dataset.index])
+        onNodeSelect && onNodeSelect(nodeIndex == index ? null : arrNode[e.target.dataset.index]);
     }
 
     return (

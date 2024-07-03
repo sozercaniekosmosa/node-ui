@@ -2,7 +2,7 @@ import "./style.css"
 import React, {useEffect, useState} from "react";
 import {arrNode} from "../nodes/nodes";
 
-export function Header() {
+export function Header({children}) {
 
     // const [index, setIndex] = useState(-1)
 
@@ -16,5 +16,5 @@ export function Header() {
     //     onNodeSelect && onNodeSelect(nodeIndex == index ? null : arrNode[target.dataset.index])
     // }
 
-    return <div className="menu">menu</div>
+    return <div className="header">{children}</div>
 }

@@ -57,13 +57,12 @@ export function Property({setNode, controlShow, onChange}) {
     return (
         <div className="property property--hide" ref={refMenu}>
             <div className="property__header">
-                <div>Конфигуратор</div>
+                <div>Конфигуратор: {nodeName}</div>
                 <Button onClick={onCancel}>
                     <div className="icon-cross"></div>
                 </Button>
             </div>
             <div className="property__body">
-                <div className="property__node-name">{nodeName}</div>
                 <div className="property__node-name">{description}</div>
                 {arrCfg.map(([name, type, val, desc], i) => {
                     let comp = listTypeComponent[type] ? listTypeComponent[type] : listNode[nodeName].components[type];

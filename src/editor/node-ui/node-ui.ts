@@ -22,7 +22,6 @@ interface TNodeParam {
     y?: number;
     widthEmpty?: number;
     nodeName?: string;
-    description?: string;
     arrIn?: string[];
     arrOut?: string[];
     id?: string;
@@ -74,7 +73,7 @@ export class NodeUI extends Svg {
     }
 
     public createNode(
-        {x = 50, y = 50, widthEmpty = 0, nodeName = 'empty', description = '', arrIn = [], arrOut = [], id = getID(), data}: TNodeParam) {
+        {x = 50, y = 50, widthEmpty = 0, nodeName = 'empty', arrIn = [], arrOut = [], id = getID(), data}: TNodeParam) {
         const numberIn: number = arrIn!.length;
         const numberOut: number = arrOut!.length;
 
@@ -104,7 +103,7 @@ export class NodeUI extends Svg {
         const fillNode: string = '#d7d7d7';
         const stroke: string = '#25334b';
 
-        const nodeGroup = this.group({x, y, class: NodeSelector.node, data: {node: nodeName, description, ...data}});
+        const nodeGroup = this.group({x, y, class: NodeSelector.node, data: {node: nodeName, ...data}});
 
         this.rectangle({
             x: 0, y: 0, width, height, rx,
@@ -151,6 +150,7 @@ export class NodeUI extends Svg {
     }
 
     public removeNode() {
+        let didRemove = false;
         [...this.svg.querySelectorAll('.' + NodeSelector.selected)].forEach(node => {
             node = node.closest('.' + NodeSelector.node);
             const arrIn = [...node.querySelectorAll('.' + NodeSelector.pinIn)].map(it => it.dataset.to + '-' + it.id);
@@ -159,7 +159,10 @@ export class NodeUI extends Svg {
             const ids = '#' + arrPath.join(',#');
             [...this.svg.querySelectorAll(ids)].forEach(d => this.linkRemove.removeNode(d as SVGElement))
             this.svg.removeChild(node as Element);
+            didRemove = true;
         })
+
+        if (didRemove) this.svg.dispatchEvent(new CustomEvent('node-remove', {detail: {}}));
     }
 
     private handlerKeyDown(e: KeyboardEvent) {

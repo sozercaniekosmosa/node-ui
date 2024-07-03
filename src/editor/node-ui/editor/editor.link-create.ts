@@ -103,6 +103,7 @@ export class EditorLinkCreate {
 
             this.nodeLink!.id = idLink;
 
+            this.svg.dispatchEvent(new CustomEvent('link-create', {detail: {}}));
         } else {
             this.removeNode(this.nodeLink as SVGElement);
         }
