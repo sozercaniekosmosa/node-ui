@@ -1,12 +1,16 @@
 export default class {
     name = 'sum';
-    description = 'Сумма';
     A: number;
     B: number;
     out: number;
 
     inputs = ['A', 'B'];
     outputs = ['out'];
+    cfg = {
+        'общие': [
+            {name: 'description', type: 'string', val: 'Описание', title: 'Знaчение-параметр'},
+        ]
+    };
 
     update() {
         this.out = this.A + this.B

@@ -4,15 +4,22 @@ import React from "react";
 
 export default class {
     name = 'value';
-    description = 'Значение';
     out: number
     inputs = [];
     outputs = ['out'];
-    cfg = [
-        ['value', 'number', 0, 'Значение-0'],
-        ['valueA', 'number', 1, 'Значение-1'],
-        ['valueB', 'number', 2, 'Значение-2'],
-    ];
+    cfg = {
+        'основная': [
+            {name: 'description', type: 'string', val: 'Описание', title: 'Знaчение-параметр'},
+            {name: 'value', type: 'number', val: 0, title: 'Значение-0'},
+            {name: 'valueA', type: 'number', val: 1, title: 'Значение-1'},
+            {name: 'valueB', type: 'number', val: 2, title: 'Значение-2'},
+        ],
+        'вторая': [
+            {name: 'value', type: 'number', val: 0, title: 'Значение-0'},
+            {name: 'valueA', type: 'number', val: 1, title: 'Значение-1'},
+            {name: 'valueB', type: 'number', val: 2, title: 'Значение-2'},
+        ]
+    };
     components = {
         'number': function ({name, val}) {
             return <div>

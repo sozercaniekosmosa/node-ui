@@ -13,6 +13,7 @@ import {MenuConfirm} from "./auxiliary/menu/menu-confirm";
 const root = ReactDOM.createRoot(document.querySelector('.root') as HTMLElement);
 const history = new History();
 let nui = null;
+let arrSelect: Element[] | undefined = [];
 
 function Root() {
 
@@ -20,6 +21,7 @@ function Root() {
     const [propertyShow, setPropertyShow] = useState(() => () => true);
     const [nodeProp, setNodeProp] = useState(null);
     const [nodeDataSelected, setNodeDataSelected] = useState(null);
+    const [confirmShow, setConfirmShow] = useState(() => () => true);
 
     let onDblClick = ({target}) => {
         const node = target.closest('.' + NodeSelector.node)
@@ -33,14 +35,14 @@ function Root() {
         console.log(node, val)
     };
 
-    let onEventEditor = ({name, nui: nodeUi, arrSelect, arrKey}: TEventData) => {
+    let onEventEditor = ({name, nui: nodeUi, arrSelect: arrSel, arrKey}: TEventData) => {
         switch (name) {
             case 'init':
                 nui = nodeUi;
                 history.initHistory(nui.svg.innerHTML);
                 break;
             case 'selected':
-                refArrSelect.current = (arrSelect?.length > 0)
+                arrSelect = arrSel;
                 break;
             case 'dragged':
             case 'link-create':
@@ -50,10 +52,9 @@ function Root() {
                 history.addHistory(name, nui.svg.innerHTML);
                 break;
             case 'key-down':
-                if (arrKey?.['controlleft'] && arrKey?.['keyz'])
-                    onUndo();
-                if (arrKey?.['controlleft'] && arrKey?.['keyy'])
-                    onRedo();
+                if (arrKey?.['controlleft'] && arrKey?.['keyz']) onUndo();
+                if (arrKey?.['controlleft'] && arrKey?.['keyy']) onRedo();
+                if (arrKey?.['delete']) confirmShow();
                 break;
             case 'key-up':
                 break;
@@ -69,6 +70,40 @@ function Root() {
         let data = history.redoHistory();
         data && (nui.svg.innerHTML = data);
     };
+
+    let arrObj = [];
+
+    function elementToObject(node: HTMLElement) {
+        var arrIn = [...node.querySelectorAll('.' + NodeSelector.pinIn) as NodeListOf<HTMLElement>];
+        var arrOut = [...node.querySelectorAll('.' + NodeSelector.pinOut) as NodeListOf<HTMLElement>];
+        let cfgIn = [], cfgOut = [];
+        if (arrIn.length) cfgIn = arrIn.map(node => node.dataset.name);
+        if (arrOut.length) cfgOut = arrOut.map(node => node.dataset.name)
+        let cfg = {
+            name: node.dataset.node, description: node.dataset.description, in: cfgIn, out: cfgOut,
+        };
+        if (node.dataset?.cfg) cfg["cfg"] = JSON.parse(base64to(node.dataset.cfg));
+        return cfg;
+    }
+
+    let onCopy = () => {
+        arrObj = [];
+        let arrCfg = [];
+        let arrNode = arrSelect?.map(node => node.cloneNode(true)) as HTMLElement[];
+        console.log(arrNode)
+        arrNode.forEach(node => {
+            arrCfg.push(elementToObject(node))
+        })
+
+        console.log(arrCfg)
+    }
+
+    let onPast = () => {
+        // nui.svg.
+    }
+
+    window['clone'] = onCopy;
+
     return (<>
         <Header className="menu">
             <Button onClick={onUndo}>
@@ -83,7 +118,11 @@ function Root() {
             <Editor newNode={nodeDataSelected} onEvent={onEventEditor}/>
             <Property setNode={nodeProp} controlShow={setPropertyShow} onChange={onPropertyChange}/>
         </div>
+        <MenuConfirm controlShow={setConfirmShow} onClickYes={() => nui.removeNode()}>Уверены?</MenuConfirm>
     </>)
 }
 
 root.render(<Root/>);
+
+export const toBase64 = (value: string) => window.btoa(encodeURI(encodeURIComponent(value)));
+export const base64to = (value: string) => decodeURIComponent(decodeURI(window.atob(value)));
