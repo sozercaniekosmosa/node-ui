@@ -9,9 +9,10 @@ export function Property({setNode, controlShow, onChange}) {
     // let arrCfg: [[string, string, any, string]] = [];
     let arrCfg = useRef([]);
 
-    let refMenu = useRef(null);
+    let refProp = useRef(null);
+    let refPropTabs = useRef(null);
 
-    const show = (isShow) => refMenu.current.classList[isShow ? 'remove' : 'add']('property--hide')
+    const show = (isShow) => refProp.current.classList[isShow ? 'remove' : 'add']('property--hide')
 
     useEffect(() => {
         controlShow && controlShow(() => () => show(true))
@@ -65,8 +66,19 @@ export function Property({setNode, controlShow, onChange}) {
         show(false)
     }
 
+    function onClickTab(e) {
+
+        e.target.parentNode.querySelector('.tab__header__item--active')?.classList.remove('tab__header__item--active')
+        e.target.classList.add('tab__header__item--active')
+
+        const index = e.target.dataset.index;
+        [...refPropTabs.current.children].forEach(node => node.style.display = 'none')
+        refPropTabs.current.children[index].style.display = ''
+    }
+
+
     return (
-        <div className="property property--hide" ref={refMenu}>
+        <div className="property property--hide" ref={refProp}>
             <div className="property__menu">
                 <div className="property__header">
                     <div>Конфигуратор: {nodeName}</div>
@@ -74,25 +86,41 @@ export function Property({setNode, controlShow, onChange}) {
                         <div className="icon-cross"></div>
                     </Button>
                 </div>
-                <div className="property__body">
+
+                <div className="tab__header" onClick={onClickTab}>
                     {Object.entries(arrCfg.current).map(([tabName, arrParam], iTab) => {
-                        return <div className="property__tab" key={iTab}>
-                            <div className="property__tab__header">{tabName}</div>
-                            <div className="property__tab__body">
-                                {arrParam.map(({name, type, val, title}, i) => {
-                                    let comp = listTypeComponent[type] ? listTypeComponent[type] : listNode[nodeName].components[type];
-                                    return createElement(comp, {name, val, title, key: i, onChange: onChangeParam});
-                                })}
-                            </div>
-                        </div>
+                        return <div
+                            className={"tab__header__item " + (iTab == 0 ? 'tab__header__item--active' : '')}
+                            key={iTab}
+                            data-index={iTab}>{tabName}</div>
                     })}
                 </div>
+                <div className="tab__body" ref={refPropTabs}>
+                    {Object.entries(arrCfg.current).map(([tabName, arrParam], iTab) => {
+                        return (<div className="tab__body__item" key={iTab}
+                                     style={{display: iTab == 0 ? 'unset' : 'none'}}>
+                            {arrParam.map(({name, type, val, title}, i) => {
+                                let comp = listTypeComponent[type] ? listTypeComponent[type] : listNode[nodeName].components[type];
+                                return createElement(comp, {
+                                    name,
+                                    val,
+                                    title,
+                                    key: i,
+                                    onChange: onChangeParam
+                                })
+                            })}
+                        </div>)
+
+                    })}
+                </div>
+
                 <div className="property__footer">
                     <Button onClick={onApply}>Применить</Button>
                     <Button onClick={onCancel}>Отмена</Button>
                 </div>
             </div>
-        </div>)
+        </div>
+    )
 }
 
 export const toBase64 = (value: string) => window.btoa(encodeURI(encodeURIComponent(value)));

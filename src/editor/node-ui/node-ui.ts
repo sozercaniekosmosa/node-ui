@@ -26,6 +26,7 @@ interface TNodeParam {
     arrOut?: string[];
     id?: string;
     data?: object;
+    color?: string;
 }
 
 type TKey = Record<string, boolean>;
@@ -73,7 +74,11 @@ export class NodeUI extends Svg {
     }
 
     public createNode(
-        {x = 50, y = 50, widthEmpty = 0, nodeName = 'empty', arrIn = [], arrOut = [], id = getID(), data}: TNodeParam) {
+        {
+            x = 50, y = 50, widthEmpty = 0, nodeName = 'empty',
+            arrIn = [], arrOut = [], id = getID(), data,
+            color = '#d7d7d7'
+        }: TNodeParam) {
         const numberIn: number = arrIn!.length;
         const numberOut: number = arrOut!.length;
 
@@ -100,7 +105,7 @@ export class NodeUI extends Svg {
 
         const fillIn: string = '#bcffd6';
         const fillOut: string = '#ffc69a';
-        const fillNode: string = '#d7d7d7';
+        const fillNode: string = color;
         const stroke: string = '#25334b';
 
         const nodeGroup = this.group({x, y, class: NodeSelector.node, data: {node: nodeName, ...data}});

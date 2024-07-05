@@ -4,21 +4,54 @@ import React from "react";
 
 export default class {
     name = 'value';
-    out: number
+    color = '#d5f5d6';
+    out: number;
     inputs = [];
     outputs = ['out'];
     cfg = {
+        'вторая': [
+            {name: 'value', type: 'number', val: 0, title: 'Значение-0'},
+            {name: 'valueA', type: 'number', val: 1, title: 'Значение-1'},
+            {name: 'valueB', type: 'number', val: 2, title: 'Значение-2'},
+            {name: 'value', type: 'number', val: 0, title: 'Значение-0'},
+            {name: 'valueA', type: 'number', val: 1, title: 'Значение-1'},
+            {name: 'valueB', type: 'number', val: 2, title: 'Значение-2'},
+            {name: 'value', type: 'number', val: 0, title: 'Значение-0'},
+            {name: 'valueA', type: 'number', val: 1, title: 'Значение-1'},
+            {name: 'valueB', type: 'number', val: 2, title: 'Значение-2'},
+            {name: 'value', type: 'number', val: 0, title: 'Значение-0'},
+            {name: 'valueA', type: 'number', val: 1, title: 'Значение-1'},
+            {name: 'valueB', type: 'number', val: 2, title: 'Значение-2'},
+            {name: 'value', type: 'number', val: 0, title: 'Значение-0'},
+            {name: 'valueA', type: 'number', val: 1, title: 'Значение-1'},
+            {name: 'valueB', type: 'number', val: 2, title: 'Значение-2'},
+            {name: 'value', type: 'number', val: 0, title: 'Значение-0'},
+            {name: 'valueA', type: 'number', val: 1, title: 'Значение-1'},
+            {name: 'valueB', type: 'number', val: 2, title: 'Значение-2'},
+            {name: 'value', type: 'number', val: 0, title: 'Значение-0'},
+            {name: 'valueA', type: 'number', val: 1, title: 'Значение-1'},
+            {name: 'valueB', type: 'number', val: 2, title: 'Значение-2'},
+            {name: 'value', type: 'number', val: 0, title: 'Значение-0'},
+            {name: 'valueA', type: 'number', val: 1, title: 'Значение-1'},
+            {name: 'valueB', type: 'number', val: 2, title: 'Значение-2'},
+            {name: 'valueA', type: 'number', val: 1, title: 'Значение-1'},
+            {name: 'valueB', type: 'number', val: 2, title: 'Значение-2'},
+            {name: 'value', type: 'number', val: 0, title: 'Значение-0'},
+            {name: 'valueA', type: 'number', val: 1, title: 'Значение-1'},
+            {name: 'valueB', type: 'number', val: 2, title: 'Значение-2'},
+            {name: 'value', type: 'number', val: 0, title: 'Значение-0'},
+            {name: 'valueA', type: 'number', val: 1, title: 'Значение-1'},
+            {name: 'valueB', type: 'number', val: 2, title: 'Значение-2'},
+            {name: 'value', type: 'number', val: 0, title: 'Значение-0'},
+            {name: 'valueA', type: 'number', val: 1, title: 'Значение-1'},
+            {name: 'valueB', type: 'number', val: 2, title: 'Значение-2'},
+        ],
         'основная': [
             {name: 'description', type: 'string', val: 'Описание', title: 'Знaчение-параметр'},
             {name: 'value', type: 'number', val: 0, title: 'Значение-0'},
             {name: 'valueA', type: 'number', val: 1, title: 'Значение-1'},
             {name: 'valueB', type: 'number', val: 2, title: 'Значение-2'},
         ],
-        'вторая': [
-            {name: 'value', type: 'number', val: 0, title: 'Значение-0'},
-            {name: 'valueA', type: 'number', val: 1, title: 'Значение-1'},
-            {name: 'valueB', type: 'number', val: 2, title: 'Значение-2'},
-        ]
     };
     components = {
         'number': function ({name, val}) {
