@@ -9,6 +9,7 @@ import {NodeSelector, NodeUI} from "./editor/node-ui/node-ui";
 import {History} from './auxiliary/history'
 import {Button} from "./auxiliary/button/button";
 import {MenuConfirm} from "./auxiliary/menu/menu-confirm";
+import {decompress, compress, decompressString, compressString} from './utils'
 
 const root = ReactDOM.createRoot(document.querySelector('.root') as HTMLElement);
 const history = new History();
@@ -33,6 +34,7 @@ function Root() {
 
     let onPropertyChange = (node, val) => {
         console.log(node, val)
+        history.addHistory('property', nui.svg.innerHTML);
     };
 
     let onEventEditor = ({name, nui: nodeUi, arrSelect: arrSel, arrKey}: TEventData) => {
@@ -82,7 +84,7 @@ function Root() {
         let cfg = {
             name: node.dataset.node, description: node.dataset.description, in: cfgIn, out: cfgOut,
         };
-        if (node.dataset?.cfg) cfg["cfg"] = JSON.parse(base64to(node.dataset.cfg));
+        if (node.dataset?.cfg) cfg["cfg"] = JSON.parse(decompressString(node.dataset.cfg));
         return cfg;
     }
 
@@ -123,6 +125,3 @@ function Root() {
 }
 
 root.render(<Root/>);
-
-export const toBase64 = (value: string) => window.btoa(encodeURI(encodeURIComponent(value)));
-export const base64to = (value: string) => decodeURIComponent(decodeURI(window.atob(value)));

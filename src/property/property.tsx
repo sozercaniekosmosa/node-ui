@@ -2,6 +2,7 @@ import "./style.css"
 import React, {createElement, InputHTMLAttributes, useEffect, useRef, useState} from "react";
 import {listNode} from "../nodes/nodes";
 import {Button} from "../auxiliary/button/button";
+import {decompress, compress, decompressString, compressString} from '../utils'
 
 export function Property({setNode, controlShow, onChange}) {
 
@@ -20,7 +21,7 @@ export function Property({setNode, controlShow, onChange}) {
 
     if (setNode) {
         nodeName = setNode.dataset.node;
-        arrCfg.current = JSON.parse(base64to(setNode.dataset.cfg));
+        arrCfg.current = JSON.parse(decompressString(setNode.dataset.cfg)!);
     }
 
     const listTypeComponent = {
@@ -52,13 +53,13 @@ export function Property({setNode, controlShow, onChange}) {
                 }
             })
         })
-        // setNode.dataset.cfg = toBase64(JSON.stringify(arrCfg));
+        // setNode.dataset.cfg = compressString(JSON.stringify(arrCfg));
         console.log(arrCfg.current)
         console.log(setNode.dataset.cfg)
     }
 
     let onApply = () => {
-        setNode.dataset.cfg = toBase64(JSON.stringify(arrCfg.current));
+        setNode.dataset.cfg = compressString(JSON.stringify(arrCfg.current));
         onChange(setNode, arrCfg.current)
         show(false)
     };
@@ -68,6 +69,7 @@ export function Property({setNode, controlShow, onChange}) {
 
     function onClickTab(e) {
 
+        if (!e.target.classList.contains('tab__header__item')) return;
         e.target.parentNode.querySelector('.tab__header__item--active')?.classList.remove('tab__header__item--active')
         e.target.classList.add('tab__header__item--active')
 
@@ -123,5 +125,5 @@ export function Property({setNode, controlShow, onChange}) {
     )
 }
 
-export const toBase64 = (value: string) => window.btoa(encodeURI(encodeURIComponent(value)));
-export const base64to = (value: string) => decodeURIComponent(decodeURI(window.atob(value)));
+//@ts-ignore
+window.decompress = decompress, window.compress = compress;

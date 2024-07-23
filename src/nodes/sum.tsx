@@ -1,6 +1,6 @@
 export default class {
     name = 'sum';
-    color = '#ffeee9';
+    color = '#f6e6e1';
     A: number;
     B: number;
     out: number;

@@ -1,5 +1,5 @@
 import {Point, Svg} from "./svg";
-import {getID} from "./utils";
+import {getID} from "../../utils";
 import {EditorLinkCreate} from "./editor/editor.link-create";
 import {EditorLinkRemove} from "./editor/editor.link-remove";
 import {EditorDrag} from "./editor/editor.drag";

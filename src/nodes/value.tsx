@@ -4,7 +4,7 @@ import React from "react";
 
 export default class {
     name = 'value';
-    color = '#d5f5d6';
+    color = '#ebf5ec';
     out: number;
     inputs = [];
     outputs = ['out'];
