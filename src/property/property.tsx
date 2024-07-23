@@ -29,9 +29,12 @@ export function Property({setNode, controlShow, onChange}) {
             return <div className="property__param">
                 <div className="property__param__name">{title}:</div>
                 <input className="property__param__number" type="number" defaultValue={val}
-                       onBlur={({target}) => onChange(name, target.value)}
+                       onBlur={({target}) => {
+                           console.log(val)
+                           onChange(name, Number(target.value), val)
+                       }}
                        onKeyDown={({target, key}) => {
-                           if (key == 'Enter') onChange(name, (target as InputHTMLAttributes<string>).value)
+                           if (key == 'Enter') onChange(name, Number((target as InputHTMLAttributes<string>).value), val)
                        }}/></div>
         },
         'string': function ({name, val, title, onChange}) {
@@ -45,10 +48,10 @@ export function Property({setNode, controlShow, onChange}) {
         }
     }
 
-    const onChangeParam = (name, val) => {
+    const onChangeParam = (name, val, _val) => {
         Object.entries(arrCfg.current).forEach(([key, param]) => {
             param.forEach(({name: _name, type, val: _val, title}, i) => {
-                if (_name == name) {
+                if (_name == name && _val != val) {
                     arrCfg.current[key][i] = {name, type, val, title}
                 }
             })

@@ -9,6 +9,12 @@ export default class {
     inputs = [];
     outputs = ['out'];
     cfg = {
+        'основная': [
+            {name: 'description', type: 'string', val: 'Описание', title: 'Знaчение-параметр'},
+            {name: 'value', type: 'number', val: 0, title: 'Значение-0'},
+            {name: 'valueA', type: 'number', val: 1, title: 'Значение-1'},
+            {name: 'valueB', type: 'number', val: 2, title: 'Значение-2'},
+        ],
         'вторая': [
             {name: 'value', type: 'number', val: 0, title: 'Значение-0'},
             {name: 'valueA', type: 'number', val: 1, title: 'Значение-1'},
@@ -42,12 +48,6 @@ export default class {
             {name: 'value', type: 'number', val: 0, title: 'Значение-0'},
             {name: 'valueA', type: 'number', val: 1, title: 'Значение-1'},
             {name: 'valueB', type: 'number', val: 2, title: 'Значение-2'},
-            {name: 'value', type: 'number', val: 0, title: 'Значение-0'},
-            {name: 'valueA', type: 'number', val: 1, title: 'Значение-1'},
-            {name: 'valueB', type: 'number', val: 2, title: 'Значение-2'},
-        ],
-        'основная': [
-            {name: 'description', type: 'string', val: 'Описание', title: 'Знaчение-параметр'},
             {name: 'value', type: 'number', val: 0, title: 'Значение-0'},
             {name: 'valueA', type: 'number', val: 1, title: 'Значение-1'},
             {name: 'valueB', type: 'number', val: 2, title: 'Значение-2'},
