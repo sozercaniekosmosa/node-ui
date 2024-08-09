@@ -31,7 +31,7 @@ export class History {
         if (this.indexHistory + 1 < this.history.length) this.history = this.history.splice(0, this.indexHistory + 1)
         this.history.push([name, data]);
         this.indexHistory = this.history.length - 1;
-        console.log('add:', this.history)
+        // console.log('add:', this.history)
     }
 
 }

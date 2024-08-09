@@ -1,5 +1,5 @@
-import Value from "./value";
-import Sum from "./sum";
+import Value from "./value/value";
+import Sum from "./sum/sum";
 
 export type TCfg = Record<string, any>
 

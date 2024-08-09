@@ -1,3 +1,28 @@
+// EventBus.dispatchEvent('evb-key', {event, combine, nodeFocus}))
+class EventBus {
+    private bus: HTMLElement;
+
+    constructor() {
+        this.bus = document.createElement('eventbus');
+    }
+
+    addEventListener(event, callback) {
+        this.bus.addEventListener(event, e => callback(...e.detail));
+    }
+
+    removeEventListener(event, callback) {
+        this.bus.removeEventListener(event, callback);
+    }
+
+    dispatchEvent(event, ...data) {
+        this.bus.dispatchEvent(new CustomEvent(event, {detail: data}));
+    }
+}
+
+//@ts-ignore
+export const eventBus = window.EventBus = new EventBus;
+
+
 export const toBase64 = (value: string) => window.btoa(encodeURI(encodeURIComponent(value)));
 export const base64to = (value: string) => decodeURIComponent(decodeURI(window.atob(value)));
 

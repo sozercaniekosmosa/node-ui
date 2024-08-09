@@ -2,72 +2,87 @@ import "./style.css"
 import React, {createElement, InputHTMLAttributes, useEffect, useRef, useState} from "react";
 import {listNode} from "../nodes/nodes";
 import {Button} from "../auxiliary/button/button";
-import {decompress, compress, decompressString, compressString} from '../utils'
+import {decompress, compress, decompressString, compressString, eventBus} from '../utils'
 
-export function Property({setNode, controlShow, onChange}) {
+export function Property({setNode, onChange}) {
 
-    let nodeName: string = ''
-    // let arrCfg: [[string, string, any, string]] = [];
-    let arrCfg = useRef([]);
+    const [, setUpdateNow] = useState(0); //для перерисовки компонента
+    let nodeName: string = '';
+
+    let refChanged = useRef(null); //флаг -- компонент изменен
+    let refArrCfg = useRef([]);
+    let refIsWasChange = useRef(false);
 
     let refProp = useRef(null);
     let refPropTabs = useRef(null);
 
-    const show = (isShow) => refProp.current.classList[isShow ? 'remove' : 'add']('property--hide')
-
-    useEffect(() => {
-        controlShow && controlShow(() => () => show(true))
-    }, [])
+    const show = (isShow) => {
+        setUpdateNow(conut => conut + 1); //при каждом показе/скрытиии перерисовываем}
+        refProp.current.classList[isShow ? 'remove' : 'add']('prop--hide');
+        refProp.current.focus();
+        refChanged.current.innerHTML = '';
+    }
 
     if (setNode) {
         nodeName = setNode.dataset.node;
-        arrCfg.current = JSON.parse(decompressString(setNode.dataset.cfg)!);
+        refArrCfg.current = JSON.parse(decompressString(setNode.dataset.cfg)!);
     }
 
+    eventBus.addEventListener('menu-property-show', () => {
+        refIsWasChange.current = false;
+        show(true)
+    })
+
     const listTypeComponent = {
-        'number': function ({name, val, title, onChange}) {
-            return <div className="property__param">
-                <div className="property__param__name">{title}:</div>
-                <input className="property__param__number" type="number" defaultValue={val}
-                       onBlur={({target}) => {
-                           console.log(val)
-                           onChange(name, Number(target.value), val)
-                       }}
+        'number': function ({name, val, onChange}) {
+            return <>
+                <input className="prop__param__number" type="number" defaultValue={val}
+                       onBlur={({target}) => onChange(name, Number(target.value), val)}
                        onKeyDown={({target, key}) => {
                            if (key == 'Enter') onChange(name, Number((target as InputHTMLAttributes<string>).value), val)
-                       }}/></div>
+                       }}/></>
         },
-        'string': function ({name, val, title, onChange}) {
-            return <div className="property__param">
-                <div className="property__param__name">{title}:</div>
-                <input className="property__param__string" type="text" defaultValue={val}
+        'string': function ({name, val, onChange}) {
+            return <>
+                <input className="prop__param__string" type="text" defaultValue={val}
                        onBlur={({target}) => onChange(name, target.value)}
                        onKeyDown={({target, key}) => {
                            if (key == 'Enter') onChange(name, (target as InputHTMLAttributes<string>).value)
-                       }}/></div>
+                       }}/></>
         }
     }
 
     const onChangeParam = (name, val, _val) => {
-        Object.entries(arrCfg.current).forEach(([key, param]) => {
+        Object.entries(refArrCfg.current).forEach(([key, param]) => {
             param.forEach(({name: _name, type, val: _val, title}, i) => {
                 if (_name == name && _val != val) {
-                    arrCfg.current[key][i] = {name, type, val, title}
+                    refIsWasChange.current = true;
+                    refArrCfg.current[key][i] = {name, type, val, title}
+                    refChanged.current.innerHTML = '*';
                 }
             })
         })
         // setNode.dataset.cfg = compressString(JSON.stringify(arrCfg));
-        console.log(arrCfg.current)
-        console.log(setNode.dataset.cfg)
+        // console.log(refArrCfg.current)
+        // console.log(setNode.dataset.cfg)
     }
 
     let onApply = () => {
-        setNode.dataset.cfg = compressString(JSON.stringify(arrCfg.current));
-        onChange(setNode, arrCfg.current)
+        setNode.dataset.cfg = compressString(JSON.stringify(refArrCfg.current));
+        onChange(setNode, refArrCfg.current)
         show(false)
     };
     let onCancel = () => {
-        show(false)
+        if (refIsWasChange.current) {
+            eventBus.dispatchEvent('confirm', (isYes) => {
+                if (isYes) {
+                    setNode.dataset.cfg = compressString(JSON.stringify(refArrCfg.current));
+                    onChange(setNode, refArrCfg.current)
+                }
+                show(false)
+            }, 'Сохранить изменения?')
+        } else
+            show(false)
     }
 
     function onClickTab(e) {
@@ -81,19 +96,23 @@ export function Property({setNode, controlShow, onChange}) {
         refPropTabs.current.children[index].style.display = ''
     }
 
-
     return (
-        <div className="property property--hide" ref={refProp}>
-            <div className="property__menu">
-                <div className="property__header">
-                    <div>Конфигуратор: {nodeName}</div>
+        <div className="prop prop--hide" ref={refProp} tabIndex="-1" onKeyDown={({key}) => {
+            if (key == 'Escape') onCancel();
+        }}>
+            <div className="prop__menu">
+                <div className="prop__header">
+                    <div>
+                        Конфигуратор: {nodeName}
+                        <div ref={refChanged} style={{display: 'inline'}}></div>
+                    </div>
                     <Button onClick={onCancel}>
                         <div className="icon-cross"></div>
                     </Button>
                 </div>
 
                 <div className="tab__header" onClick={onClickTab}>
-                    {Object.entries(arrCfg.current).map(([tabName, arrParam], iTab) => {
+                    {Object.entries(refArrCfg.current).map(([tabName, arrParam], iTab) => {
                         return <div
                             className={"tab__header__item " + (iTab == 0 ? 'tab__header__item--active' : '')}
                             key={iTab}
@@ -101,25 +120,22 @@ export function Property({setNode, controlShow, onChange}) {
                     })}
                 </div>
                 <div className="tab__body" ref={refPropTabs}>
-                    {Object.entries(arrCfg.current).map(([tabName, arrParam], iTab) => {
-                        return (<div className="tab__body__item" key={iTab}
-                                     style={{display: iTab == 0 ? 'unset' : 'none'}}>
-                            {arrParam.map(({name, type, val, title}, i) => {
-                                let comp = listTypeComponent[type] ? listTypeComponent[type] : listNode[nodeName].components[type];
-                                return createElement(comp, {
-                                    name,
-                                    val,
-                                    title,
-                                    key: i,
-                                    onChange: onChangeParam
-                                })
-                            })}
-                        </div>)
+                    {Object.entries(refArrCfg.current).map(([tabName, arrParam], iTab) => {
+                        return (
+                            <div className="tab__body__item" key={iTab} style={{display: iTab == 0 ? 'unset' : 'none'}}>
+                                {arrParam.map(({name, type, val, title}, i) => {
+                                    let comp = listTypeComponent[type] ? listTypeComponent[type] : listNode[nodeName].components[type];
+                                    return <div className="prop__param" key={i}>
+                                        <div className="prop__param__name">{title}:</div>
+                                        {createElement(comp, {name, val, title, key: i, onChange: onChangeParam})}
+                                    </div>
+                                })}
+                            </div>)
 
                     })}
                 </div>
 
-                <div className="property__footer">
+                <div className="prop__footer">
                     <Button onClick={onApply}>Применить</Button>
                     <Button onClick={onCancel}>Отмена</Button>
                 </div>

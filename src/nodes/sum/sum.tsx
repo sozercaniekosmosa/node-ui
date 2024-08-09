@@ -1,4 +1,5 @@
 export default class {
+    ver: string = '0.0.0';
     name = 'sum';
     color = '#f6e6e1';
     A: number;
