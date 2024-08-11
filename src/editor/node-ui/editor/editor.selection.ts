@@ -10,6 +10,7 @@ export class EditorSelection {
     private arrSelected: Element[] | null = [];
     private isControlLeft: boolean = false;
     private wasSelected: boolean = false;
+    private arrKey = [];
 
     constructor(private nu: NodeUI) {
         this.svg = nu.svg;
@@ -22,11 +23,22 @@ export class EditorSelection {
     }
 
     private handlerKeyDown(e): void {
-        if (e.code == 'ControlLeft') this.isControlLeft = true;
+        this.arrKey[e.code.toLowerCase()] = true;
+
+        if (this.arrKey['controlleft']) this.isControlLeft = true;
+        if (this.arrKey['controlleft'] && this.arrKey['keya']) {
+            let listSelected = this.svg.querySelectorAll('.' + NodeSelector.node);
+            if (listSelected) {
+                this.arrSelected = [...listSelected]
+                this.arrSelected.forEach(node => node.classList.add(NodeSelector.selected))
+                this.svg.dispatchEvent(new CustomEvent('selected', {detail: listSelected ? this.arrSelected : null}));
+            }
+        }
     }
 
     private handlerKeyUp(e): void {
-        if (e.code == 'ControlLeft') this.isControlLeft = false;
+        this.arrKey[e.code.toLowerCase()] = false
+        if (!this.arrKey['controlleft']) this.isControlLeft = false;
     }
 
     public handlerMouseDown({target, p, start: s}: TMouseEvent): void {

@@ -1,4 +1,4 @@
-import {Point, Svg} from "./svg";
+import {Svg} from "./svg";
 import {getID} from "../../utils";
 import {EditorLinkCreate} from "./editor/editor.link-create";
 import {EditorLinkRemove} from "./editor/editor.link-remove";
@@ -77,7 +77,8 @@ export class NodeUI extends Svg {
         {
             x = 50, y = 50, widthEmpty = 0, nodeName = 'empty',
             arrIn = [], arrOut = [], id = getID(), data,
-            color = '#d7d7d7'
+            color = '#d7d7d7',
+            linkIn, linkOut
         }: TNodeParam) {
         const numberIn: number = arrIn!.length;
         const numberOut: number = arrOut!.length;
@@ -105,7 +106,7 @@ export class NodeUI extends Svg {
 
         const fillIn: string = '#bcffd6';
         const fillOut: string = '#ffc69a';
-        const fillNode: string = color;
+        const fillNode: string = color!;
         const stroke: string = '#25334b';
 
         const nodeGroup = this.group({x, y, class: NodeSelector.node, data: {node: nodeName, ...data}});
@@ -119,30 +120,51 @@ export class NodeUI extends Svg {
         nodeGroup.id = id!;
 
         for (let i = 0, offY = 0; i < numberIn; i++, offY += r * 2 + step) {
-            this.circle(
+            const idIn = getID();
+            const nodeConnectorIn = this.circle(
                 {
                     cx: inX, cy: inY + offY, r, stroke, fill: fillIn,
                     to: nodeGroup, class: [NodeSelector.pinIn],
-                    id: getID(), data: {name: arrIn?.[i]}
+                    id: idIn, data: {name: arrIn?.[i]}
                 });
             this.text({
                 x: inX + offEdge, y: inY + offY + 3,
                 text: arrIn?.[i],
                 to: nodeGroup, class: [NodeSelector.pinText],
             })
+            if (linkIn) {
+                const arrNode = linkIn[i];
+                arrNode && arrNode.forEach(node => {
+                    let nodeLink = this.link(0, 0, 0, 0, {class: NodeSelector.link, strokeLinecap: 'round',})
+                    this.linkCreate.updateConnectors(nodeConnectorIn, node)
+                    nodeLink!.id = node.id + '-' + idIn;
+                    this.linkCreate.updateConnection()
+                });
+            }
         }
         for (let i = 0, offY = 0; i < numberOut; i++, offY += r * 2 + step) {
-            this.circle(
+            const idOut = getID();
+            const nodeConnectorOut = this.circle(
                 {
                     cx: outX, cy: outY + offY, r, stroke, fill: fillOut,
                     to: nodeGroup, class: [NodeSelector.pinOut],
-                    id: getID(), data: {name: arrOut?.[i]}
+                    id: idOut, data: {name: arrOut?.[i]}
                 });
             this.text({
                 x: outX - offEdge - arrWidthOut[i], y: outY + offY + 3,
                 text: arrOut?.[i],
                 to: nodeGroup, class: [NodeSelector.pinText],
             })
+
+            if (linkOut) {
+                    const arrNode = linkOut[i];
+                    arrNode && arrNode.forEach(node => {
+                        let nodeLink = this.link(0, 0, 0, 0, {class: NodeSelector.link, strokeLinecap: 'round',})
+                        this.linkCreate.updateConnectors(nodeConnectorOut, node)
+                        nodeLink!.id = idOut + '-' + node.id;
+                        this.linkCreate.updateConnection()
+                    });
+            }
         }
 
         this.text({
@@ -175,7 +197,6 @@ export class NodeUI extends Svg {
         if (this.key['escape']) this.resetMode(this.mode);
         // console.log(this.key)
         if (this.key['f5'] || this.key['f12']) return
-        // e.preventDefault();
         document.dispatchEvent(new CustomEvent('svgkeydown', {detail: {...this.key}}))
     }
 

@@ -312,7 +312,7 @@ export class Svg {
         // Создаем текстовый элемент и добавляем его в SVG
         let id = 'temp-node-for-width-text';
         let prop = {x: 0, y: 0, class: css, text, opacity: 0, id};
-        if (!this.tempNodeForWidthText) this.tempNodeForWidthText = this.svg.querySelector('#' + id);
+        if (!this.tempNodeForWidthText || !document.body.contains(this.tempNodeForWidthText)) this.tempNodeForWidthText = this.svg.querySelector('#' + id);
         this.tempNodeForWidthText = (this.tempNodeForWidthText ? this.setProperty(this.tempNodeForWidthText, prop) : this.text(prop)) as SVGGraphicsElement
         return this.tempNodeForWidthText.getBBox();
     }

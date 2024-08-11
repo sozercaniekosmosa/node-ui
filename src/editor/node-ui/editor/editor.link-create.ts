@@ -34,7 +34,7 @@ export class EditorLinkCreate {
         node && this.svg.removeChild(node as Element);
     }
 
-    private updateConnection() {
+    public updateConnection() {
 
         // получаем все конекторы на выделенных nod-ах
         let selector = `.${NodeSelector.selected}>.${NodeSelector.pinIn},.${NodeSelector.selected}>.${NodeSelector.pinOut}`;
@@ -92,15 +92,7 @@ export class EditorLinkCreate {
         if (((isStartIn && isEndOut) || (isStartOut && isEndIn)) && isNotExist) { // подключение к пину
 
             this.nu.updateLink(this.nodeLink as SVGElement, sc, ec)
-
-            const setEndTo = new Set(nodeEnd.dataset?.to ? nodeEnd?.dataset.to.split(' ') : []);
-            setEndTo.add(this.nodeStart.id)
-            nodeEnd.dataset.to = [...setEndTo].join(' ');
-
-            const setStartTo = new Set(this.nodeStart.dataset?.to ? this.nodeStart?.dataset.to.split(' ') : []);
-            setStartTo.add(nodeEnd.id)
-            this.nodeStart.dataset.to = [...setStartTo].join(' ');
-
+            this.updateConnectors(this.nodeStart, nodeEnd)
             this.nodeLink!.id = idLink;
 
             this.svg.dispatchEvent(new CustomEvent('link-create', {detail: {}}));
@@ -111,4 +103,14 @@ export class EditorLinkCreate {
         this.nodeStart = null;
         this.nodeUnitDrag = null;
     }
+
+    public updateConnectors(nodeStart: SVGElement, nodeEnd: SVGElement) {
+        const setEndTo = new Set(nodeEnd.dataset?.to ? nodeEnd?.dataset.to.split(' ') : []);
+        setEndTo.add(nodeStart!.id)
+        nodeEnd.dataset.to = [...setEndTo].join(' ');
+        const setStartTo = new Set(nodeStart?.dataset.to ? nodeStart?.dataset.to.split(' ') : []);
+        setStartTo.add(nodeEnd.id)
+        nodeStart.dataset.to = [...setStartTo].join(' ');
+    }
 }
+

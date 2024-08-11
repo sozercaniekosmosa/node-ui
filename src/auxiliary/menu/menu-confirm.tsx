@@ -3,7 +3,7 @@ import React, {useEffect, useRef, useState} from "react";
 import "./style.css"
 import {eventBus} from "../../utils"
 
-export function MenuConfirm({children, onClickYes, onClickNo, show = 'confirm-show', hide = "confirm-hide"}) {
+export function MenuConfirm({children, onClickYes, onClickNo, name = 'confirm-show'}) {
     let refMenu = useRef(null);
     let refCallback = useRef((is) => is);
     let [desc, setDesc] = useState('Введите сообщение');
@@ -27,12 +27,11 @@ export function MenuConfirm({children, onClickYes, onClickNo, show = 'confirm-sh
         }
     }
 
-    eventBus && eventBus.addEventListener(show, (callback, description) => {
+    eventBus && eventBus.addEventListener(name, (callback, description) => {
         setDesc(description ? description : children)
         refCallback.current = callback;
         showMenu(true)
     })
-    eventBus && eventBus.addEventListener(hide, () => showMenu(false))
 
     const onCancel = () => {
         onClickNo && onClickNo();
