@@ -1,9 +1,14 @@
 .header {
   border: 1px solid gray;
   display: flex;
+  padding: 0.2em;
+  box-shadow: 0 0 11px -6px rgb(0, 0, 0);
 }
 .header, .header *, .header * * {
   user-select: none;
+}
+.header > * {
+  margin-right: 0.2em;
 }
 
 /*# sourceMappingURL=style.css.map */

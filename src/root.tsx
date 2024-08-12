@@ -1,10 +1,11 @@
 import React, {MutableRefObject, useRef, useState} from 'react';
 import ReactDOM from 'react-dom/client';
 import './style.css';
+import './auxiliary/icon/style.css';
 import {Property} from "./property/property";
 import {Toolbox} from "./toolbox/toolbox";
-import {Editor, TEventData} from "./editor/editor";
-import {Header} from "./header/header";
+import {Editor, TEventEditor} from "./editor/editor";
+import {Header, TEventHeader} from "./header/header";
 import {NodeSelector, NodeUI} from "./editor/node-ui/node-ui";
 import {History} from './auxiliary/history'
 import {Button} from "./auxiliary/button/button";
@@ -31,7 +32,10 @@ function Root() {
     const [nodeDataSelected, setNodeDataSelected] = useState(null);
 
     function onKeyDown(e) {
-        arrKey[e.code.toLowerCase()] = true;
+        const code = e.code.toLowerCase();
+        if (arrKey[code]) return;
+        arrKey[code] = true;
+
         if (arrKey?.['escape']) arrKey = [];
         if (arrKey?.['controlleft'] && arrKey?.['keyz']) onUndo();
         if (arrKey?.['controlleft'] && arrKey?.['keyy']) onRedo();
@@ -41,37 +45,17 @@ function Root() {
         }
         if (arrKey?.['controlleft'] && arrKey?.['keyv']) {
             onPast();
-            history.addHistory('property', nui.svg.innerHTML);
+            // arrKey = [];
+            // console.log(code)
         }
-        if (arrKey?.['controlleft'] && arrKey?.['keyx']) {
-            onCut();
-            history.addHistory('property', nui.svg.innerHTML);
-        }
+        if (arrKey?.['controlleft'] && arrKey?.['keyx']) onCut();
 
-        if (arrKey?.['delete'] && arrSelected!.length > 0 && nodeFocus.classList.contains('editor')) {
-            eventBus.dispatchEvent('confirm', (isYes) => isYes && nui.removeNode(), 'Уверены?')
-        }
-        if ((arrKey?.['enter'] || arrKey?.['numpadenter']) && arrSelected!.length === 1 && nodeFocus.classList.contains('editor')) {
-            eventBus.dispatchEvent('menu-property-show')
-            setNodeProp((arrSelected as [])[0])
-        }
-        console.log(e.code.toLowerCase())
+        if (arrKey?.['delete'] && nodeFocus.classList.contains('editor')) onDelete()
+        if ((arrKey?.['enter'] || arrKey?.['numpadenter']) && nodeFocus.classList.contains('editor')) onProperty();
 
-
+        console.log(arrKey)
+        // console.log(e.code.toLowerCase())
     }
-
-    let onDblClick = ({target}) => {
-        const node = target.closest('.' + NodeSelector.node)
-        if (node) {
-            eventBus.dispatchEvent('menu-property-show')
-            setNodeProp(node)
-        }
-    };
-
-    let onPropertyChange = (node, val) => {
-        // console.log(node, val)
-        history.addHistory('property', nui.svg.innerHTML);
-    };
 
     function onUndo() {
         let data = history.undoHistory();
@@ -100,8 +84,13 @@ function Root() {
             if (arrOut.length) cfgOut = arrOut.map(node => node.dataset.name)
             let cfg = {
                 ...nui.getTransformPoint(node).add(10),
-                nodeName: node.dataset.node, arrIn: cfgIn, arrOut: cfgOut, color: node.querySelector('.handle').getAttribute('fill'),
-                linkIn: arrNodeIdOut, linkOut: arrNodeIdIn, data: {cfg: node.dataset.cfg}
+                nodeName: node.dataset.node,
+                arrIn: cfgIn,
+                arrOut: cfgOut,
+                color: node.querySelector('.handle').getAttribute('fill'),
+                linkIn: arrNodeIdOut,
+                linkOut: arrNodeIdIn,
+                data: {cfg: node.dataset.cfg}
             };
 
             if (node.dataset?.cfg) cfg["cfg"] = JSON.parse(decompressString(node.dataset.cfg)!);
@@ -127,26 +116,41 @@ function Root() {
         arrCfg.forEach(cfg => {
             const newNode = nui.createNode(cfg)
             newNode.classList.add(NodeSelector.selected)
+            cfg.x += 10;
+            cfg.y += 10;
         })
+        history.addHistory('past', nui.svg.innerHTML);
     }
 
     let onCut = () => {
         onCopy(false); // false -- тк нарушаются связи после удаления
         nui.removeNode();
+        history.addHistory('cut', nui.svg.innerHTML);
     }
 
-    window['copy'] = onCopy;
-    window['past'] = onPast;
-    window['cut'] = onCut;
+    let onDelete = () => {
+        if (arrSelected!.length > 0)
+            eventBus.dispatchEvent('confirm', (isYes) => isYes && nui.removeNode(), 'Уверены?')
+    }
 
-    let onEventEditor = ({name, nui: nodeUi, arrSelect: arrSel}: TEventData) => {
+    let onProperty = () => {
+        if (arrSelected?.length !== 1) return
+        setNodeProp((arrSelected as [])[0])
+        eventBus.dispatchEvent('menu-property-show')
+    }
+
+    let onPropertyChange = (node, val) => {
+        history.addHistory('property', nui.svg.innerHTML);
+    };
+
+    let onEventHandler = ({name, data}: TEventEditor | TEventHeader) => {
         switch (name) {
             case 'init':
-                nui = nodeUi;
+                nui = data;
                 history.initHistory(nui.svg.innerHTML);
                 break;
             case 'selected':
-                arrSelected = arrSel;
+                arrSelected = data;
                 break;
             case 'dragged':
             case 'link-create':
@@ -156,30 +160,36 @@ function Root() {
                 history.addHistory(name, nui.svg.innerHTML);
                 break;
 
+            case 'undo':
+                onUndo()
+                break;
+            case 'redo':
+                onRedo()
+                break;
+            case 'copy':
+                onCopy()
+                break;
+            case 'past':
+                onPast()
+                break;
+            case 'cut':
+                onCut()
+                break;
+            case 'delete':
+                onDelete()
+                break;
+            case 'property':
+                onProperty()
+                break;
+
         }
     }
 
     return (<>
-        <Header className="menu">
-            <Button onClick={onUndo}>
-                <div className="icon-undo"/>
-            </Button>
-            <Button onClick={onRedo}>
-                <div className="icon-redo"/>
-            </Button>
-            <Button onClick={onCopy}>
-                <div className="icon-copy"/>
-            </Button>
-            <Button onClick={onPast}>
-                <div className="icon-past"/>
-            </Button>
-            <Button onClick={onCut}>
-                <div className="icon-cut"/>
-            </Button>
-        </Header>
-        <div className="node-editor" onDoubleClick={onDblClick}>
+        <Header className="menu" onEvent={onEventHandler}></Header>
+        <div className="node-editor" onDoubleClick={onProperty}>
             <Toolbox onNodeSelect={(data) => setNodeDataSelected(data)}/>
-            <Editor newNode={nodeDataSelected} onEvent={onEventEditor}/>
+            <Editor newNode={nodeDataSelected} onEvent={onEventHandler}/>
             <Property setNode={nodeProp} onChange={onPropertyChange}/>
         </div>
         <MenuConfirm name={'confirm'}/>

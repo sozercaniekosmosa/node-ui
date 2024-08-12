@@ -97,9 +97,9 @@ export function Property({setNode, onChange}) {
     }
 
     return (
-        <div className="prop prop--hide" ref={refProp} tabIndex="-1" onKeyDown={({key}) => {
-            if (key == 'Escape') onCancel();
-        }}>
+        <div className="prop prop--hide" ref={refProp} tabIndex="-1"
+             onKeyDown={({key}) => key == 'Escape' && onCancel()}
+             onClick={({target}) => (target as Element).classList.contains('prop') && onCancel()}>
             <div className="prop__menu">
                 <div className="prop__header">
                     <div>

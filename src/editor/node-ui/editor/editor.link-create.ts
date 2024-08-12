@@ -62,7 +62,10 @@ export class EditorLinkCreate {
         if (clickTarget.classList.contains(NodeSelector.pinIn) || clickTarget.classList.contains(NodeSelector.pinOut)) {
             this.nu.setMode('link-create');
             this.nodeStart = clickTarget; //запоминаем коннектор
-            this.nodeLink = this.nu.link(c.x, c.y, c.x, c.y, {class: NodeSelector.link, strokeLinecap: 'round',})
+            this.nodeLink = this.nu.link(c.x, c.y, c.x, c.y, {
+                class: NodeSelector.link, strokeLinecap: 'round',
+                to: this.nu.gpath
+            })
         }
     }
 

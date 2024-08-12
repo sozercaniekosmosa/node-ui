@@ -1,0 +1,85 @@
+.icon-undo {
+  background-size: cover;
+  background-position: initial;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  padding: 3px;
+  background-image: url("./icon-undo.svg");
+}
+
+.icon-redo {
+  background-size: cover;
+  background-position: initial;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  padding: 3px;
+  background-image: url("./icon-redo.svg");
+}
+
+.icon-past {
+  background-size: cover;
+  background-position: initial;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  padding: 2px;
+  background-image: url("./icon-past.svg");
+}
+
+.icon-copy {
+  background-size: cover;
+  background-position: initial;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  padding: 1px;
+  background-image: url("./icon-copy.svg");
+}
+
+.icon-cut {
+  background-size: cover;
+  background-position: initial;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  padding: 1px;
+  background-image: url("./icon-cut.svg");
+}
+
+.icon-delete {
+  background-size: cover;
+  background-position: initial;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  padding: 3px;
+  background-image: url("./icon-delete.svg");
+}
+
+.icon-property {
+  background-size: cover;
+  background-position: initial;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  padding: 3px;
+  background-image: url("./icon-property.svg");
+}
+
+/*# sourceMappingURL=style.css.map */

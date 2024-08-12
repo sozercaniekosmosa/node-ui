@@ -1,20 +1,40 @@
 import "./style.css"
-import React, {useEffect, useState} from "react";
-import {arrNode} from "../nodes/nodes";
+import React from "react";
+import {Button} from "../auxiliary/button/button";
 
-export function Header({children}) {
 
-    // const [index, setIndex] = useState(-1)
+export type TEventHeader = {
+    name: 'undo' | 'redo' | 'copy' | 'past' | 'cut' | 'delete' | 'property',
+    data?: any
+};
 
-    // useEffect(() => {
-    //     getReset(() => () => setIndex(-1))
-    // }, [])
+export function Header({children, onEvent}) {
 
-    // function onMouseDown({target}) {
-    //     let nodeIndex = target.dataset.index;
-    //     setIndex(nodeIndex == index ? -1 : nodeIndex);
-    //     onNodeSelect && onNodeSelect(nodeIndex == index ? null : arrNode[target.dataset.index])
-    // }
+    function eventEmit(name: string) {
+        onEvent && onEvent({name} as TEventHeader)
+    }
 
-    return <div className="header">{children}</div>
+    return <div className="header">
+        <Button onClick={() => eventEmit('undo')} hint="Отмена ctrl+z">
+            <div className="icon-undo"/>
+        </Button>
+        <Button onClick={() => eventEmit('redo')} hint="Повторить ctrl+y">
+            <div className="icon-redo"/>
+        </Button>
+        <Button onClick={() => eventEmit('copy')} hint="Копировать ctrl+c">
+            <div className="icon-copy"/>
+        </Button>
+        <Button onClick={() => eventEmit('past')} hint="Вставить ctrl+v">
+            <div className="icon-past"/>
+        </Button>
+        <Button onClick={() => eventEmit('cut')} hint="Вырезать ctrl+x">
+            <div className="icon-cut"/>
+        </Button>
+        <Button onClick={() => eventEmit('delete')} hint="Удалить delete">
+            <div className="icon-delete"/>
+        </Button>
+        <Button onClick={() => eventEmit('property')} hint="Свойства">
+            <div className="icon-property"/>
+        </Button>
+    </div>
 }

@@ -1,0 +1,21 @@
+@mixin icon-styles($name, $path, $padding) {
+  .icon-#{$name} {
+    background-size: cover;
+    background-position: initial;
+    background-repeat: no-repeat;
+    background-origin: content-box;
+    box-sizing: border-box;
+    width: 24px;
+    height: 24px;
+    padding: $padding;
+    background-image: url($path)
+  }
+}
+
+@include icon-styles("undo", "./icon-undo.svg", 3px);
+@include icon-styles("redo", "./icon-redo.svg", 3px);
+@include icon-styles("past", "./icon-past.svg", 2px);
+@include icon-styles("copy", "./icon-copy.svg", 1px);
+@include icon-styles("cut", "./icon-cut.svg", 1px);
+@include icon-styles("delete", "./icon-delete.svg", 3px);
+@include icon-styles("property", "./icon-property.svg", 3px);

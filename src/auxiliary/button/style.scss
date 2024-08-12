@@ -30,7 +30,7 @@
 .icon {
   &-cross {
     @include icon-init;
-    background-image: url("../../asset/icon-cross.svg");
+    background-image: url("../icon/icon-cross.svg");
   }
 }
 
