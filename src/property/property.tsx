@@ -4,6 +4,12 @@ import {listNode} from "../nodes/nodes";
 import {Button} from "../auxiliary/button/button";
 import {decompress, compress, decompressString, compressString, eventBus} from '../utils'
 
+
+export type TEventProperty = {
+    name: 'property-change',
+    data?: any
+}
+
 export function Property({setNode, onChange}) {
 
     const [, setUpdateNow] = useState(0); //для перерисовки компонента

@@ -196,21 +196,12 @@ export class Svg {
     private startPoint: Point | null = null;
     private tempNodeForWidthText: SVGGraphicsElement | null = null;
 
-    public _gpath: SVGElement;
-    public get gpath(): SVGElement { //сделана функция получения тк из-за history ссылки на элементы svg становятся неактуальными
-        if (!this._gpath || !document.body.contains(this._gpath))
-            this._gpath = this.group({class: NodeSelector.path})
-        return this._gpath;
-    };
-
     constructor(dest: HTMLElement = document.body) {
         let {width, height} = dest.getBoundingClientRect();
         this.svg = this.createSvg({
             width: width, height: height, to: dest,
             // shapeRendering: "crispEdges"
         })
-        // debugger
-        // this.gpath = this.group({class: NodeSelector.path});
 
         this.setView(0, 0, width, height);
 
@@ -358,8 +349,8 @@ export class Svg {
     }
 
     private pathCalc(sx: number, ex: number, sy: number, ey: number) {
-        const controlPoint1 = {x: sx + (ex - sx) / 3, y: sy};
-        const controlPoint2 = {x: ex - (ex - sx) / 3, y: ey};
+        const controlPoint1 = {x: sx + (ex - sx) / 1.5, y: sy};
+        const controlPoint2 = {x: ex - (ex - sx) / 1.5, y: ey};
         return `M${sx} ${sy} C ${controlPoint1.x} ${controlPoint1.y}, ${controlPoint2.x} ${controlPoint2.y}, ${ex} ${ey}`;
     }
 

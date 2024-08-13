@@ -7,11 +7,9 @@ export class EditorLinkRemove {
     public nodeStart: SVGElement | null = null;
     private nodeRemove: SVGElement | null = null;
     private readonly svg: SVGElement;
-    private readonly gpath: SVGElement;
 
     constructor(private nu: NodeUI) {
         this.svg = nu.svg;
-        this.gpath = nu.gpath;
 
         this.svg.addEventListener('svgmousedown', (e: CustomEventInit) => this.handlerMouseDown(e.detail));
         this.svg.addEventListener('svgmouseup', (e: CustomEventInit) => this.handlerMouseUp(e.detail));
@@ -31,8 +29,8 @@ export class EditorLinkRemove {
             setEnd.delete(startConnId);
             nodeDestConn.dataset.to = [...setEnd].join(' ');
         }
-        node && this.gpath.removeChild(node as Element);
-        // node && this.svg.removeChild(node as Element);
+        const gpath = this.svg.querySelector('.'+NodeSelector.path)
+        node && gpath.removeChild(node as Element);
     }
 
     public handlerMouseDown({p, target}: TMouseEvent): void {
@@ -76,7 +74,7 @@ export class EditorLinkRemove {
             // this.removeNode(this.nodeRemove)
             this.svg.removeChild(this.nodeRemove);
             this.nodeRemove = null;
-            if(didRemove) this.svg.dispatchEvent(new CustomEvent('link-remove', {detail: {}}));
+            if (didRemove) this.svg.dispatchEvent(new CustomEvent('link-remove', {detail: {}}));
         }
     }
 

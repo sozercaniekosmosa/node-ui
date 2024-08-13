@@ -9,7 +9,7 @@ import {EditorPan} from "./editor/editor.pan";
 export const NodeSelector = {
     selected: 'selected',
     node: 'node',
-    path: 'path',
+    path: 'group-path',
     handle: 'handle',
     link: 'link',
     linkRemove: 'link-remove',
@@ -46,6 +46,7 @@ export class NodeUI extends Svg {
 
     constructor(dest: HTMLElement) {
         super(dest);
+        this.group({class: NodeSelector.path})
 
         //building editor
         this.pan = new EditorPan(this);
@@ -134,18 +135,6 @@ export class NodeUI extends Svg {
                 text: arrIn?.[i],
                 to: nodeGroup, class: [NodeSelector.pinText],
             })
-            if (linkIn) {
-                const arrNode = linkIn[i];
-                arrNode && arrNode.forEach(node => {
-                    let nodeLink = this.link(0, 0, 0, 0, {
-                        class: NodeSelector.link, strokeLinecap: 'round',
-                        to: this.gpath
-                    })
-                    this.linkCreate.updateConnectors(nodeConnectorIn, node)
-                    nodeLink!.id = node.id + '-' + idIn;
-                    this.linkCreate.updateConnection()
-                });
-            }
         }
         for (let i = 0, offY = 0; i < numberOut; i++, offY += r * 2 + step) {
             const idOut = getID();
@@ -160,19 +149,6 @@ export class NodeUI extends Svg {
                 text: arrOut?.[i],
                 to: nodeGroup, class: [NodeSelector.pinText],
             })
-
-            if (linkOut) {
-                const arrNode = linkOut[i];
-                arrNode && arrNode.forEach(node => {
-                    let nodeLink = this.link(0, 0, 0, 0, {
-                        class: NodeSelector.link, strokeLinecap: 'round',
-                        to: this.gpath
-                    })
-                    this.linkCreate.updateConnectors(nodeConnectorOut, node)
-                    nodeLink!.id = idOut + '-' + node.id;
-                    this.linkCreate.updateConnection()
-                });
-            }
         }
 
         this.text({

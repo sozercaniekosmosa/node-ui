@@ -1,13 +1,15 @@
-export class History {
+export default class History {
 
     history = [];
     indexHistory = -1;
+    maxDept = 3;
 
-    constructor() {
+    constructor(maxDept = 10) {
+        this.maxDept = maxDept;
 
-        window['undoHistory'] = this.undoHistory;
-        window['redoHistory'] = this.redoHistory;
-        window['addHistory'] = this.addHistory;
+        // window['undoHistory'] = this.undoHistory;
+        // window['redoHistory'] = this.redoHistory;
+        // window['addHistory'] = this.addHistory;
     }
 
     initHistory(data) {
@@ -30,6 +32,7 @@ export class History {
     addHistory(name, data?) {
         if (this.indexHistory + 1 < this.history.length) this.history = this.history.splice(0, this.indexHistory + 1)
         this.history.push([name, data]);
+        if (this.history.length > this.maxDept) this.history.shift()//если больше макс. глубины сдвигаем (удаляем ранний)
         this.indexHistory = this.history.length - 1;
         // console.log('add:', this.history)
     }

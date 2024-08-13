@@ -31,7 +31,8 @@ export class EditorLinkCreate {
             setEnd.delete(startConnId);
             nodeDestConn.dataset.to = [...setEnd].join(' ');
         }
-        node && this.svg.removeChild(node as Element);
+        const gpath = this.svg.querySelector('.' + NodeSelector.path)
+        node && gpath.removeChild(node as Element);
     }
 
     public updateConnection() {
@@ -62,9 +63,10 @@ export class EditorLinkCreate {
         if (clickTarget.classList.contains(NodeSelector.pinIn) || clickTarget.classList.contains(NodeSelector.pinOut)) {
             this.nu.setMode('link-create');
             this.nodeStart = clickTarget; //запоминаем коннектор
+            const gpath = this.svg.querySelector('.' + NodeSelector.path)
             this.nodeLink = this.nu.link(c.x, c.y, c.x, c.y, {
                 class: NodeSelector.link, strokeLinecap: 'round',
-                to: this.nu.gpath
+                to: gpath
             })
         }
     }
