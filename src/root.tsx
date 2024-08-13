@@ -6,8 +6,8 @@ import {Property, TEventProperty} from "./property/property";
 import {Toolbox} from "./toolbox/toolbox";
 import {Editor, TEventEditor} from "./editor/editor";
 import {Header, TEventHeader} from "./header/header";
-import History from './auxiliary/history'
-import Service from './auxiliary/service'
+import History from './history'
+import Service from './service'
 import {MenuConfirm} from "./auxiliary/menu/menu-confirm";
 import {eventBus} from "./utils"
 

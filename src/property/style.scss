@@ -1,6 +1,6 @@
 $color-gray: rgba(128, 128, 128, 0.5);
 
-.property {
+.prop {
 
   position: absolute;
   left: 0;
@@ -43,15 +43,44 @@ $color-gray: rgba(128, 128, 128, 0.5);
     border-bottom: 1px solid $color-gray;
   }
 
+  &__param--inline {
+    width: 100%;
+  }
+
+  &__param--2 {
+    width: 50%;
+  }
+
+  &__param--3 {
+    width: 33%;
+  }
+
+  &__param--hr {
+    padding-bottom: 1em;
+    border-bottom: 1px solid #cdcdcd;
+  }
+
+  &__param--left {
+    display: flex;
+    justify-content: flex-start !important;
+  }
+
+  &__param--right {
+    display: flex;
+    justify-content: flex-end !important;
+  }
+
   &__param {
     display: flex;
+    flex-direction: row;
     justify-content: center;
-    width: 100%;
 
     &__name {
       min-width: 50px;
       max-width: 40%;
-      margin-right: 1em;
+      margin: 0 1em;
+      white-space: nowrap;
+      padding: 0 0.3em;
     }
 
     &__number {
@@ -112,13 +141,21 @@ $color-gray: rgba(128, 128, 128, 0.5);
   flex: 1;
 
   &__item {
-    //padding: 1em;
-    //overflow: auto;
-    //height: inherit;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    //justify-content: space-between;
+    justify-content: center;
+    flex-direction: column;
+    padding: 2em;
 
     & > * {
       margin: .5em 0;
     }
+  }
+
+  &__item--heap {
+    flex-direction: unset;
   }
 
 }

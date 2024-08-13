@@ -60,7 +60,7 @@ export function Property({setNode, onChange}) {
 
     const onChangeParam = (name, val, _val) => {
         Object.entries(refArrCfg.current).forEach(([key, param]) => {
-            param.forEach(({name: _name, type, val: _val, title}, i) => {
+            param.arrParam.forEach(({name: _name, type, val: _val, title}, i) => {
                 if (_name == name && _val != val) {
                     refIsWasChange.current = true;
                     refArrCfg.current[key][i] = {name, type, val, title}
@@ -126,13 +126,30 @@ export function Property({setNode, onChange}) {
                     })}
                 </div>
                 <div className="tab__body" ref={refPropTabs}>
-                    {Object.entries(refArrCfg.current).map(([tabName, arrParam], iTab) => {
+                    {Object.entries(refArrCfg.current).map(([tabName, {arrOption, arrParam}], iTab) => {
+                        let arrStyle = [];
+                        if (arrOption) {
+                            arrOption.forEach(it => {
+                                if (it == 'heap') {
+                                    arrStyle.push('tab__body__item--heap')
+                                }
+                            })
+                        }
                         return (
-                            <div className="tab__body__item" key={iTab} style={{display: iTab == 0 ? 'unset' : 'none'}}>
-                                {arrParam.map(({name, type, val, title}, i) => {
+                            <div className={"tab__body__item " + arrStyle.join(' ')} key={iTab}
+                                 style={iTab !== 0 ? {display: 'none'} : {}}>
+                                {arrParam.map(({name, type, val, title, arrOption}, i) => {
                                     let comp = listTypeComponent[type] ? listTypeComponent[type] : listNode[nodeName].components[type];
-                                    return <div className="prop__param" key={i}>
-                                        <div className="prop__param__name">{title}:</div>
+                                    let arrStyle = [];
+                                    if (arrOption) {
+                                        let setCSS = new Set(['inline', 'center', 'right', 'left', '2', '3', 'hr'])
+                                        arrOption.forEach(it => { //inline, center, right, left, 2, 3, hr
+                                            if (setCSS.has(it)) arrStyle.push('prop__param--' + it)
+                                        })
+                                    }
+
+                                    return <div className={"prop__param " + arrStyle.join(' ')} key={i}>
+                                        <div className="prop__param__name">{title + ':'}</div>
                                         {createElement(comp, {name, val, title, key: i, onChange: onChangeParam})}
                                     </div>
                                 })}

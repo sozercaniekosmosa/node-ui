@@ -9,17 +9,33 @@ export default class {
     inputs = [];
     outputs = ['out'];
     cfg = {
-        'основная': [
-            {name: 'description', type: 'string', val: 'Описание', title: 'Знaчение-параметр'},
-            {name: 'valueA', type: 'number', val: 1, title: 'Значение-A'},
-            {name: 'valueB', type: 'number', val: 2, title: 'Значение-B'},
-            {name: 'valueC', type: 'number2', val: 0, title: 'Значение-C'},
-        ],
-        'вторая': [
-            {name: 'valueD', type: 'number', val: 1, title: 'Значение-D'},
-            {name: 'valueE', type: 'number', val: 2, title: 'Значение-E'},
-            {name: 'valueF', type: 'number', val: 0, title: 'Значение-F'},
-        ],
+        'основная': {
+            arrOption: ['heap'],
+            arrParam: [
+                {
+                    name: 'description', type: 'string', val: 'Описание', title: 'Знaчение-параметр',
+                    arrOption: ['inline', 'right', 'hr']
+                },
+                {name: 'valueA', type: 'number', val: 1, title: 'Значение-A', arrOption: ['2']},
+                {name: 'valueB', type: 'number', val: 2, title: 'Значение-B', arrOption: ['2']},
+                {name: 'valueC', type: 'number2', val: 0, title: 'Значение-C', arrOption: ['2']},
+                {name: 'valueG', type: 'number2', val: 0, title: 'Значение-G', arrOption: ['2']},
+                {name: 'valueH', type: 'number2', val: 0, title: 'Значение-H', arrOption: ['3']},
+                {name: 'valueI', type: 'number2', val: 0, title: 'Значение-I', arrOption: ['3']},
+                {name: 'valueI', type: 'number2', val: 0, title: 'Значение-I', arrOption: ['3']},
+                {name: 'valueI', type: 'number2', val: 0, title: 'Значение-I', arrOption: ['3']},
+                {name: 'valueI', type: 'number2', val: 0, title: 'Значение-I', arrOption: ['3']},
+                {name: 'valueI', type: 'number2', val: 0, title: 'Значение-I', arrOption: ['3']},
+                {name: 'valueI', type: 'number2', val: 0, title: 'Значение-I', arrOption: ['3']},
+            ]
+        },
+        'вторая': {
+            arrParam: [
+                {name: 'valueD', type: 'number', val: 1, title: 'Значение-D'},
+                {name: 'valueE', type: 'number', val: 2, title: 'Значение-E'},
+                {name: 'valueF', type: 'number', val: 0, title: 'Значение-F'},
+            ]
+        },
     };
     components = {
         'number2': function ({name, val, onChange}) {

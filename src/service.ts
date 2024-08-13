@@ -1,5 +1,5 @@
-import {NodeSelector, NodeUI} from "../editor/node-ui/node-ui";
-import {decompressString} from "../utils";
+import {NodeSelector, NodeUI} from "./editor/node-ui/node-ui";
+import {decompressString} from "./utils";
 
 export default class Service {
 
