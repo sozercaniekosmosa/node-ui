@@ -82,4 +82,16 @@
   background-image: url("./icon-property.svg");
 }
 
+.icon-cross {
+  background-size: cover;
+  background-position: initial;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  padding: 3px;
+  background-image: url("./icon-cross.svg");
+}
+
 /*# sourceMappingURL=style.css.map */

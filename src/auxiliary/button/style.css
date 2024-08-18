@@ -7,23 +7,11 @@
   text-align: center;
 }
 .button:hover {
-  background-color: rgba(0, 0, 0, 0.07);
+  background-color: rgba(0, 0, 0, 0.12);
 }
 .button:active {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.3);
   line-height: -1px;
-}
-
-.icon-cross {
-  background-size: cover;
-  background-position: initial;
-  background-repeat: no-repeat;
-  background-origin: content-box;
-  box-sizing: border-box;
-  width: 16px;
-  height: 16px;
-  padding: 3px;
-  background-image: url("../icon/icon-cross.svg");
 }
 
 /*# sourceMappingURL=style.css.map */

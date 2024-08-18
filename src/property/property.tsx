@@ -60,7 +60,7 @@ export function Property({setNode, onChange}) {
 
     const onChangeParam = (name, val, _val) => {
         Object.entries(refArrCfg.current).forEach(([key, param]) => {
-            param.arrParam.forEach(({name: _name, type, val: _val, title}, i) => {
+            param.forEach(({name: _name, type, val: _val, title}, i) => {
                 if (_name == name && _val != val) {
                     refIsWasChange.current = true;
                     refArrCfg.current[key][i] = {name, type, val, title}
@@ -113,7 +113,7 @@ export function Property({setNode, onChange}) {
                         <div ref={refChanged} style={{display: 'inline'}}></div>
                     </div>
                     <Button onClick={onCancel}>
-                        <div className="icon-cross"></div>
+                        <div className="icon-cross" style={{width: '16px', height: '16px'}}></div>
                     </Button>
                 </div>
 
@@ -126,18 +126,9 @@ export function Property({setNode, onChange}) {
                     })}
                 </div>
                 <div className="tab__body" ref={refPropTabs}>
-                    {Object.entries(refArrCfg.current).map(([tabName, {arrOption, arrParam}], iTab) => {
-                        let arrStyle = [];
-                        if (arrOption) {
-                            arrOption.forEach(it => {
-                                if (it == 'heap') {
-                                    arrStyle.push('tab__body__item--heap')
-                                }
-                            })
-                        }
+                    {Object.entries(refArrCfg.current).map(([tabName, arrParam], iTab) => {
                         return (
-                            <div className={"tab__body__item " + arrStyle.join(' ')} key={iTab}
-                                 style={iTab !== 0 ? {display: 'none'} : {}}>
+                            <div className="tab__body__item" key={iTab} style={iTab !== 0 ? {display: 'none'} : {}}>
                                 {arrParam.map(({name, type, val, title, arrOption}, i) => {
                                     let comp = listTypeComponent[type] ? listTypeComponent[type] : listNode[nodeName].components[type];
                                     let arrStyle = [];
@@ -149,7 +140,7 @@ export function Property({setNode, onChange}) {
                                     }
 
                                     return <div className={"prop__param " + arrStyle.join(' ')} key={i}>
-                                        <div className="prop__param__name">{title + ':'}</div>
+                                        {title ? <div className="prop__param__name">{title + ':'}</div> : ''}
                                         {createElement(comp, {name, val, title, key: i, onChange: onChangeParam})}
                                     </div>
                                 })}
@@ -168,4 +159,4 @@ export function Property({setNode, onChange}) {
 }
 
 //@ts-ignore
-window.decompress = decompress, window.compress = compress;
+// window.decompress = decompress, window.compress = compress;

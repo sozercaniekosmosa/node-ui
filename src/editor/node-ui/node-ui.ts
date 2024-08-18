@@ -79,8 +79,7 @@ export class NodeUI extends Svg {
         {
             x = 50, y = 50, widthEmpty = 0, nodeName = 'empty',
             arrIn = [], arrOut = [], id = getID(), data,
-            color = '#d7d7d7',
-            linkIn, linkOut
+            color = '#d7d7d7'
         }: TNodeParam) {
 
         const numberIn: number = arrIn!.length;

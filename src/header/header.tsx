@@ -36,5 +36,14 @@ export function Header({children, onEvent}) {
         <Button onClick={() => eventEmit('property')} hint="Свойства">
             <div className="icon-property"/>
         </Button>
+        <Button onClick={() => eventEmit('calc')} hint="Свойства">
+            Calc
+        </Button>
+        <Button onClick={() => eventEmit('save')} hint="Сохранить">
+            Save
+        </Button>
+        <Button onClick={() => eventEmit('read')} hint="Сохранить">
+            Read
+        </Button>
     </div>
 }

@@ -7,30 +7,30 @@
   text-align: center;
 
   &:hover {
-    background-color: rgba(0, 0, 0, 0.07);
+    background-color: rgba(0, 0, 0, 0.12);
   }
 
   &:active {
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.3);
     line-height: -1px;
   }
 }
 
-@mixin icon-init {
-  background-size: cover;
-  background-position: initial;
-  background-repeat: no-repeat;
-  background-origin: content-box;
-  box-sizing: border-box;
-  width: 16px;
-  height: 16px;
-  padding: 3px;
-}
-
-.icon {
-  &-cross {
-    @include icon-init;
-    background-image: url("../icon/icon-cross.svg");
-  }
-}
+//@mixin icon-init {
+//  background-size: cover;
+//  background-position: initial;
+//  background-repeat: no-repeat;
+//  background-origin: content-box;
+//  box-sizing: border-box;
+//  width: 16px;
+//  height: 16px;
+//  padding: 3px;
+//}
+//
+//.icon {
+//  &-cross {
+//    @include icon-init;
+//    background-image: url("../icon/icon-cross.svg");
+//  }
+//}
 

@@ -59,11 +59,13 @@
   justify-content: center;
 }
 .prop__param__name {
-  min-width: 50px;
-  max-width: 40%;
-  margin: 0 1em;
+  min-width: 2em;
   white-space: nowrap;
   padding: 0 0.3em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  /* width: 126px; */
+  overflow: hidden;
 }
 .prop__param__number {
   min-width: 2em;
@@ -105,6 +107,9 @@
   border-radius: 5px 5px 0 0;
   margin: 0 0.5px;
 }
+.tab__header__item:hover {
+  background-color: rgba(0, 0, 0, 0.3137254902);
+}
 .tab__header__item--active {
   background-color: rgba(0, 0, 0, 0.2509803922);
 }
@@ -118,14 +123,10 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
   padding: 2em;
 }
 .tab__body__item > * {
   margin: 0.5em 0;
-}
-.tab__body__item--heap {
-  flex-direction: unset;
 }
 
 /*# sourceMappingURL=style.css.map */

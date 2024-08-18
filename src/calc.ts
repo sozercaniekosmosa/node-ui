@@ -1,4 +1,4 @@
-import {NodeSelector, NodeUI} from "./node-ui";
+import {NodeSelector, NodeUI} from "./editor/node-ui/node-ui";
 
 type TPinsCfgNode = { name: string, id: string, to: string[] }[];
 
@@ -11,12 +11,12 @@ interface ItemNodeCfg {
 type TCfgNode = Record<string, ItemNodeCfg>;
 
 
-export class Calc {
+export default class Calc {
     private svg: SVGElement;
     dataMap: object = {};
     private listCfgNode: TCfgNode = {};
 
-    constructor(private nu: NodeUI, private nodeRun: Element|null) {
+    constructor(private nu: NodeUI, private nodeRun: Element | null) {
         this.svg = nu.svg;
         this.listCfgNode = this.getListCfgNode();
 

@@ -26,8 +26,12 @@ export const eventBus = window.EventBus = new EventBus;
 export const toBase64 = (value: string) => window.btoa(encodeURI(encodeURIComponent(value)));
 export const base64to = (value: string) => decodeURIComponent(decodeURI(window.atob(value)));
 
-export const compressString = (value: string) => LZString.compressToBase64(value);
-export const decompressString = (value: string) => LZString.decompressFromBase64(value);
+export const compressString = (value: string) => {
+    return LZString.compressToBase64(value);
+};
+export const decompressString = (value: string) => {
+    return LZString.decompressFromBase64(value);
+};
 
 const toShortString = (value: number, language = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ') => {
     const len = language.length;
@@ -42,7 +46,7 @@ const toShortString = (value: number, language = '0123456789abcdefghijklmnopqrst
 let __counter: number = 0;
 export const getID = (): string => toShortString((new Date()).getTime() + __counter++)
 
-export const compress = (string: string, encoding: string): Promise<ArrayBuffer> => {
+export const compress = (string: string, encoding: string = "gzip"): Promise<ArrayBuffer> => {
     const byteArray: Uint8Array = new TextEncoder().encode(string);
     const cs: CompressionStream = new CompressionStream(<"deflate" | "deflate-raw" | "gzip">encoding);
     const writer = cs.writable.getWriter()
@@ -51,7 +55,7 @@ export const compress = (string: string, encoding: string): Promise<ArrayBuffer>
     return new Response(cs.readable).arrayBuffer();
 }
 
-export const decompress = (byteArray: Uint8Array, encoding: string): Promise<string> => {
+export const decompress = (byteArray: Uint8Array, encoding: string = "gzip"): Promise<string> => {
     const cs: DecompressionStream = new DecompressionStream(<"deflate" | "deflate-raw" | "gzip">encoding);
     const writer = cs.writable.getWriter()
     writer.write(byteArray)
@@ -565,3 +569,46 @@ export const LZString = (function () {
 
 //@ts-ignore
 window.LZString = LZString;
+
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+
+type ContentType =
+    | 'application/json'
+    | 'application/x-www-form-urlencoded'
+    | 'multipart/form-data'
+    | 'text/plain'
+    | 'text/html';
+
+interface ApiRequestOptions {
+    method?: HttpMethod;
+    body?: any; // Можно уточнить тип в зависимости от ожидаемого формата
+    headers?: Record<string, string>;
+    contentType?: ContentType; // Добавляем поле для Content-Type
+}
+
+export async function apiRequest<T>(
+    url: string,
+    {method = 'GET', body = null, headers = {}, contentType}: ApiRequestOptions = {}
+): Promise<T> {
+    // const options: RequestInit = ({method, headers: new Headers({'Content-Type': 'application/json', ...headers,}),} as RequestInit);
+
+    const options: RequestInit = ({
+        method, headers: new Headers({...(contentType ? {'Content-Type': contentType} : {}), ...headers,}),
+    } as RequestInit);
+
+    if (body) {
+        options.body = JSON.stringify(body);
+    }
+
+    try {
+        const response = await fetch(url, options);
+
+        if (!response.ok) throw new Error(`Error: ${response.status} ${response.statusText}`);
+
+        const data: T = await response.json();
+        return data;
+    } catch (error) {
+        console.error('API request error:', error);
+        throw error; // Пробрасываем ошибку дальше
+    }
+}

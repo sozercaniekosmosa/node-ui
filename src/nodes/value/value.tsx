@@ -1,41 +1,40 @@
-import {TCfg} from "../nodes";
 import React, {InputHTMLAttributes} from "react";
 
 
 export default class {
+    ver: string = '0.0.0';
     name = 'value';
     color = '#ebf5ec';
-    out: number;
     inputs = [];
-    outputs = ['out'];
+    outputs = ['x'];
     cfg = {
-        'основная': {
-            arrOption: ['heap'],
-            arrParam: [
-                {
-                    name: 'description', type: 'string', val: 'Описание', title: 'Знaчение-параметр',
-                    arrOption: ['inline', 'right', 'hr']
-                },
-                {name: 'valueA', type: 'number', val: 1, title: 'Значение-A', arrOption: ['2']},
-                {name: 'valueB', type: 'number', val: 2, title: 'Значение-B', arrOption: ['2']},
-                {name: 'valueC', type: 'number2', val: 0, title: 'Значение-C', arrOption: ['2']},
-                {name: 'valueG', type: 'number2', val: 0, title: 'Значение-G', arrOption: ['2']},
-                {name: 'valueH', type: 'number2', val: 0, title: 'Значение-H', arrOption: ['3']},
-                {name: 'valueI', type: 'number2', val: 0, title: 'Значение-I', arrOption: ['3']},
-                {name: 'valueI', type: 'number2', val: 0, title: 'Значение-I', arrOption: ['3']},
-                {name: 'valueI', type: 'number2', val: 0, title: 'Значение-I', arrOption: ['3']},
-                {name: 'valueI', type: 'number2', val: 0, title: 'Значение-I', arrOption: ['3']},
-                {name: 'valueI', type: 'number2', val: 0, title: 'Значение-I', arrOption: ['3']},
-                {name: 'valueI', type: 'number2', val: 0, title: 'Значение-I', arrOption: ['3']},
-            ]
-        },
-        'вторая': {
-            arrParam: [
-                {name: 'valueD', type: 'number', val: 1, title: 'Значение-D'},
-                {name: 'valueE', type: 'number', val: 2, title: 'Значение-E'},
-                {name: 'valueF', type: 'number', val: 0, title: 'Значение-F'},
-            ]
-        },
+        'основная': [
+            {name: 'valueA', type: 'number', val: 1, title: 'Значение-A', arrOption: ['2']},
+            {name: 'valueB', type: 'number', val: 2, title: 'Значение-B', arrOption: ['2']},
+            {name: 'valueC', type: 'number2', val: 0, title: 'Значение-C', arrOption: ['2']},
+            {name: 'valueG', type: 'number2', val: 0, title: 'Значение-G', arrOption: ['2']},
+            {name: 'valueH', type: 'number2', val: 0, title: 'Значение-H', arrOption: ['3']},
+            {name: 'valueI', type: 'number2', val: 0, title: 'Значение-I', arrOption: ['3']},
+            {name: 'valueI', type: 'number2', val: 0, title: 'Значение-I', arrOption: ['3']},
+            {name: 'valueI', type: 'number2', val: 0, title: 'Значение-I', arrOption: ['3']},
+            {name: 'valueI', type: 'number2', val: 0, title: 'Значение-I', arrOption: ['3']},
+            {name: 'valueI', type: 'number2', val: 0, title: 'Значение-I', arrOption: ['3']},
+            {name: 'valueI', type: 'number2', val: 0, title: 'Значение-I', arrOption: ['3']},
+        ],
+        'вторая': [
+            {name: 'valueD', type: 'number', val: 1, title: 'Значение-D'},
+            {name: 'valueE', type: 'number', val: 2, title: 'Значение-E'},
+            {name: 'valueF', type: 'number', val: 0, title: 'Значение-F'},
+        ],
+        'сеть': [
+            {name: 'ip', type: 'string', val: '192.168.0.3', title: 'ip-адрес', arrOption: []},
+        ],
+        'инфо': [
+            {
+                name: 'description', type: 'string', val: 'Описание',
+                arrOption: ['inline', 'right', 'hr']
+            },
+        ],
     };
     components = {
         'number2': function ({name, val, onChange}) {

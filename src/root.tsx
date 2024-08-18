@@ -1,4 +1,4 @@
-import React, {MutableRefObject, useRef, useState} from 'react';
+import React, {useState} from 'react';
 import ReactDOM from 'react-dom/client';
 import './style.css';
 import './auxiliary/icon/style.css';
@@ -7,9 +7,9 @@ import {Toolbox} from "./toolbox/toolbox";
 import {Editor, TEventEditor} from "./editor/editor";
 import {Header, TEventHeader} from "./header/header";
 import History from './history'
-import Service from './service'
+import Service, {TEventService} from './service'
 import {MenuConfirm} from "./auxiliary/menu/menu-confirm";
-import {eventBus} from "./utils"
+import {apiRequest, compressString, decompressString, eventBus} from "./utils"
 
 const root = ReactDOM.createRoot(document.querySelector('.root') as HTMLElement);
 const history = new History();
@@ -52,7 +52,7 @@ function Root() {
         // console.log(e.code.toLowerCase())
     }
 
-    let onEventHandler = ({name, data}: TEventEditor | TEventHeader | TEventProperty) => {
+    let onEventHandler = ({name, data}: TEventEditor | TEventHeader | TEventProperty | TEventService) => {
         switch (name) {
             case 'init':
                 nui = data;
@@ -100,6 +100,35 @@ function Root() {
                 break;
             case 'property-change':
                 history.addHistory('property', nui.svg.innerHTML);
+                break;
+            case 'calc':
+                console.log(service.getNodeStruct());
+                break;
+            case 'save':
+                (async () => {
+                    try {
+                        const data = await apiRequest<{ message: string }>(' http://localhost:3000/api/v1/project', {
+                            method: 'PUT', body: compressString(nui.svg.innerHTML), contentType: 'text/plain'
+                        });
+                        // console.log(data);
+                    } catch (error) {
+                        console.error('Error fetching data:', error);
+                    }
+                })();
+                break;
+            case 'read':
+                (async () => {
+                    try {
+                        const {data} = await apiRequest<{ message: string }>(' http://localhost:3000/api/v1/project', {
+                            method: 'GET', contentType: 'text/plain'
+                        });
+                        nui.svg.innerHTML = await decompressString(data.substring(1, data.length - 1));
+                        // console.log(data);
+                    } catch (error) {
+                        console.error('Error fetching data:', error);
+                    }
+                })();
+
                 break;
         }
     }
