@@ -40,7 +40,7 @@ export function Header({children, onEvent}) {
             Calc
         </Button>
         <Button onClick={() => eventEmit('save')} hint="Сохранить">
-            Save
+            <div className="icon-save"/>
         </Button>
         <Button onClick={() => eventEmit('read')} hint="Сохранить">
             Read

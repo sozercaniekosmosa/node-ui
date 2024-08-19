@@ -1,6 +1,5 @@
 import React, {InputHTMLAttributes} from "react";
 
-
 export default class {
     ver: string = '0.0.0';
     name = 'value';
@@ -33,6 +32,12 @@ export default class {
             {
                 name: 'description', type: 'string', val: 'Описание',
                 arrOption: ['inline', 'right', 'hr']
+            },
+        ],
+        'jhjhd': [
+            {
+                name: 'description', type: 'string', val: 'Описание2',
+                arrOption: ['inline', 'left', 'hr']
             },
         ],
     };

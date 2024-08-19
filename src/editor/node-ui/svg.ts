@@ -281,6 +281,19 @@ export class Svg {
         node.setAttribute('transform', `translate(${p.x},${p.y})`);
     }
 
+    /**
+     * Поворот SVG элемента
+     * @param svgNode
+     * @param centerX
+     * @param centerY
+     * @param angle
+     */
+    public rotateSVG(svgNode, centerX, centerY, angle) {
+        const rotationTransform = svgNode.createSVGTransform();
+        rotationTransform.setRotate(angle, centerX, centerY);
+        svgNode.transform.baseVal.appendItem(rotationTransform);
+    }
+
     public setProperty(node: Element, arg: INodeProp): Element {
         Object.entries(arg).forEach(([key, val]) => {
             if (key == 'to') {

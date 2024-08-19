@@ -3,12 +3,12 @@ import {readFromFile, writeToFile} from "../../utils";
 import {resolve} from "path";
 
 const pathRoot = process.cwd();
-const pathDB = resolve(pathRoot, 'database', 'project.db');
+const pathProject = resolve(pathRoot, 'database', 'project');
 
 
 const getProject = (): any => {
     try {
-        return readFromFile(pathDB);
+        return readFromFile(pathProject);
     } catch (error) {
         throw error;
     }
@@ -16,7 +16,7 @@ const getProject = (): any => {
 
 const updateProject = (data: any): any => {
     try {
-        return writeToFile(pathDB, data);
+        return writeToFile(pathProject, data);
     } catch (error) {
         throw error;
     }

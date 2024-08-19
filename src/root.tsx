@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import ReactDOM from 'react-dom/client';
 import './style.css';
 import './auxiliary/icon/style.css';
@@ -6,14 +6,14 @@ import {Property, TEventProperty} from "./property/property";
 import {Toolbox} from "./toolbox/toolbox";
 import {Editor, TEventEditor} from "./editor/editor";
 import {Header, TEventHeader} from "./header/header";
-import History from './history'
-import Service, {TEventService} from './service'
+import History from './service/history'
 import {MenuConfirm} from "./auxiliary/menu/menu-confirm";
 import {apiRequest, compressString, decompressString, eventBus} from "./utils"
+import {writeProject, readProject, getNodeStruct, TEventService} from './service/service-backend'
+import {copy, past, cut} from "./service/cpc";
 
 const root = ReactDOM.createRoot(document.querySelector('.root') as HTMLElement);
-const history = new History();
-let service;
+let history;
 let nui = null;
 let arrSelected: Element[] | undefined = [];
 let arrKey = [];
@@ -52,12 +52,17 @@ function Root() {
         // console.log(e.code.toLowerCase())
     }
 
-    let onEventHandler = ({name, data}: TEventEditor | TEventHeader | TEventProperty | TEventService) => {
+    const addHistory = (name, data) => {
+        history.addHistory(name, nui.svg.innerHTML);
+        writeProject(nui.svg);
+    }
+
+    let onEventHandler = async ({name, data}: TEventEditor | TEventHeader | TEventProperty | TEventService) => {
         switch (name) {
             case 'init':
                 nui = data;
-                service = new Service(nui);
-                history.initHistory(nui.svg.innerHTML);
+                nui.svg.innerHTML = await readProject();
+                history = new History(nui.svg.innerHTML, 20);
                 break;
             case 'selected':
                 arrSelected = data;
@@ -67,27 +72,33 @@ function Root() {
             case 'link-remove':
             case 'node-remove':
             case 'add-node':
-                history.addHistory(name, nui.svg.innerHTML);
+                addHistory(name, nui.svg.innerHTML);
                 break;
 
             case 'undo':
                 let undoHistory = history.undoHistory();
-                undoHistory && (nui.svg.innerHTML = undoHistory);
+                if (undoHistory) {
+                    nui.svg.innerHTML = undoHistory;
+                    writeProject(nui.svg);
+                }
                 break;
             case 'redo':
                 let redoHistory = history.redoHistory();
-                redoHistory && (nui.svg.innerHTML = redoHistory);
+                if (redoHistory) {
+                    nui.svg.innerHTML = redoHistory;
+                    writeProject(nui.svg);
+                }
                 break;
             case 'copy':
-                service.onCopy();
+                copy(nui);
                 break;
             case 'past':
-                service.onPast();
-                history.addHistory('past', nui.svg.innerHTML);
+                past(nui);
+                addHistory('past', nui.svg.innerHTML);
                 break;
             case 'cut':
-                service.onCut();
-                history.addHistory('cut', nui.svg.innerHTML);
+                cut(nui);
+                addHistory('cut', nui.svg.innerHTML);
                 break;
             case 'delete':
                 if (arrSelected!.length > 0)
@@ -99,36 +110,13 @@ function Root() {
                 eventBus.dispatchEvent('menu-property-show')
                 break;
             case 'property-change':
-                history.addHistory('property', nui.svg.innerHTML);
+                addHistory('property', nui.svg.innerHTML);
                 break;
             case 'calc':
-                console.log(service.getNodeStruct());
+                console.log(getNodeStruct());
                 break;
             case 'save':
-                (async () => {
-                    try {
-                        const data = await apiRequest<{ message: string }>(' http://localhost:3000/api/v1/project', {
-                            method: 'PUT', body: compressString(nui.svg.innerHTML), contentType: 'text/plain'
-                        });
-                        // console.log(data);
-                    } catch (error) {
-                        console.error('Error fetching data:', error);
-                    }
-                })();
-                break;
-            case 'read':
-                (async () => {
-                    try {
-                        const {data} = await apiRequest<{ message: string }>(' http://localhost:3000/api/v1/project', {
-                            method: 'GET', contentType: 'text/plain'
-                        });
-                        nui.svg.innerHTML = await decompressString(data.substring(1, data.length - 1));
-                        // console.log(data);
-                    } catch (error) {
-                        console.error('Error fetching data:', error);
-                    }
-                })();
-
+                writeProject(nui.svg);
                 break;
         }
     }

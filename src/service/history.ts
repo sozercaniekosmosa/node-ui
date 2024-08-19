@@ -4,17 +4,13 @@ export default class History {
     indexHistory = -1;
     maxDept = 3;
 
-    constructor(maxDept = 10) {
+    constructor(data, maxDept = 10) {
         this.maxDept = maxDept;
-
+        this.history.push(['init', data]);
+        this.indexHistory = this.history.length - 1;
         // window['undoHistory'] = this.undoHistory;
         // window['redoHistory'] = this.redoHistory;
         // window['addHistory'] = this.addHistory;
-    }
-
-    initHistory(data) {
-        this.history.push(['init', data]);
-        this.indexHistory = this.history.length - 1;
     }
 
     undoHistory() {
