@@ -8,8 +8,8 @@ import {Editor, TEventEditor} from "./editor/editor";
 import {Header, TEventHeader} from "./header/header";
 import History from './service/history'
 import {MenuConfirm} from "./auxiliary/menu/menu-confirm";
-import {apiRequest, compressString, decompressString, eventBus} from "./utils"
-import {writeProject, readProject, getNodeStruct, TEventService} from './service/service-backend'
+import {apiRequest, camelToKebab, compressString, decompressString, eventBus} from "./utils"
+import {writeProject, readProject, getNodeStruct, startTask, stopTask} from './service/service-backend'
 import {copy, past, cut} from "./service/cpc";
 
 const root = ReactDOM.createRoot(document.querySelector('.root') as HTMLElement);
@@ -22,7 +22,7 @@ let nodeFocus;
 
 function Root() {
 
-    document.addEventListener('keyup', e => arrKey[e.code.toLowerCase()] = false, true);
+    document.addEventListener('keyup', e => arrKey[camelToKebab(e.code).toLowerCase()] = false, true);
     document.addEventListener('keydown', onKeyDown, true);
     document.addEventListener('blur', () => arrKey = [], true);
     document.addEventListener('focus', ({target}) => nodeFocus = target, true);
@@ -31,19 +31,23 @@ function Root() {
     const [nodeDataSelected, setNodeDataSelected] = useState(null);
 
     function onKeyDown(e) {
-        const code = e.code.toLowerCase();
+        const code = camelToKebab(e.code).toLowerCase();
         if (arrKey[code]) return;
         arrKey[code] = true;
 
         if (arrKey?.['escape']) arrKey = [];
-        if (arrKey?.['controlleft'] && arrKey?.['keyz']) onEventHandler({name: 'undo'});
-        if (arrKey?.['controlleft'] && arrKey?.['keyy']) onEventHandler({name: 'redo'});
-        if (arrKey?.['controlleft'] && arrKey?.['keyc']) {
+        if (arrKey?.['control-left'] && arrKey?.['key-s']) {
+            onEventHandler({name: 'save'});
+            e.preventDefault();
+        }
+        if (arrKey?.['control-left'] && arrKey?.['key-z']) onEventHandler({name: 'undo'});
+        if (arrKey?.['control-left'] && arrKey?.['key-y']) onEventHandler({name: 'redo'});
+        if (arrKey?.['control-left'] && arrKey?.['key-c']) {
             onEventHandler({name: 'copy'})
             e.preventDefault();
         }
-        if (arrKey?.['controlleft'] && arrKey?.['keyv']) onEventHandler({name: 'past'})
-        if (arrKey?.['controlleft'] && arrKey?.['keyx']) onEventHandler({name: 'cut'})
+        if (arrKey?.['control-left'] && arrKey?.['key-v']) onEventHandler({name: 'past'})
+        if (arrKey?.['control-left'] && arrKey?.['key-x']) onEventHandler({name: 'cut'})
 
         if (arrKey?.['delete'] && nodeFocus.classList.contains('editor')) onEventHandler({name: 'delete'})
         if ((arrKey?.['enter'] || arrKey?.['numpadenter']) && nodeFocus.classList.contains('editor')) onEventHandler({name: 'property'});
@@ -57,7 +61,7 @@ function Root() {
         writeProject(nui.svg);
     }
 
-    let onEventHandler = async ({name, data}: TEventEditor | TEventHeader | TEventProperty | TEventService) => {
+    let onEventHandler = async ({name, data}: TEventEditor | TEventHeader | TEventProperty) => {
         switch (name) {
             case 'init':
                 nui = data;
@@ -112,11 +116,14 @@ function Root() {
             case 'property-change':
                 addHistory('property', nui.svg.innerHTML);
                 break;
-            case 'calc':
-                console.log(getNodeStruct());
-                break;
             case 'save':
                 writeProject(nui.svg);
+                break;
+            case 'start':
+                eventBus.dispatchEvent('confirm', (isYes) => isYes && startTask(), 'Запустить стстему?')
+                break;
+            case 'stop':
+                eventBus.dispatchEvent('confirm', (isYes) => isYes && stopTask(), 'Остановить стстему?')
                 break;
         }
     }

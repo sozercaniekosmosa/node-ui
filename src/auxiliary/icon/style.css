@@ -106,4 +106,28 @@
   background-image: url("./icon-save.svg");
 }
 
+.icon-play {
+  background-size: cover;
+  background-position: initial;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  padding: 3px;
+  background-image: url("./icon-play.svg");
+}
+
+.icon-stop {
+  background-size: cover;
+  background-position: initial;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  padding: 3px;
+  background-image: url("./icon-stop.svg");
+}
+
 /*# sourceMappingURL=style.css.map */

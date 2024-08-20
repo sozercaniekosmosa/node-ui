@@ -1,10 +1,8 @@
-import {NodeSelector, NodeUI} from "../editor/node-ui/node-ui";
-import {apiRequest, compressString, debounce, decompressString, throttle} from "../utils";
+import {NodeSelector} from "../editor/node-ui/node-ui";
+import {apiRequest, ApiRequestOptions, ContentType, decompressString, throttle} from "../utils";
 
-export type TEventService = {
-    name: 'calc' | 'save' | 'read',
-    data?: any
-}
+let port = 3000;
+let routService: string = `http://localhost:${port}/api/v1/service/`;
 
 type TPinsCfgNode = { name: string, id: string, to: string[] }[];
 
@@ -26,11 +24,7 @@ export function getNodeStruct(nodeProject): TCfgNode {
         !(data?.[id]) && (data[id] = {})
         let d = data[id];
 
-        // ullyYU6
-        //     name:"value"
-        //     out:{x: Array(1)}
-
-        d.name = node.dataset.node;
+        d.node = node.dataset.node;
         d.cfg = [];
 
         type TParam = { name: string, type: string, val: any, title: string, arrOption: [string] }
@@ -67,21 +61,26 @@ export function getNodeStruct(nodeProject): TCfgNode {
     return data;
 }
 
+async function put(route: string, contentType: ContentType, data: any) {
+    return await apiRequest<{ message: string }>(route, {method: 'PUT', contentType, body: data});
+}
+
+async function get(route: string, contentType: ContentType) {
+    return await apiRequest<{ message: string }>(route, {method: 'GET', contentType});
+}
+
+async function post(route: string, contentType: ContentType, data?: any) {
+    return await apiRequest<{ message: string }>(route, {method: 'POST', contentType, body: data});
+}
+
 export const writeProject = throttle((async (node: HTMLElement) => {
     try {
-        let data = await apiRequest<{ message: string }>('http://localhost:3000/api/v1/project', {
-            method: 'PUT',
-            contentType: 'text/plain',
-            body: compressString(node.innerHTML),
-        });
-        console.log(data);
-
-        data = await apiRequest<{ message: string }>('http://localhost:3000/api/v1/task', {
-            method: 'PUT',
-            contentType: 'application/json',
-            body: getNodeStruct(node),
-        });
-        console.log(data);
+        // let body = await compress(node.innerHTML);
+        let body = node.innerHTML;
+        let dataProject = await put(routService + 'project', 'text/plain', body)
+        let dataTask = await put(routService + 'task', 'application/json', getNodeStruct(node))
+        console.log(dataProject);
+        console.log(dataTask);
     } catch (error) {
         console.error('Error fetching data:', error);
     }
@@ -90,14 +89,35 @@ export const writeProject = throttle((async (node: HTMLElement) => {
 
 export async function readProject() {
     try {
-        const {data} = await apiRequest<{ message: string }>('http://localhost:3000/api/v1/project', {
-            method: 'GET',
-            contentType: 'text/plain'
-        });
-        return <string>await decompressString(data);
-        // console.log(data);
+        const {status, data} = await get(routService + 'project', 'text/plain')
+        console.log(status, 'project прочитан');
+        return data;
     } catch (error) {
         console.error('Error fetching data:', error);
     }
-
 }
+
+export async function startTask() {
+    try {
+        let resp = await post(routService + 'task/start', 'text/plain')
+        console.log(resp);
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+}
+
+export async function stopTask() {
+    try {
+        let resp = await post(routService + 'task/stop', 'text/plain')
+        console.log(resp);
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+}
+
+// function myRecursiveFunction() {
+//     console.log("Эта функция выполняется каждые 2 секунды");
+//     setTimeout(myRecursiveFunction, 2000);
+// }
+// // Запускаем функцию
+// myRecursiveFunction();

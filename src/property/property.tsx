@@ -2,13 +2,15 @@ import "./style.css"
 import React, {createElement, InputHTMLAttributes, useEffect, useRef, useState} from "react";
 import {listNode} from "../nodes/nodes";
 import {Button} from "../auxiliary/button/button";
-import {decompress, compress, decompressString, compressString, eventBus} from '../utils'
+import {decompress, compress, decompressString, compressString, eventBus, camelToKebab} from '../utils'
 
 
 export type TEventProperty = {
     name: 'property-change',
     data?: any
 }
+
+let arrKey = [];
 
 export function Property({setNode, onChange}) {
 
@@ -102,9 +104,26 @@ export function Property({setNode, onChange}) {
         refPropTabs.current.children[index].style.display = ''
     }
 
+    const onKeyUp = (e) => arrKey[camelToKebab(e.code).toLowerCase()] = false
+    const onKeyDown = (e) => {
+        const code = camelToKebab(e.code).toLowerCase();
+        if (arrKey[code]) return;
+        arrKey[code] = true;
+
+        if (arrKey?.['escape']) {
+            arrKey = [];
+            onCancel();
+        }
+
+        if (arrKey?.['control-left'] && (arrKey?.['enter'] || arrKey?.['numpadenter'])) onApply()
+        // console.log(e.code.toLowerCase())
+    }
+
+
     return (
         <div className="prop prop--hide" ref={refProp} tabIndex="-1"
-             onKeyDown={({key}) => key == 'Escape' && onCancel()}
+             onKeyDown={onKeyDown}
+             onKeyUp={onKeyUp}
              onClick={({target}) => (target as Element).classList.contains('prop') && onCancel()}>
             <div className="prop__menu">
                 <div className="prop__header">
@@ -112,9 +131,9 @@ export function Property({setNode, onChange}) {
                         Конфигуратор: {nodeName}
                         <div ref={refChanged} style={{display: 'inline'}}></div>
                     </div>
-                    <Button onClick={onCancel}>
+                    <button onClick={onCancel}>
                         <div className="icon-cross" style={{width: '16px', height: '16px'}}></div>
-                    </Button>
+                    </button>
                 </div>
 
                 <div className="tab__header" onClick={onClickTab}>
@@ -150,8 +169,8 @@ export function Property({setNode, onChange}) {
                 </div>
 
                 <div className="prop__footer">
-                    <Button onClick={onApply}>Применить</Button>
-                    <Button onClick={onCancel}>Отмена</Button>
+                    <button onClick={onApply}>Применить</button>
+                    <button onClick={onCancel}>Отмена</button>
                 </div>
             </div>
         </div>

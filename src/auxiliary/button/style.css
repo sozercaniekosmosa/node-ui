@@ -6,6 +6,9 @@
   user-select: none;
   text-align: center;
 }
+.button-focus {
+  outline: 0.2em solid rgba(0, 0, 0, 0.12);
+}
 .button:hover {
   background-color: rgba(0, 0, 0, 0.12);
 }

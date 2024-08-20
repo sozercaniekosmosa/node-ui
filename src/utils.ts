@@ -1,3 +1,7 @@
+export function camelToKebab(camelCaseString: string): string {
+    return camelCaseString.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
+}
+
 // EventBus.dispatchEvent('evb-key', {event, combine, nodeFocus}))
 class EventBus {
     private bus: HTMLElement;
@@ -982,14 +986,15 @@ export function sendPostReq(method, data, clb) {
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
-type ContentType =
+export type ContentType =
     | 'text/plain'
     | 'text/html'
     | 'application/json'
     | 'multipart/form-data'
     | 'application/x-www-form-urlencoded'
+    | 'application/octet-stream'
 
-interface ApiRequestOptions {
+export interface ApiRequestOptions {
     method?: HttpMethod;
     body?: any; // Можно уточнить тип в зависимости от ожидаемого формата
     headers?: Record<string, string>;
@@ -1009,6 +1014,7 @@ export async function apiRequest<T>(
         switch (contentType) {
             case 'text/plain':
             case 'text/html':
+            case 'application/octet-stream':
                 options.body = body;
                 break;
             case 'application/json':

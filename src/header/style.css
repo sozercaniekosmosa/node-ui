@@ -9,6 +9,10 @@
 }
 .header > * {
   margin-right: 0.2em;
+  background-color: rgba(0, 0, 0, 0.03);
+}
+.header-highlight {
+  background-color: #b3ffb9;
 }
 
 /*# sourceMappingURL=style.css.map */

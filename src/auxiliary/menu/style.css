@@ -25,7 +25,11 @@
   display: flex;
   width: 100%;
 }
+.menu-confirm__buttons--focus {
+  outline: 0.2em solid rgba(0, 0, 0, 0.12);
+}
 .menu-confirm__buttons > * {
+  height: 2em;
   margin: 0 1em;
   width: 100% !important;
   background-color: #fcfcfc;

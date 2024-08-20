@@ -10,5 +10,10 @@
 
   & > * {
     margin-right: .2em;
+    background-color: rgba(0, 0, 0, 0.03);
+  }
+
+  &-highlight {
+    background-color: #b3ffb9;
   }
 }

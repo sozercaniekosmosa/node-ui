@@ -1,10 +1,10 @@
 {
   "ulxoFjU": {
-    "name": "value",
+    "node": "value",
     "cfg": [
       [
         "valueA",
-        321,
+        1,
         "number"
       ],
       [
@@ -85,7 +85,7 @@
     }
   },
   "ulxoFIW": {
-    "name": "value",
+    "node": "value",
     "cfg": [
       [
         "valueA",
@@ -170,11 +170,11 @@
     }
   },
   "ulxoObO": {
-    "name": "sum",
+    "node": "sum",
     "cfg": [
       [
         "qwq",
-        18.2,
+        32.2,
         "number"
       ]
     ],

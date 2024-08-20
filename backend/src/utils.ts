@@ -5,11 +5,15 @@ export const writeToFile = (path: string, data: any) => {
         fs.writeFileSync(path, data);
         console.log(`Файл ${path} сохранен!`);
     } catch (err) {
-        console.error('Ошибка при записи файла:', err);
+        throw 'Ошибка записи файла: ' + path
     }
 };
 
 
 export const readFromFile = (path: string): any => {
-    return fs.readFileSync(path);
+    try {
+        return fs.readFileSync(path);
+    } catch (err) {
+        throw 'Ошибка чтения файла: ' + path
+    }
 };

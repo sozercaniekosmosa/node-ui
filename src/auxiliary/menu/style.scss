@@ -25,9 +25,14 @@
   &__buttons {
     display: flex;
     width: 100%;
+
+    &--focus {
+      outline: 0.2em solid rgba(0, 0, 0, 0.12);
+    }
   }
 
   &__buttons > * {
+    height: 2em;
     margin: 0 1em;
     width: 100% !important;
     background-color: #fcfcfc;
