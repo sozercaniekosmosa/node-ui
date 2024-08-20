@@ -49,7 +49,7 @@ function Root() {
         if (arrKey?.['control-left'] && arrKey?.['key-v']) onEventHandler({name: 'past'})
         if (arrKey?.['control-left'] && arrKey?.['key-x']) onEventHandler({name: 'cut'})
 
-        if (arrKey?.['delete'] && nodeFocus.classList.contains('editor')) onEventHandler({name: 'delete'})
+        if (arrKey?.['delete'] && nodeFocus?.classList.contains('editor')) onEventHandler({name: 'delete'})
         if ((arrKey?.['enter'] || arrKey?.['numpadenter']) && nodeFocus.classList.contains('editor')) onEventHandler({name: 'property'});
 
         // console.log(arrKey)

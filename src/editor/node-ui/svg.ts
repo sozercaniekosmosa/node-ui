@@ -396,7 +396,10 @@ export class Svg {
     private handlerMouseDown(e: MouseEvent) {
         this.updateZoom();
 
-        this.mouse.button[0] = true;
+        if (e.button == 0) this.mouse.button[0] = true;
+        if (e.button == 1) this.mouse.button[1] = true;
+        if (e.button == 2) this.mouse.button[2] = true;
+
         this.mouse.target = e.target;
         this.off = new Point(e.clientX - e.offsetX, e.clientY - e.offsetY);
         this.startPoint = new Point(e.offsetX, e.offsetY); //сохраняем позицию что бы обновить её если изменится zoom
@@ -411,7 +414,11 @@ export class Svg {
     }
 
     private handlerMouseUp(e: MouseEvent) {
-        this.mouse.button[0] = false;
+
+        if (e.button == 0) this.mouse.button[0] = false;
+        if (e.button == 1) this.mouse.button[1] = false;
+        if (e.button == 2) this.mouse.button[2] = false;
+
         this.updateZoom();
         this.mouse.target = e.target;
         this.mouse.end = this.getPosZoom(new Point(e.offsetX, e.offsetY));

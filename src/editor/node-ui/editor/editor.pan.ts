@@ -16,14 +16,15 @@ export class EditorPan {
         this.svg.addEventListener('svgmousemove', (e: CustomEventInit) => this.handlerMouseMove(e.detail));
     }
 
-    public handlerMouseDown(e: TMouseEvent): void {
+    public handlerMouseDown({button}: TMouseEvent): void {
+        if (button[1]) this.nu.setMode('pan')
         if (this.nu.key['space']) this.nu.setMode('pan')
         if (!this.nu.isMode('pan')) return;
 
     }
 
     public handlerMouseMove({delta: d, button}: TMouseEvent): void {
-        if (!button[0]) this.nu.resetMode('pan');
+        if (!button[1] && !button[0]) this.nu.resetMode('pan');
         if (!this.nu.isMode('pan')) return;
 
         let {x, y, width, height} = this.nu.getView();

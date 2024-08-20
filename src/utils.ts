@@ -856,7 +856,8 @@ export const meval = function (js, scope) {
     return new Function(`with (this) { return (${js}); }`).call(scope);
 }
 
-export const getID = (host, port = '', tid, ccid = '') => `${host}:${port}${tid ?? ''}${ccid ?? ''}`;
+let __counter = 0;
+export const getID = (): string => toShortString((new Date()).getTime() + __counter++)
 
 
 export const isFunction = functionToCheck => functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';

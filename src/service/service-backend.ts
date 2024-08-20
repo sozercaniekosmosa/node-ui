@@ -90,7 +90,7 @@ export const writeProject = throttle((async (node: HTMLElement) => {
 export async function readProject() {
     try {
         const {status, data} = await get(routService + 'project', 'text/plain')
-        console.log(status, 'project прочитан');
+        console.log(status, 'project загружен');
         return data;
     } catch (error) {
         console.error('Error fetching data:', error);
