@@ -25,10 +25,11 @@ export interface NodeConfig {
     components?: any
 }
 
-export const arrNode = [
+const arrNode = [
     Value,
     Sum,
 ]
+
 
 export interface Node {
     nodeName: string;

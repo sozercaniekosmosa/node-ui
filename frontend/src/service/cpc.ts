@@ -15,7 +15,7 @@ export function copy(nui) {
         if (arrOutNode.length) arrOut = arrOutNode.map(node => node.dataset.name)
         let nodeParam = {
             ...nui.getTransformPoint(node).add(10),
-            nodeName: node.dataset.node,
+            nodeName: node.dataset.nodeName,
             arrIn,
             arrOut,
             color: node.querySelector('.handle').getAttribute('fill'),

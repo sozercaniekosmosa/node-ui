@@ -1,7 +1,7 @@
 import "./style.css"
-import React, {createElement, InputHTMLAttributes, useEffect, useRef, useState} from "react";
-import {listNode} from "../../../nodes/nodes";
-import {decompress, compress, decompressString, compressString, eventBus, camelToKebab} from '../utils'
+import React, {createElement, InputHTMLAttributes, useRef, useState} from "react";
+// import {listNode} from "../../../nodes/nodes";
+import {camelToKebab, compressString, decompressString, eventBus} from '../utils'
 
 
 export type TEventProperty = {
@@ -11,7 +11,7 @@ export type TEventProperty = {
 
 let arrKey = [];
 
-export function Property({setNode, onChange}) {
+export function Property({setNode, onChange, listNode}) {
 
     const [, setUpdateNow] = useState(0); //для перерисовки компонента
     let nodeName: string = '';
@@ -22,10 +22,6 @@ export function Property({setNode, onChange}) {
 
     let refProp = useRef(null);
     let refPropTabs = useRef(null);
-
-    useEffect(() => {
-        console.log('!!!')
-    }, [])
 
     const show = (isShow) => {
         setUpdateNow(conut => conut + 1); //при каждом показе/скрытиии перерисовываем}
@@ -163,9 +159,10 @@ export function Property({setNode, onChange}) {
                                         })
                                     }
 
+                                    let props = {name, val, title, key: i, onChange: onChangeParam};
                                     return <div className={"prop__param " + arrStyle.join(' ')} key={i}>
                                         {title ? <div className="prop__param__name">{title + ':'}</div> : ''}
-                                        {createElement(comp, {name, val, title, key: i, onChange: onChangeParam})}
+                                        {createElement(comp, props)}
                                     </div>
                                 })}
                             </div>)

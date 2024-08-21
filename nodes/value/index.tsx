@@ -7,7 +7,7 @@ export default {
     widthEmpty: 0,
     cfg: {
         'основная': [
-            {name: 'valueA', type: 'number2', val: 1, title: 'Значение-A', arrOption: ['2']},
+            {name: 'valueA', type: 'number', val: 1, title: 'Значение-A', arrOption: ['2']},
             {name: 'valueB', type: 'number', val: 2, title: 'Значение-B', arrOption: ['2']},
             {name: 'valueC', type: 'number', val: 0, title: 'Значение-C', arrOption: ['2']},
         ],

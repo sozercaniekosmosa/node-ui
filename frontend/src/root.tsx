@@ -23,6 +23,13 @@ let nodeFocus;
 
 function Root() {
 
+
+    const [listNode, setListNode] = useState(false);
+
+    //@ts-ignore
+    // (async () => !listNode && setListNode((await import("../../nodes/nodes")).listNode))();
+
+
     document.addEventListener('keyup', e => arrKey[camelToKebab(e.code).toLowerCase()] = false, true);
     document.addEventListener('keydown', onKeyDown, true);
     document.addEventListener('blur', () => arrKey = [], true);
@@ -138,9 +145,9 @@ function Root() {
     return (<>
         <Header onEvent={onEventHandler}/>
         <div className="node-editor" onDoubleClick={({target}) => onEventHandler({name: 'property', data: target})}>
-            <Toolbox onNodeSelect={(data) => setNodeDataSelected(data)}/>
+            <Toolbox onNodeSelect={(data) => setNodeDataSelected(data)} listNode={listNode}/>
             <Editor newNode={nodeDataSelected} onEvent={onEventHandler}/>
-            <Property setNode={nodeProp} onChange={() => onEventHandler({name: 'property-change'})}/>
+            <Property setNode={nodeProp} onChange={() => onEventHandler({name: 'property-change'})} listNode={listNode}/>
         </div>
         <MenuConfirm name={'confirm'}/>
     </>)
