@@ -1,6 +1,6 @@
 import "./style.css"
 import React, {createElement, InputHTMLAttributes, useEffect, useRef, useState} from "react";
-import {listNode} from "../nodes/nodes";
+import {listNode} from "../../capsules/nodes";
 import {Button} from "../auxiliary/button/button";
 import {decompress, compress, decompressString, compressString, eventBus, camelToKebab} from '../utils'
 
@@ -24,6 +24,10 @@ export function Property({setNode, onChange}) {
     let refProp = useRef(null);
     let refPropTabs = useRef(null);
 
+    useEffect(() => {
+        console.log('!!!')
+    }, [])
+
     const show = (isShow) => {
         setUpdateNow(conut => conut + 1); //при каждом показе/скрытиии перерисовываем}
         refProp.current.classList[isShow ? 'remove' : 'add']('prop--hide');
@@ -32,7 +36,7 @@ export function Property({setNode, onChange}) {
     }
 
     if (setNode) {
-        nodeName = setNode.dataset.node;
+        nodeName = setNode.dataset.nodeName;
         refArrCfg.current = JSON.parse(decompressString(setNode.dataset.cfg)!);
     }
 
@@ -40,6 +44,8 @@ export function Property({setNode, onChange}) {
         refIsWasChange.current = false;
         show(true)
     })
+
+    const noType = (typeName) => () => <b style={{color: "#cc0000"}}>[{typeName}]</b>
 
     const listTypeComponent = {
         'number': function ({name, val, onChange}) {
@@ -149,7 +155,7 @@ export function Property({setNode, onChange}) {
                         return (
                             <div className="tab__body__item" key={iTab} style={iTab !== 0 ? {display: 'none'} : {}}>
                                 {arrParam.map(({name, type, val, title, arrOption}, i) => {
-                                    let comp = listTypeComponent[type] ? listTypeComponent[type] : listNode[nodeName].components[type];
+                                    let comp = listTypeComponent[type] ? listTypeComponent[type] : listNode[nodeName].components[type] ?? noType(type);
                                     let arrStyle = [];
                                     if (arrOption) {
                                         let setCSS = new Set(['inline', 'center', 'right', 'left', '2', '3', 'hr'])

@@ -32,9 +32,6 @@
   padding: 0.2em 0.4em;
   border-bottom: 1px solid rgba(128, 128, 128, 0.5);
 }
-.prop__param--inline {
-  width: 100%;
-}
 .prop__param--2 {
   width: 50%;
 }

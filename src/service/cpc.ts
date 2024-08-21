@@ -2,51 +2,49 @@ import {NodeSelector, NodeUI} from "../editor/node-ui/node-ui";
 import {apiRequest, compressString, debounce, decompressString, throttle} from "../utils";
 
 
-let bufArrCfg: any[] = [];
+let bufArrNodeParam: any[] = [];
 
 export function copy(nui) {
 
-    function elementToObject(node: SVGElement) {
-        var arrIn = [...node.querySelectorAll('.' + NodeSelector.pinIn) as NodeListOf<HTMLElement>];
-        var arrOut = [...node.querySelectorAll('.' + NodeSelector.pinOut) as NodeListOf<HTMLElement>];
+    function getNodeParamFromElement(node: SVGElement) {
+        const arrInNode = [...node.querySelectorAll('.' + NodeSelector.pinIn) as NodeListOf<HTMLElement>];
+        const arrOutNode = [...node.querySelectorAll('.' + NodeSelector.pinOut) as NodeListOf<HTMLElement>];
 
-        let cfgIn = [], cfgOut = [];
-        if (arrIn.length) cfgIn = arrIn.map(node => node.dataset.name);
-        if (arrOut.length) cfgOut = arrOut.map(node => node.dataset.name)
-        let cfg = {
+        let arrIn = [], arrOut = [];
+        if (arrInNode.length) arrIn = arrInNode.map(node => node.dataset.name);
+        if (arrOutNode.length) arrOut = arrOutNode.map(node => node.dataset.name)
+        let nodeParam = {
             ...nui.getTransformPoint(node).add(10),
             nodeName: node.dataset.node,
-            arrIn: cfgIn,
-            arrOut: cfgOut,
+            arrIn,
+            arrOut,
             color: node.querySelector('.handle').getAttribute('fill'),
-            data: {cfg: node.dataset.cfg}
+            cfg: JSON.parse(decompressString(node.dataset.cfg)!)
         };
-
-        if (node.dataset?.cfg) cfg["cfg"] = JSON.parse(decompressString(node.dataset.cfg)!);
-        return cfg;
+        return nodeParam;
     }
 
-    let arrCfg: any[] = [];
+    let arrNodeParam: any[] = [];
     let arrNode = [...nui.svg.querySelectorAll('.' + NodeSelector.selected)]?.map(node => node.cloneNode(true)) as SVGElement[];
 
     if (arrNode.length == 0) return;
 
     arrNode.forEach(node => {
-        let cfg = elementToObject(node);
-        arrCfg.push(cfg)
+        let nodeParam = getNodeParamFromElement(node);
+        arrNodeParam.push(nodeParam)
     })
 
-    bufArrCfg = arrCfg
+    bufArrNodeParam = arrNodeParam
 }
 
 export function past(nui) {
-    const arrCfg = bufArrCfg
+    const arrNodeParam = bufArrNodeParam
     nui.svg.querySelectorAll('.' + NodeSelector.selected).forEach(el => el.classList.remove(NodeSelector.selected));
-    arrCfg.forEach(cfg => {
-        const newNode = nui.createNode(cfg)
+    arrNodeParam.forEach(nodeParam => {
+        const newNode = nui.createNode(nodeParam)
         newNode.classList.add(NodeSelector.selected)
-        cfg.x += 10;
-        cfg.y += 10;
+        nodeParam.x += 10;
+        nodeParam.y += 10;
     })
 
 }

@@ -4,7 +4,8 @@ import {Button} from "../auxiliary/button/button";
 
 
 export type TEventHeader = {
-    name: 'undo' | 'redo' | 'copy' | 'past' | 'cut' | 'delete' | 'property' | 'save' | 'start' | 'stop',
+    name: 'undo' | 'redo' | 'copy' | 'past' | 'cut' | 'delete' | 'property' | 'save' | 'start' | 'stop'
+        | 'module',
     data?: any
 };
 
@@ -44,6 +45,9 @@ export function Header({children, onEvent}) {
         </button>
         <button onClick={() => eventEmit('stop')} title="Остановить систему">
             <div className="icon-stop"/>
+        </button>
+        <button onClick={() => eventEmit('module')} title="Остановить систему">
+            mod
         </button>
     </div>
 }

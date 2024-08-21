@@ -1,5 +1,5 @@
 import {NodeSelector} from "../editor/node-ui/node-ui";
-import {apiRequest, ApiRequestOptions, ContentType, decompressString, throttle} from "../utils";
+import {apiRequest, ApiRequestOptions, ContentType, debounce, decompressString, throttle} from "../utils";
 
 let port = 3000;
 let routService: string = `http://localhost:${port}/api/v1/service/`;
@@ -73,7 +73,7 @@ async function post(route: string, contentType: ContentType, data?: any) {
     return await apiRequest<{ message: string }>(route, {method: 'POST', contentType, body: data});
 }
 
-export const writeProject = throttle((async (node: HTMLElement) => {
+const writeProjectNow = async (node: HTMLElement) => {
     try {
         // let body = await compress(node.innerHTML);
         let body = node.innerHTML;
@@ -84,7 +84,10 @@ export const writeProject = throttle((async (node: HTMLElement) => {
     } catch (error) {
         console.error('Error fetching data:', error);
     }
-}), 5000)
+};
+
+
+export const writeProject = <(node: HTMLElement) => void>debounce(writeProjectNow, 1000)
 
 
 export async function readProject() {
@@ -113,6 +116,37 @@ export async function stopTask() {
     } catch (error) {
         console.error('Error fetching data:', error);
     }
+}
+
+export async function loadModule(moduleUrl) {
+    // URL вашего модуля
+    // const moduleUrl = 'path/to/your/module.js';
+    let blobUrl: string;
+    try {
+        // Используем fetch для загрузки модуля
+        const response = await fetch(moduleUrl);
+
+        if (!response.ok) throw new Error('Network response was not ok');
+
+        const code = await response.text();
+
+        // Создаем новый Blob с загруженным кодом
+        const blob = new Blob([code], {type: 'application/javascript'});
+        blobUrl = URL.createObjectURL(blob);
+
+        // Динамически импортируем модуль
+        const module = await import(blobUrl);
+
+        // Теперь вы можете использовать функции и переменные из модуля
+        return module; // или module.someFunction();
+
+    } catch (err) {
+        console.error('Error:', err);
+    } finally {
+        // Освобождаем объект URL
+        URL.revokeObjectURL(blobUrl);
+    }
+
 }
 
 // function myRecursiveFunction() {

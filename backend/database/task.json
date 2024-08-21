@@ -1,189 +1,106 @@
 {
-  "ulxoFjU": {
-    "node": "value",
-    "cfg": [
-      [
-        "valueA",
-        1,
-        "number"
-      ],
-      [
-        "valueB",
-        2,
-        "number"
-      ],
-      [
-        "valueC",
-        0,
-        "number2"
-      ],
-      [
-        "valueG",
-        0,
-        "number2"
-      ],
-      [
-        "valueH",
-        0,
-        "number2"
-      ],
-      [
-        "valueI",
-        0,
-        "number2"
-      ],
-      [
-        "valueI",
-        0,
-        "number2"
-      ],
-      [
-        "valueI",
-        0,
-        "number2"
-      ],
-      [
-        "valueI",
-        0,
-        "number2"
-      ],
-      [
-        "valueI",
-        0,
-        "number2"
-      ],
-      [
-        "valueI",
-        0,
-        "number2"
-      ],
-      [
-        "valueD",
-        1,
-        "number"
-      ],
-      [
-        "valueE",
-        2,
-        "number"
-      ],
-      [
-        "valueF",
-        0,
-        "number"
-      ],
-      [
-        "ip",
-        "192.168.0.3",
-        "string"
-      ]
-    ],
-    "out": {
-      "x": [
-        "ulxoObO.A"
-      ]
-    }
-  },
-  "ulxoFIW": {
-    "node": "value",
-    "cfg": [
-      [
-        "valueA",
-        1,
-        "number"
-      ],
-      [
-        "valueB",
-        2,
-        "number"
-      ],
-      [
-        "valueC",
-        0,
-        "number2"
-      ],
-      [
-        "valueG",
-        0,
-        "number2"
-      ],
-      [
-        "valueH",
-        0,
-        "number2"
-      ],
-      [
-        "valueI",
-        0,
-        "number2"
-      ],
-      [
-        "valueI",
-        0,
-        "number2"
-      ],
-      [
-        "valueI",
-        0,
-        "number2"
-      ],
-      [
-        "valueI",
-        0,
-        "number2"
-      ],
-      [
-        "valueI",
-        0,
-        "number2"
-      ],
-      [
-        "valueI",
-        0,
-        "number2"
-      ],
-      [
-        "valueD",
-        1,
-        "number"
-      ],
-      [
-        "valueE",
-        2,
-        "number"
-      ],
-      [
-        "valueF",
-        0,
-        "number"
-      ],
-      [
-        "ip",
-        "192.168.0.3",
-        "string"
-      ]
-    ],
-    "out": {
-      "x": [
-        "ulxoObO.B"
-      ]
-    }
-  },
-  "ulxoObO": {
-    "node": "sum",
+  "um41JXD": {
     "cfg": [
       [
         "qwq",
-        32.2,
+        2.2,
         "number"
       ]
     ],
     "in": {
       "A": [
-        "ulxoFjU.x"
+        "um41KJC.x"
       ],
       "B": [
-        "ulxoFIW.x"
+        "um41LqY.x"
+      ]
+    }
+  },
+  "um41KJC": {
+    "cfg": [
+      [
+        "valueA",
+        1,
+        "number"
+      ],
+      [
+        "valueB",
+        2,
+        "number"
+      ],
+      [
+        "valueC",
+        0,
+        "number2"
+      ],
+      [
+        "valueD",
+        1,
+        "number"
+      ],
+      [
+        "valueE",
+        2,
+        "number"
+      ],
+      [
+        "valueF",
+        0,
+        "number"
+      ],
+      [
+        "ip",
+        "192.168.0.3",
+        "string"
+      ]
+    ],
+    "out": {
+      "x": [
+        "um41JXD.A"
+      ]
+    }
+  },
+  "um41LqY": {
+    "cfg": [
+      [
+        "valueA",
+        1,
+        "number"
+      ],
+      [
+        "valueB",
+        2,
+        "number"
+      ],
+      [
+        "valueC",
+        0,
+        "number2"
+      ],
+      [
+        "valueD",
+        1,
+        "number"
+      ],
+      [
+        "valueE",
+        2,
+        "number"
+      ],
+      [
+        "valueF",
+        0,
+        "number"
+      ],
+      [
+        "ip",
+        "192.168.0.3",
+        "string"
+      ]
+    ],
+    "out": {
+      "x": [
+        "um41JXD.B"
       ]
     }
   }

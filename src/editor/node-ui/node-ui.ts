@@ -1,5 +1,5 @@
 import {Svg} from "./svg";
-import {getID} from "../../utils";
+import {compressString, getID} from "../../utils";
 import {EditorLinkCreate} from "./editor/editor.link-create";
 import {EditorLinkRemove} from "./editor/editor.link-remove";
 import {EditorDrag} from "./editor/editor.drag";
@@ -26,7 +26,7 @@ interface TNodeParam {
     arrIn?: string[];
     arrOut?: string[];
     id?: string;
-    data?: object;
+    cfg?: object;
     color?: string;
 }
 
@@ -75,12 +75,12 @@ export class NodeUI extends Svg {
         if (this.mode == mode) this.mode = '';
     }
 
-    public createNode(
-        {
+    public createNode(nodeParam: TNodeParam) {
+        const {
             x = 50, y = 50, widthEmpty = 0, nodeName = 'empty',
-            arrIn = [], arrOut = [], id = getID(), data,
+            arrIn = [], arrOut = [], id = getID(), cfg,
             color = '#d7d7d7'
-        }: TNodeParam) {
+        } = nodeParam
 
         const numberIn: number = arrIn!.length;
         const numberOut: number = arrOut!.length;
@@ -111,7 +111,8 @@ export class NodeUI extends Svg {
         const fillNode: string = color!;
         const stroke: string = '#25334b';
 
-        const nodeGroup = this.group({x, y, class: NodeSelector.node, data: {node: nodeName, ...data}});
+        const nodeGroup = this.group(
+            {x, y, class: NodeSelector.node, data: {nodeName, cfg: compressString(JSON.stringify(cfg))}});
 
         this.rectangle({
             x: 0, y: 0, width, height, rx,

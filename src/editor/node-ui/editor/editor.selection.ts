@@ -41,7 +41,8 @@ export class EditorSelection {
         if (!this.arrKey['controlleft']) this.isControlLeft = false;
     }
 
-    public handlerMouseDown({target, p, start: s}: TMouseEvent): void {
+    public handlerMouseDown({target, p, start: s, button}: TMouseEvent): void {
+        if (!button[0]) return
 
         this.targetDown = (target as Element);
         const isEmpty = this.targetDown === this.svg;

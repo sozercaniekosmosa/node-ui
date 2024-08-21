@@ -1,6 +1,6 @@
 import "./style.css"
 import React, {useEffect, useState} from "react";
-import {arrNode} from "../nodes/nodes";
+import {arrNode} from "../../capsules/nodes";
 
 export function Toolbox({onNodeSelect}) {
 
@@ -28,7 +28,7 @@ export function Toolbox({onNodeSelect}) {
                     <div className={'toolbox__item' + (i == index ? ' toolbox__item--press' : '')} key={i}
                          data-index={i}>
                         <div className="toolbox__icon" style={{backgroundImage: it.icon}}></div>
-                        <div className="toolbox__desc">{it.name}</div>
+                        <div className="toolbox__desc">{it.nodeName}</div>
                     </div>
                 )
             })}

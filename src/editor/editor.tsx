@@ -41,14 +41,7 @@ export function Editor({newNode, onEvent}) {
             const nui = nuiRef.current;
             nui?.updateZoom();
             const {x, y} = nui?.getPosZoom(new Point(e.clientX, e.clientY).sub(nui?.off!));
-
-            let data = {cfg: compressString(JSON.stringify(newNode.cfg))};
-
-            nuiRef.current?.createNode({
-                x, y, nodeName: newNode.name,
-                arrIn: newNode.inputs, arrOut: newNode.outputs, data,
-                color: newNode.color
-            });
+            nuiRef.current?.createNode({x, y, ...newNode});
             eventEmit({name: 'add-node'})
         }
     }

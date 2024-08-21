@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, StrictMode} from 'react';
 import ReactDOM from 'react-dom/client';
 import './style.css';
 import './auxiliary/icon/style.css';
@@ -9,8 +9,9 @@ import {Header, TEventHeader} from "./header/header";
 import History from './service/history'
 import {MenuConfirm} from "./auxiliary/menu/menu-confirm";
 import {apiRequest, camelToKebab, compressString, decompressString, eventBus} from "./utils"
-import {writeProject, readProject, getNodeStruct, startTask, stopTask} from './service/service-backend'
+import {writeProject, readProject, getNodeStruct, startTask, stopTask, loadModule} from './service/service-backend'
 import {copy, past, cut} from "./service/cpc";
+import {NodeSelector} from "./editor/node-ui/node-ui";
 
 const root = ReactDOM.createRoot(document.querySelector('.root') as HTMLElement);
 let history;
@@ -109,6 +110,7 @@ function Root() {
                     eventBus.dispatchEvent('confirm', (isYes) => isYes && nui.removeNode(), 'Уверены?')
                 break;
             case 'property':
+                if (data && !data.classList.contains(NodeSelector.handle)) return
                 if (arrSelected?.length !== 1) return
                 setNodeProp((arrSelected as [])[0])
                 eventBus.dispatchEvent('menu-property-show')
@@ -125,12 +127,16 @@ function Root() {
             case 'stop':
                 eventBus.dispatchEvent('confirm', (isYes) => isYes && stopTask(), 'Остановить стстему?')
                 break;
+            case 'module':
+                let d = await loadModule('http://localhost:3000/api/v1/service/module')
+                d.test()
+                break;
         }
     }
 
     return (<>
         <Header className="menu" onEvent={onEventHandler}></Header>
-        <div className="node-editor" onDoubleClick={() => onEventHandler({name: 'property'})}>
+        <div className="node-editor" onDoubleClick={({target}) => onEventHandler({name: 'property', data: target})}>
             <Toolbox onNodeSelect={(data) => setNodeDataSelected(data)}/>
             <Editor newNode={nodeDataSelected} onEvent={onEventHandler}/>
             <Property setNode={nodeProp} onChange={() => onEventHandler({name: 'property-change'})}/>
@@ -139,4 +145,8 @@ function Root() {
     </>)
 }
 
-root.render(<Root/>);
+root.render(
+    // <StrictMode>
+    <Root/>
+    //</StrictMode>
+);
