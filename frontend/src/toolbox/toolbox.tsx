@@ -19,12 +19,12 @@ export function Toolbox({onNodeSelect, listNode}) {
     function onMouseDown(e) {
         let nodeIndex = e.target.dataset.index;
         setIndex(nodeIndex == index ? -1 : nodeIndex);
-        onNodeSelect && onNodeSelect(nodeIndex == index ? null : Object.values(listNode)[e.target.dataset.index]);
+        onNodeSelect && onNodeSelect(nodeIndex == index ? null : listNode[e.target.dataset.index]);
     }
 
     return (
         <div className="toolbox" onMouseDown={onMouseDown}>
-            {Object.values(listNode).map(({icon, nodeName}, i) => {
+            {listNode.map(({icon, nodeName}, i) => {
                 return (
                     <div className={'toolbox__item' + (i == index ? ' toolbox__item--press' : '')} key={i}
                          data-index={i}>

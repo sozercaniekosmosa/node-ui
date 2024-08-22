@@ -1,8 +1,6 @@
 import express from "express";
 
-import {getProject, getModules, startTask, stopTask, updateProject, updateTask} from "./controller";
-
-import {check, body} from "express-validator";
+import {getProject, getToolbox, startTask, stopTask, updateProject, updateTask} from "./controller";
 
 
 const router = express.Router();
@@ -10,7 +8,7 @@ const router = express.Router();
 
 // GET — получение данных.
 // router.get('/', getProject);
-router.get('/module', getModules);
+router.get('/toolbox', getToolbox);
 router.get('/project', getProject);
 
 // PUT — полное обновление данных.

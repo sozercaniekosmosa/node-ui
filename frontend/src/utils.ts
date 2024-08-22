@@ -1039,7 +1039,7 @@ export async function apiRequest<T>(
 
         if (!response.ok) throw new Error(`Error: ${response.status} ${response.statusText}`);
 
-        const data: T = await response.json();
+        const {data}: T = await response.json();
         return data;
     } catch (error) {
         console.error('API request error:', error);

@@ -18,7 +18,7 @@ type TCfgNode = Record<string, ItemNodeCfg>;
 export function getNodeStruct(nodeProject): TCfgNode {
     let arrNode = nodeProject.querySelectorAll('.' + NodeSelector.node) as NodeListOf<HTMLElement>;
     let data = {};
-    console.log(arrNode)
+    // console.log(arrNode)
     arrNode.forEach(node => {
         let id = node.id;
         !(data?.[id]) && (data[id] = {})
@@ -62,15 +62,15 @@ export function getNodeStruct(nodeProject): TCfgNode {
 }
 
 async function put(route: string, contentType: ContentType, data: any) {
-    return await apiRequest<{ message: string }>(route, {method: 'PUT', contentType, body: data});
+    return await apiRequest(route, {method: 'PUT', contentType, body: data});
 }
 
 async function get(route: string, contentType: ContentType) {
-    return await apiRequest<{ message: string }>(route, {method: 'GET', contentType});
+    return await apiRequest(route, {method: 'GET', contentType});
 }
 
 async function post(route: string, contentType: ContentType, data?: any) {
-    return await apiRequest<{ message: string }>(route, {method: 'POST', contentType, body: data});
+    return await apiRequest(route, {method: 'POST', contentType, body: data});
 }
 
 const writeProjectNow = async (node: HTMLElement) => {
@@ -93,8 +93,19 @@ export const writeProject = <(node: HTMLElement) => void>debounce(writeProjectNo
 export async function readProject() {
     try {
         //@ts-ignore
-        const {status, data} = await get(routService + 'project', 'text/plain')
-        console.log(status, 'project загружен');
+        const data = await get(routService + 'project', 'text/plain')
+        console.log('project загружен');
+        return data;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+}
+
+export async function getToolbox() {
+    try {
+        //@ts-ignore
+        const data = await get(routService + 'toolbox', 'application/json')
+        console.log('toolbox загружен');
         return data;
     } catch (error) {
         console.error('Error fetching data:', error);

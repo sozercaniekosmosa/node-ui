@@ -9,7 +9,7 @@ import {Header, TEventHeader} from "./header/header";
 import History from './service/history'
 import {MenuConfirm} from "./auxiliary/menu/menu-confirm";
 import {apiRequest, camelToKebab, compressString, decompressString, eventBus} from "./utils"
-import {writeProject, readProject, getNodeStruct, startTask, stopTask, loadModule} from './service/service-backend'
+import {writeProject, readProject, getNodeStruct, startTask, stopTask, loadModule, getToolbox} from './service/service-backend'
 import {copy, past, cut} from "./service/cpc";
 import {NodeSelector} from "./editor/node-ui/node-ui";
 
@@ -31,21 +31,24 @@ console.log(import.meta.env.VITE_SOME_KEY)
 function Root() {
 
 
-    let [listNode, setListNode] = useState(false);
+    let [listNode, setListNode] = useState([]);
 
-    (async () => {
-        if (import.meta.env.PROD) {
-            !listNode && setListNode((await import("../dist/plugins.js")).default);
-        } else {//@ts-ignore
-            !listNode && setListNode((await import("../../plugins/src/nodes.ts")).default);
-        }
-    })();
+    useEffect(() => {
+        (async () => setListNode(await getToolbox() as [Object]))()
+        document.addEventListener('keyup', e => arrKey[camelToKebab(e.code).toLowerCase()] = false, true);
+        document.addEventListener('keydown', onKeyDown, true);
+        document.addEventListener('blur', () => arrKey = [], true);
+        document.addEventListener('focus', ({target}) => nodeFocus = target, true);
+    }, [])
 
+    // (async () => {
+    //     if (import.meta.env.PROD) {
+    //         !listNode && setListNode((await import("../../plugins/dist/plugins.js")).default);
+    //     } else {//@ts-ignore
+    //         !listNode && setListNode((await import("../../plugins/src/nodes.ts")).default);
+    //     }
+    // })();
 
-    document.addEventListener('keyup', e => arrKey[camelToKebab(e.code).toLowerCase()] = false, true);
-    document.addEventListener('keydown', onKeyDown, true);
-    document.addEventListener('blur', () => arrKey = [], true);
-    document.addEventListener('focus', ({target}) => nodeFocus = target, true);
 
     const [nodeProp, setNodeProp] = useState(null);
     const [nodeDataSelected, setNodeDataSelected] = useState(null);
@@ -148,6 +151,7 @@ function Root() {
                 eventBus.dispatchEvent('confirm', (isYes) => isYes && stopTask(), 'Остановить стстему?')
                 break;
             case 'module':
+                setListNode(await getToolbox() as [Object])
                 // let d = await import("../../plugins/dist/plugins.js");
                 // setListNode(d.default)
                 break;
@@ -160,7 +164,7 @@ function Root() {
             <Toolbox onNodeSelect={(data) => setNodeDataSelected(data)} listNode={listNode}/>
             <Editor newNode={nodeDataSelected} onEvent={onEventHandler}/>
             <Property setNode={nodeProp} onChange={() => onEventHandler({name: 'property-change'})}
-                      listNode={listNode}/>
+                      listNode={null/*listNode*/}/>
         </div>
         <MenuConfirm name={'confirm'}/>
     </>)

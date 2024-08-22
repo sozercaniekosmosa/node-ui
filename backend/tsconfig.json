@@ -10,7 +10,7 @@
     "isolatedModules": true,
     "removeComments": true,
     /* Emit */
-    "outDir": "../prod",
+    "outDir": "./dist",
     //"declaration": true,
     //"sourceMap": true,
     //"noEmit": true,
