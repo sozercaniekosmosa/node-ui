@@ -1,12 +1,18 @@
-import {decompressGzip, readData, writeData} from "./service";
+import {decompressGzip, getDataFromArrayPath, getDirectories, readData, writeData} from "./service";
 import {validationResult} from "express-validator";
 import sanitizeHtml from 'sanitize-html';
 
-export const getTest = (req: any, res: any) => {
-    // debugger
+export const getModules = async (req: any, res: any) => {
+    debugger
     const {params: {id},} = req;
     try {
-        const data = readData('database/val.js').toString();
+
+        // let arrPath = (await getDirectories('../capsules/')).map(dir => '../capsules/' + dir + '/index.js')
+        // let arrFile = (await getDataFromArrayPath(arrPath)).map(file => file.content)
+
+
+        // const data = readData('../nodes/node.js').toString();
+        const data = readData('../nodes/dist/nodes.umd.js').toString();
         res.send(data);
     } catch (error: any) {
         res.status(error.status || 500).send({status: 'FAILED', data: {error: error?.message || error},});

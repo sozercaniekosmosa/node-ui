@@ -120,26 +120,21 @@ export async function stopTask() {
 }
 
 export async function loadModule(moduleUrl) {
-    // URL вашего модуля
-    // const moduleUrl = 'path/to/your/module.js';
     let blobUrl: string;
     try {
-        // Используем fetch для загрузки модуля
         const response = await fetch(moduleUrl);
 
         if (!response.ok) throw new Error('Network response was not ok');
 
         const code = await response.text();
-
+        // let arr = JSON.parse(code)
         // Создаем новый Blob с загруженным кодом
         const blob = new Blob([code], {type: 'application/javascript'});
         blobUrl = URL.createObjectURL(blob);
 
-        // Динамически импортируем модуль
-        const module = await import(blobUrl);
+        const module = await import(/*@vite-ignore*/blobUrl);
 
-        // Теперь вы можете использовать функции и переменные из модуля
-        return module; // или module.someFunction();
+        return module;
 
     } catch (err) {
         console.error('Error:', err);

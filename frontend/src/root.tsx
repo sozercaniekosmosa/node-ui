@@ -13,6 +13,9 @@ import {writeProject, readProject, getNodeStruct, startTask, stopTask, loadModul
 import {copy, past, cut} from "./service/cpc";
 import {NodeSelector} from "./editor/node-ui/node-ui";
 
+// if (!import.meta.env.PROD) import listNode from "../../plugins/src/nodes"
+
+
 const root = ReactDOM.createRoot(document.querySelector('.root') as HTMLElement);
 let history;
 let nui = null;
@@ -21,13 +24,22 @@ let arrKey = [];
 
 let nodeFocus;
 
+console.log(import.meta.env.MODE)
+console.log(import.meta.env.PROD)
+console.log(import.meta.env.VITE_SOME_KEY)
+
 function Root() {
 
 
-    const [listNode, setListNode] = useState(false);
+    let [listNode, setListNode] = useState(false);
 
-    //@ts-ignore
-    // (async () => !listNode && setListNode((await import("../../nodes/nodes")).listNode))();
+    (async () => {
+        if (import.meta.env.PROD) {
+            !listNode && setListNode((await import("../dist/plugins.js")).default);
+        } else {//@ts-ignore
+            !listNode && setListNode((await import("../../plugins/src/nodes.ts")).default);
+        }
+    })();
 
 
     document.addEventListener('keyup', e => arrKey[camelToKebab(e.code).toLowerCase()] = false, true);
@@ -136,8 +148,8 @@ function Root() {
                 eventBus.dispatchEvent('confirm', (isYes) => isYes && stopTask(), 'Остановить стстему?')
                 break;
             case 'module':
-                let d = await loadModule('http://localhost:3000/api/v1/service/module')
-                d.test()
+                // let d = await import("../../plugins/dist/plugins.js");
+                // setListNode(d.default)
                 break;
         }
     }
@@ -147,7 +159,8 @@ function Root() {
         <div className="node-editor" onDoubleClick={({target}) => onEventHandler({name: 'property', data: target})}>
             <Toolbox onNodeSelect={(data) => setNodeDataSelected(data)} listNode={listNode}/>
             <Editor newNode={nodeDataSelected} onEvent={onEventHandler}/>
-            <Property setNode={nodeProp} onChange={() => onEventHandler({name: 'property-change'})} listNode={listNode}/>
+            <Property setNode={nodeProp} onChange={() => onEventHandler({name: 'property-change'})}
+                      listNode={listNode}/>
         </div>
         <MenuConfirm name={'confirm'}/>
     </>)

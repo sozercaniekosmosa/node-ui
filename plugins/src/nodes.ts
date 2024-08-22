@@ -36,10 +36,12 @@ export interface Node {
     components: NodeConfig
 }
 
-export const listNode: { [key: string]: NodeConfig } = {};
+const listNode: { [key: string]: NodeConfig } = {};
 
 for (let i = 0; i < arrNode.length; i++) {
     const it = arrNode[i];
     //@ts-ignore
     listNode[it.nodeName] = it;
 }
+
+export default listNode;

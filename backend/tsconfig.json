@@ -10,7 +10,7 @@
     "isolatedModules": true,
     "removeComments": true,
     /* Emit */
-    "outDir": "./dist",
+    "outDir": "../prod",
     //"declaration": true,
     //"sourceMap": true,
     //"noEmit": true,
@@ -19,7 +19,7 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     /* Type Checking */
-    "strict": true,
+    "strict": false,
     /* Completeness */
     "skipLibCheck": true
   },
