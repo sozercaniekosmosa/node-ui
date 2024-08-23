@@ -90,6 +90,8 @@ function Root() {
                 nui = data;
                 nui.svg.innerHTML = await readProject();
                 history = new History(nui.svg.innerHTML, 20);
+                nui.selection.clearSelection();
+                nui.selection.clearRectSelection();
                 break;
             case 'selected':
                 arrSelected = data;

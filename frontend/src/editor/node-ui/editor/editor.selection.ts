@@ -102,7 +102,8 @@ export class EditorSelection {
 
         this.selectionRect = this.nu.rectangle({
             x: startPoint.x, y: startPoint.y, width: 0, height: 0,
-            fill: '#ccccee', fillOpacity: 0.3, stroke: '#222255', strokeDasharray: '4'
+            fill: '#ccccee', fillOpacity: 0.3, stroke: '#222255', strokeDasharray: '4',
+            class: NodeSelector.selectionRect
         })
 
         return startPoint;
@@ -138,8 +139,14 @@ export class EditorSelection {
     }
 
     public clearRectSelection() {
-        if (!this.selectionRect) return;
-        this.svg.removeChild(this.selectionRect as Element);
-        this.selectionRect = false;
+        try {
+            if (!this.selectionRect) return;
+            this.selectionRect = false;
+        } catch (e) {
+            console.log(e)
+        } finally {
+            this.svg.querySelectorAll('.' + NodeSelector.selectionRect).forEach(el => this.svg.removeChild(el as Element));
+            this.selectionRect = false;
+        }
     }
 }

@@ -7,6 +7,7 @@ import {EditorSelection} from "./editor/editor.selection";
 import {EditorPan} from "./editor/editor.pan";
 
 export const NodeSelector = {
+    selectionRect: 'selection-rect',
     selected: 'selected',
     node: 'node',
     path: 'group-path',
@@ -36,7 +37,7 @@ export class NodeUI extends Svg {
     private mode: string = '';
     public key: TKey = {};
 
-    private selection: EditorSelection;
+    public selection: EditorSelection;
     private linkCreate: EditorLinkCreate;
     private linkRemove: EditorLinkRemove;
     private drag: EditorDrag;

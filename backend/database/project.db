@@ -1,1 +1,45 @@
-<g class="group-path" transform="translate(0,0)"><path class="link" stroke-linecap="round" d="M70 47.375 C 85.97530110677083 47.375, 77.98765055338542 57.63426208496094, 93.96295166015625 57.63426208496094" id="um6E9Fb-um6EcoP"></path><path class="link" stroke-linecap="round" d="M69.03703308105469 82.26388549804688 C 85.65431213378906 82.26388549804688, 77.34567260742188 73.63426208496094, 93.96295166015625 73.63426208496094" id="um6Eaq2-um6EcoQ"></path></g><text x="0" y="0" class="pin-text" opacity="0" id="temp-node-for-width-text">sum</text><rect x="111" y="183" width="0" height="0" fill="#ccccee" fill-opacity="0.3" stroke="#222255" stroke-dasharray="4"></rect><rect x="116" y="211" width="0" height="0" fill="#ccccee" fill-opacity="0.3" stroke="#222255" stroke-dasharray="4"></rect><rect x="107" y="158" width="0" height="0" fill="#ccccee" fill-opacity="0.3" stroke="#222255" stroke-dasharray="4"></rect><rect x="249" y="223" width="0" height="54" fill="#ccccee" fill-opacity="0.3" stroke="#222255" stroke-dasharray="4"></rect><g x="71" y="82" class="node" data-node-name="value" data-cfg="N4IkfCCIIgi8IGhMIFgGEEPIgIBcBtUA7AhgWwFM0QA3HAGwFcCBBEAGhABcBPAByNRC0rwCMCAJwakKaAEyMmASyblOIQOggiQOIggVhAogDhA1AWjoBfetnwKyVAgCERrDsR78hIsxKmz5xZQnVbdVxjkFBAHk2GQB7LDR0EHEQAF1DY0JiM2oAYWt2BXsBYUZnVAAGVzkFT29tHQz/QJDwyIwY+P04xlhAIRAwQAEQZCik0wpqABFM2y4cx3yxVABGEvcuco1KkcTuExTBggBRUezeXKdpyWY3MtVl3V213GSuVIIAMT27A8nRcjRi09KPC58dM8WowIGp2oAZED66zuIGkbBeXAAzkxBNIsABzI6fLgzACc4gAdDMAGwADgJhQJAGZrGdiHCdAhACwgXTUEBEAWCoWkESiCVaIE0UEAIiBgKG3BQAEwIiIAxqjubypFliMjURiscRAHgggH4QTQQBA+Dm1RUNaJo8hooiMVHogAWTBEduE/P0QA=" transform="translate(40,35)" id="um6E9F9"><rect x="0" y="0" width="30" height="24" rx="2" stroke="#25334b" fill="#ebf5ec" class="handle"></rect><circle cx="30" cy="12" r="4" stroke="#25334b" fill="#ffc69a" class="pin-out" id="um6E9Fb" data-name="x" data-to="um6EcoP"></circle><text x="16" y="15" class="pin-text">x</text><text x="0" y="-2" class="pin-text">value</text></g><g x="81.29629629629629" y="92" class="node" data-node-name="value" data-cfg="N4IkfCCIIgi8IGhMIFgGEEPIgIBcBtUA7AhgWwFM0QA3HAGwFcCBBEAGhABcBPAByNRC0rwCMCAJwakKaAIyMmASyblOIQOggiQOIggVhAogDhA1AWjqMcgwQHk2MgPZY06EACYQAXQC+9bPgVkqBAEIjWHYh5+IRFPNFspWXliZQR1LV1fAyNTCysMO0cXN0JiT2oAYT92BSCBYUYw1AAGSLkFWPjtHSLkkzNpS2tM5wdGWEAhEDBAARBkaxyPCmoAEWKArjKQyrFUSWYohtUNZtns7nc8qYIAUTnS3nLQlYj1+pithJ1TvdxcrnyCADEzwIul0XIaFqt2iXEa2103ycfRAEDUA0AMiDjfZvEDSNg/LgAZyYgmkWAA5ldAVxxABOWwAOnEADYAByU6qUgDMfg2xHROgQgBYQYZqCAiQztNLWXqMTRQQAiIGBka8FAATAhYgDGeI6XSkJWIOLxhOJxEAeCCAfhBNBAEAlBSl1ekbPjyPiiIw8QSABZMEQu4S9JxAA===" transform="translate(40,69.88888888888869)" id="um6Eaq0"><rect x="0" y="0" width="29.037036895751953" height="24" rx="2" stroke="#25334b" fill="#ebf5ec" class="handle"></rect><circle cx="29.037036895751953" cy="12" r="4" stroke="#25334b" fill="#ffc69a" class="pin-out" id="um6Eaq2" data-name="x" data-to="um6EcoQ"></circle><text x="16" y="15" class="pin-text">x</text><text x="0" y="-2" class="pin-text">value</text></g><g x="138.48148148148147" y="104.7037037037037" class="node" data-node-name="sum" data-cfg="N4IkfCCIwgiSIIHCCKwgIBcBtUA7AhgWwKZJACY4DOAxgE4CWADgC6UD2aIANCLQJ7V6IjG1U0Ac1YgAbhgA2+QHgggfhAYgQRBADCCBeEHij6tSTxCB0EFUZA4iBx1cALRzlgARBlgHhA4gIRBrojOXIB5Oo2YoAugC+LOjYugCOAO5hmly6aACuWABGOOSiEtKIAEwAdFlsWjr4gFggyoBcIGCAnCDmjmAABFa2Ds6u7l70TEjIgYFAA==" transform="translate(93.96296296296282,45.25925925925935)" id="um6EcoN"><rect x="0" y="0" width="35.01851844787598" height="40" rx="2" stroke="#25334b" fill="#f6e6e1" class="handle"></rect><circle cx="0" cy="12" r="4" stroke="#25334b" fill="#bcffd6" class="pin-in" id="um6EcoP" data-name="A" data-to="um6E9Fb"></circle><text x="8" y="15" class="pin-text">A</text><circle cx="0" cy="28" r="4" stroke="#25334b" fill="#bcffd6" class="pin-in" id="um6EcoQ" data-name="B" data-to="um6Eaq2"></circle><text x="8" y="31" class="pin-text">B</text><circle cx="35.01851844787598" cy="20" r="4" stroke="#25334b" fill="#ffc69a" class="pin-out" id="um6EcoR" data-name="y"></circle><text x="22.518518447875977" y="23" class="pin-text">y</text><text x="0" y="-2" class="pin-text">sum</text></g><rect x="676.6666666666667" y="419.3333333333333" width="0" height="0" fill="#ccccee" fill-opacity="0.3" stroke="#222255" stroke-dasharray="4"></rect>
+<g class="group-path" transform="translate(0,0)">
+<path class="link" stroke-linecap="round" d="M70 47.375 C 80.36214192708333 47.375, 75.18107096354167 57.535491943359375, 85.543212890625 57.535491943359375" id="um6E9Fb-um6EcoP">
+</path>
+<path class="link" stroke-linecap="round" d="M69.03703703703702 81.96295693479938 C 80.04115226337447 81.96295693479938, 74.53909465020575 73.23456790123457, 85.5432098765432 73.23456790123457" id="um6Eaq2-um6EcoQ">
+</path>
+</g>
+<text x="0" y="0" class="pin-text" opacity="0" id="temp-node-for-width-text">sum</text>
+<rect x="111" y="183" width="0" height="0" fill="#ccccee" fill-opacity="0.3" stroke="#222255" stroke-dasharray="4">
+</rect>
+<rect x="116" y="211" width="0" height="0" fill="#ccccee" fill-opacity="0.3" stroke="#222255" stroke-dasharray="4">
+</rect>
+<rect x="107" y="158" width="0" height="0" fill="#ccccee" fill-opacity="0.3" stroke="#222255" stroke-dasharray="4">
+</rect>
+<rect x="249" y="223" width="0" height="54" fill="#ccccee" fill-opacity="0.3" stroke="#222255" stroke-dasharray="4">
+</rect>
+<g x="71" y="82" class="node" data-node-name="value" data-cfg="N4IkfCCIIgi8IGhMIFgGEEPIgIBcBtUA7AhgWwFM0QA3HAGwFcCBBEAGhABcBPAByNRC0rwCMCAJwakKaAEwBGRkwCWTcpxCB0EESBxEECsIFEAcIBoC0dAL71s+JWSoEAQiNYdiPfkJEWJM+YuKqEmnfpuMOIKCAPJscgD2WGjoIOIgALrGpoTEFtQAwrbsSo4CwoyuqAAM7gpK3r66elmBwWGR0RhxiYYJjLCAQiBggAIgyDEp5hTUACLZ9lx5zoViqNLMHhXqWtVjydxmacMEAKLjubz5LrPiZZ5clSv6e+u4qVzpBABi+w6H06LkaKUL5V7Lfj0LzajAgGk6gBkQAYbe4gWRsV5cADOTEEsiwAHNjl8uJIAJziAB0kgAbAAOQnFQkAZlsi2I8L0CEALCA9DQQERBULhWRRGJJdogbRQQAiIGBoXclAATAhIgDGaJ5fJkOWIKLRmOxxEAeCCAfhBtBAEH5OfUlU1YujyOiiIw0RiABZMET24QCwxAA===" transform="translate(40,35)" id="um6E9F9">
+<rect x="0" y="0" width="30" height="24" rx="2" stroke="#25334b" fill="#ebf5ec" class="handle">
+</rect>
+<circle cx="30" cy="12" r="4" stroke="#25334b" fill="#ffc69a" class="pin-out" id="um6E9Fb" data-name="x" data-to="um6EcoP">
+</circle>
+<text x="16" y="15" class="pin-text">x</text>
+<text x="0" y="-2" class="pin-text">value</text>
+</g>
+<g x="81.29629629629629" y="92" class="node" data-node-name="value" data-cfg="N4IkfCCIIgi8IGhMIFgGEEPIgIBcBtUA7AhgWwFM0QA3HAGwFcCBBEAGhABcBPAByNRC0rwCMCAJwakKaAIyMmASyblOIQOggiQOIggVhAogDhA1AWjqMcgwQHk2MgPZY06EACYQAXQC+9bPgVkqBAEIjWHYh5+IRFPNFspWXliZQR1LV1fAyNTCysMO0cXN0JiT2oAYT92BSCBYUYw1AAGSLkFWPjtHSLkkzNpS2tM5wdGWEAhEDBAARBkaxyPCmoAEWKArjKQyrFUSWYohtUNZtns7nc8qYIAUTnS3nLQlYj1+pithJ1TvdxcrnyCADEzwIul0XIaFqt2iXEa2103ycfRAEDUA0AMiDjfZvEDSNg/LgAZyYgmkWAA5ldAVxxABOWwAOnEADYAByU6qUgDMfg2xHROgQgBYQYZqCAiQztNLWXqMTRQQAiIGBka8FAATAhYgDGeI6XSkJWIOLxhOJxEAeCCAfhBNBAEAlBSl1ekbPjyPiiIw8QSABZMEQu4S9JxAA===" transform="translate(40,69.88888888888869)" id="um6Eaq0">
+<rect x="0" y="0" width="29.037036895751953" height="24" rx="2" stroke="#25334b" fill="#ebf5ec" class="handle">
+</rect>
+<circle cx="29.037036895751953" cy="12" r="4" stroke="#25334b" fill="#ffc69a" class="pin-out" id="um6Eaq2" data-name="x" data-to="um6EcoQ">
+</circle>
+<text x="16" y="15" class="pin-text">x</text>
+<text x="0" y="-2" class="pin-text">value</text>
+</g>
+<g x="138.48148148148147" y="104.7037037037037" class="node" data-node-name="sum" data-cfg="N4IkfCCIwgiSIIHCCKwgIBcBtUA7AhgWwKZJACY4DOAxgE4CWADgC6UD2aIANCLQJ7V6IjG1U0Ac1YgAbhgA2+QHgggfhAYgQRBADCCBeEHij6tSTxCB0EFUZA4iBx1cALRzlgARBlgHhA4gIRBrojOXIB5Oo2YoAugC+LOjYugCOAO5hmly6aACuWABGOOSiEtKIAEwAdFlsWjr4gFggyoBcIGCAnCDmjmAABFa2Ds6u7l70TEjIgYFAA==" transform="translate(85.54320987654302,45.16049382716059)" id="um6EcoN">
+<rect x="0" y="0" width="35.01851844787598" height="40" rx="2" stroke="#25334b" fill="#f6e6e1" class="handle">
+</rect>
+<circle cx="0" cy="12" r="4" stroke="#25334b" fill="#bcffd6" class="pin-in" id="um6EcoP" data-name="A" data-to="um6E9Fb">
+</circle>
+<text x="8" y="15" class="pin-text">A</text>
+<circle cx="0" cy="28" r="4" stroke="#25334b" fill="#bcffd6" class="pin-in" id="um6EcoQ" data-name="B" data-to="um6Eaq2">
+</circle>
+<text x="8" y="31" class="pin-text">B</text>
+<circle cx="35.01851844787598" cy="20" r="4" stroke="#25334b" fill="#ffc69a" class="pin-out" id="um6EcoR" data-name="y">
+</circle>
+<text x="22.518518447875977" y="23" class="pin-text">y</text>
+<text x="0" y="-2" class="pin-text">sum</text>
+</g>

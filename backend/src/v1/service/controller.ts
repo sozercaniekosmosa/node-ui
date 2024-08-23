@@ -3,9 +3,7 @@ import {validationResult} from "express-validator";
 import sanitizeHtml from 'sanitize-html';
 
 export const getToolbox = async (req: any, res: any) => {
-    // const {params: {id},} = req;
     try {
-
         let arrDir = (await getDirectories('./plugins/'))
         let arrPath = arrDir.map(dir => './plugins/' + dir + '/cfg.json')
         let arrFile = (await getDataFromArrayPath(arrPath))
@@ -15,15 +13,12 @@ export const getToolbox = async (req: any, res: any) => {
             return cfg;
         })
 
-        // const data = readData('../nodes/node.js').toString();
-        // const data = readData('../nodes/dist/nodes.umd.js').toString();
-        res && res.send({status: 'OK', data: arrData});
+        res.send({status: 'OK', data: arrData});
 
     } catch (error: any) {
         res.status(error.status || 500).send({status: 'FAILED', data: {error: error?.message || error},});
     }
 };
-// getToolbox(null, null);
 
 export const getProject = (req: any, res: any) => {
     const errors = validationResult(req);
@@ -50,10 +45,32 @@ export const updateProject = async (req: any, res: any) => {
     }
 };
 
+type TTypeName = string;
+type TValue = any;
+type TName = string;
+type TConfig = [TName, TValue, TTypeName];
+
+type TPath = string;
+
+interface TConsumer {
+    [key: string]: TPath[];
+}
+
+interface TTask {
+    cfg: TConfig[];
+    out: TConsumer;
+}
+
+// Используем индексный синтаксис для динамических ключей верхнего уровня
+interface TTaskList {
+    [key: string]: TTask;
+}
+
 export const updateTask = (req: any, res: any) => {
     const {body} = req;
     try {
-        writeData('database/task.json', JSON.stringify(body, null, 2));
+        let taskList: TTaskList = body;
+        writeData('database/task.json', JSON.stringify(taskList, null, 2));
         res.send({status: 'OK', data: 'task written'});
     } catch (error: any) {
         res.status(error?.status || 500).send({status: 'FAILED', data: {error: error?.message || error}});
