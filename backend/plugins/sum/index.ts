@@ -41,8 +41,7 @@ routerIn.post('/b', (req: any, res: any) => {
 });
 
 routerService.post('/kill', (req: any, res: any) => {
-    // child.kill();
-    console.log('!!!')
+    res.send({status: 'OK', data: 'команда на завершение принята'});
     process.exit(0);
 });
 
