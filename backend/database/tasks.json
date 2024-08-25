@@ -3,12 +3,12 @@
     "cfg": [
       [
         "valueA",
-        21,
+        15,
         "number"
       ],
       [
         "valueB",
-        2,
+        3,
         "number"
       ],
       [
@@ -37,6 +37,8 @@
         "string"
       ]
     ],
+    "id": "um6E9F9",
+    "nodeName": "value",
     "out": {
       "x": [
         "um6EcoN.A"
@@ -81,6 +83,8 @@
         "string"
       ]
     ],
+    "id": "um6Eaq0",
+    "nodeName": "value",
     "out": {
       "x": [
         "um6EcoN.B"
@@ -91,10 +95,12 @@
     "cfg": [
       [
         "qwq",
-        2.2,
+        4.2,
         "number"
       ]
     ],
+    "id": "um6EcoN",
+    "nodeName": "sum",
     "in": {
       "A": [
         "um6E9F9.x"

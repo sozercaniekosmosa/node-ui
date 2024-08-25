@@ -39,13 +39,13 @@ export function Header({onEvent}) {
         <button onClick={() => eventEmit('property')} title="Свойства">
             <div className="icon-property"/>
         </button>
-        <button onClick={() => eventEmit('start')} title="Запустить систему">
+        <button onClick={() => eventEmit('start')} title="Запустить сервисы">
             <div className="icon-play"/>
         </button>
-        <button onClick={() => eventEmit('stop')} title="Остановить систему">
+        <button onClick={() => eventEmit('stop')} title="Остановить сервисы">
             <div className="icon-stop"/>
         </button>
-        <button onClick={() => eventEmit('module')} title="Остановить систему">
+        <button onClick={() => eventEmit('module')} title="">
             mod
         </button>
     </div>

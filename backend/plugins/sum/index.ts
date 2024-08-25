@@ -3,21 +3,17 @@ import express from "express";
 
 import {config} from "dotenv";
 import bodyParser from "body-parser";
-import apicache from "apicache";
-import {getToolbox} from "../../src/v1/service/controller";
 import axios from "axios";
 
 
 const env = config();
 const app = express();
-// const cache = apicache.middleware;
-const PORT = process.env.PORT || 3000;
+
+const PORT = process.argv[2] || 3070;
 
 app.use(bodyParser.json());
 app.use(bodyParser.raw());
 app.use(bodyParser.text());
-// app.use(express.raw({ type: 'application/octet-stream' }));
-// app.use(cache('2 minutes'));
 
 let a, b;
 
@@ -34,21 +30,28 @@ function update() {
     }
 }
 
-const router = express.Router();
-router.post('/a', (req: any, res: any) => {
-
+const routerIn = express.Router();
+const routerService = express.Router();
+routerIn.post('/a', (req: any, res: any) => {
+    const {body} = req
+    res.send({status: 'OK', data: 'привет из сервиса'});
+    console.log(body)
 });
-router.post('/b', (req: any, res: any) => {
-
-});
-router.post('/consumers', (req: any, res: any) => {
-    const {} = req;
+routerIn.post('/b', (req: any, res: any) => {
 });
 
-app.use('/in', router);
+routerService.post('/kill', (req: any, res: any) => {
+    // child.kill();
+    console.log('!!!')
+    process.exit(0);
+});
+
+
+app.use('/in', routerIn);
+app.use('/service', routerService);
 
 app.listen(PORT, () => {
-    console.log(`API is listening on port ${PORT}`);
+    console.log(`Серввис запущен на порте ${PORT}`);
 });
 
 console.log(env.parsed)

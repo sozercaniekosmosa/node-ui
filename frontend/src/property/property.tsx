@@ -1,6 +1,5 @@
 import "./style.css"
 import React, {createElement, InputHTMLAttributes, useRef, useState} from "react";
-// import {listNode} from "../../../nodes/nodes";
 import {camelToKebab, compressString, decompressString, eventBus} from '../utils'
 
 
@@ -11,7 +10,7 @@ export type TEventProperty = {
 
 let arrKey = [];
 
-export function Property({setNode, onChange, listNode}) {
+export function Property({setNode, onChange}) {
 
     const [, setUpdateNow] = useState(0); //для перерисовки компонента
     let nodeName: string = '';
@@ -77,8 +76,10 @@ export function Property({setNode, onChange, listNode}) {
     }
 
     let onApply = () => {
-        setNode.dataset.cfg = compressString(JSON.stringify(refArrCfg.current));
-        onChange(setNode, refArrCfg.current)
+        if (refIsWasChange.current) {
+            setNode.dataset.cfg = compressString(JSON.stringify(refArrCfg.current));
+            onChange({name: 'property-change', data: setNode})
+        }
         show(false)
     };
     let onCancel = () => {
@@ -86,12 +87,13 @@ export function Property({setNode, onChange, listNode}) {
             eventBus.dispatchEvent('confirm', (isYes) => {
                 if (isYes) {
                     setNode.dataset.cfg = compressString(JSON.stringify(refArrCfg.current));
-                    onChange(setNode, refArrCfg.current)
+                    // onChange(setNode, refArrCfg.current)
                 }
                 show(false)
             }, 'Сохранить изменения?')
-        } else
+        } else {
             show(false)
+        }
     }
 
     function onClickTab(e) {
@@ -116,7 +118,7 @@ export function Property({setNode, onChange, listNode}) {
             onCancel();
         }
 
-        if (arrKey?.['control-left'] && (arrKey?.['enter'] || arrKey?.['numpadenter'])) onApply()
+        if (arrKey?.['control-left'] && (arrKey?.['enter'] || arrKey?.['numpad-enter'])) onApply()
         // console.log(e.code.toLowerCase())
     }
 
@@ -150,7 +152,7 @@ export function Property({setNode, onChange, listNode}) {
                         return (
                             <div className="tab__body__item" key={iTab} style={iTab !== 0 ? {display: 'none'} : {}}>
                                 {arrParam.map(({name, type, val, title, arrOption}, i) => {
-                                    let comp = listTypeComponent[type] ? listTypeComponent[type] : listNode[nodeName].components[type] ?? noType(type);
+                                    let comp = listTypeComponent[type] ? listTypeComponent[type] : noType(type);
                                     let arrStyle = [];
                                     if (arrOption) {
                                         let setCSS = new Set(['inline', 'center', 'right', 'left', '2', '3', 'hr'])

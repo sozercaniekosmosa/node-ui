@@ -4,62 +4,73 @@ import {apiRequest, ApiRequestOptions, ContentType, debounce, decompressString, 
 let port = 3000;
 let routService: string = `http://localhost:${port}/api/v1/service/`;
 
-type TPinsCfgNode = { name: string, id: string, to: string[] }[];
+type TCfg = [string, any, string];
 
-interface ItemNodeCfg {
-    name: string,
-    in?: TPinsCfgNode,
-    out?: TPinsCfgNode,
+interface TNodeTask {
+    id: string,
+    nodeName: string,
+    cfg: TCfg[],
+    in?: {},
+    out?: {},
 }
 
-type TCfgNode = Record<string, ItemNodeCfg>;
+interface TTaskList {
+    [key: string]: TNodeTask
+}
 
 
-export function getNodeStruct(nodeProject): TCfgNode {
-    let arrNode = nodeProject.querySelectorAll('.' + NodeSelector.node) as NodeListOf<HTMLElement>;
-    let data = {};
-    // console.log(arrNode)
-    arrNode.forEach(node => {
-        let id = node.id;
-        !(data?.[id]) && (data[id] = {})
-        let d = data[id];
+function getComponentStruct(node, nodeProject): TNodeTask {
 
-        d.node = node.dataset.node;
-        d.cfg = [];
+    let data: TNodeTask = {cfg: [], id: "", nodeName: ""};
+    data.id = node.id;
+    data.nodeName = node.dataset.nodeName;
+    data.cfg = [];
 
-        type TParam = { name: string, type: string, val: any, title: string, arrOption: [string] }
-        type TArrCfg = [string, [TParam]]
+    type TParam = { name: string, type: string, val: any, title: string, arrOption: [string] }
+    type TArrCfg = [string, [TParam]]
 
-        const cfg = JSON.parse(decompressString(node.dataset.cfg)!);
+    const cfg = JSON.parse(decompressString(node.dataset.cfg)!);
 
-        const excludeFields = new Set(['description']);
-        (Object.entries(cfg) as [TArrCfg]).forEach(([tabName, arrParam]) =>
-            arrParam.forEach(({name, type, val}) => !excludeFields.has(name) && (d.cfg.push([name, val, type]))));
+    const excludeFields = new Set(['description']);
+    (Object.entries(cfg) as [TArrCfg]).forEach(([tabName, arrParam]) =>
+        arrParam.forEach(({name, type, val}) => !excludeFields.has(name) && (data.cfg.push([name, val, type]))));
 
-        var arrIn = [...node.querySelectorAll('.' + NodeSelector.pinIn) as NodeListOf<HTMLElement>];
-        var arrOut = [...node.querySelectorAll('.' + NodeSelector.pinOut) as NodeListOf<HTMLElement>];
+    var arrIn = [...node.querySelectorAll('.' + NodeSelector.pinIn) as NodeListOf<HTMLElement>];
+    var arrOut = [...node.querySelectorAll('.' + NodeSelector.pinOut) as NodeListOf<HTMLElement>];
 
-        if (arrIn.length) arrIn.forEach((node) => {
-            if (node.dataset?.to?.length) {
-                if (!d?.in) d.in = {}
-                d.in[node.dataset.name] = node.dataset.to?.split(' ').map(it => {
-                    let node = nodeProject.querySelector('#' + it) as HTMLElement;
-                    return node.closest('.' + NodeSelector.node).id + '.' + node.dataset.name
-                }) ?? []
-            }
-        })
-        if (arrOut.length) arrOut.forEach((node) => {
-            if (node.dataset?.to?.length) {
-                if (!d?.out) d.out = {}
-                d.out[node.dataset.name] = node.dataset.to?.split(' ').map(it => {
-                    let node = nodeProject.querySelector('#' + it) as HTMLElement;
-                    return node.closest('.' + NodeSelector.node).id + '.' + node.dataset.name
-                }) ?? []
-            }
-        })
+    if (arrIn.length) arrIn.forEach((node) => {
+        if (node.dataset?.to?.length) {
+            if (!data?.in) data.in = {}
+            data.in[node.dataset.name] = node.dataset.to?.split(' ').map(it => {
+                let node = nodeProject.querySelector('#' + it) as HTMLElement;
+                return node.closest('.' + NodeSelector.node).id + '.' + node.dataset.name
+            }) ?? []
+        }
     })
+
+    if (arrOut.length) arrOut.forEach((node) => {
+        if (node.dataset?.to?.length) {
+            if (!data?.out) data.out = {}
+            data.out[node.dataset.name] = node.dataset.to?.split(' ').map(it => {
+                let node = nodeProject.querySelector('#' + it) as HTMLElement;
+                return node.closest('.' + NodeSelector.node).id + '.' + node.dataset.name
+            }) ?? []
+        }
+    })
+
     return data;
 }
+
+
+export function getTasks(nodeProject): TTaskList {
+    let arrNode = nodeProject.querySelectorAll('.' + NodeSelector.node) as NodeListOf<HTMLElement>;
+    let res = {};
+    arrNode.forEach(node => {
+        res[node.id] = getComponentStruct(node, nodeProject)
+    })
+    return res;
+}
+
 
 async function put(route: string, contentType: ContentType, data: any) {
     return await apiRequest(route, {method: 'PUT', contentType, body: data});
@@ -75,12 +86,22 @@ async function post(route: string, contentType: ContentType, data?: any) {
 
 const writeProjectNow = async (node: HTMLElement) => {
     try {
-        // let body = await compress(node.innerHTML);
-        let body = node.innerHTML;
-        let dataProject = await put(routService + 'project', 'text/plain', body)
-        let dataTask = await put(routService + 'task', 'application/json', getNodeStruct(node))
+        let project = node.innerHTML;
+        let dataProject = await put(routService + 'project', 'text/plain', project)
         console.log(dataProject);
+
+        let arrTask = getTasks(node);
+        let dataTask = await put(routService + 'task', 'application/json', arrTask)
         console.log(dataTask);
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+};
+
+const writeTaskNow = async (node: HTMLElement, nodeProject: HTMLElement) => {
+    try {
+
     } catch (error) {
         console.error('Error fetching data:', error);
     }
@@ -88,6 +109,7 @@ const writeProjectNow = async (node: HTMLElement) => {
 
 
 export const writeProject = <(node: HTMLElement) => void>debounce(writeProjectNow, 1000)
+export const writeTask = <(node: HTMLElement, nodeProject: HTMLElement) => void>debounce(writeTaskNow, 50)
 
 
 export async function readProject() {

@@ -9,7 +9,7 @@ import {Header, TEventHeader} from "./header/header";
 import History from './service/history'
 import {MenuConfirm} from "./auxiliary/menu/menu-confirm";
 import {apiRequest, camelToKebab, compressString, decompressString, eventBus} from "./utils"
-import {writeProject, readProject, getNodeStruct, startTask, stopTask, loadModule, getToolbox} from './service/service-backend'
+import {writeProject, readProject, getNodeStruct, startTask, stopTask, loadModule, getToolbox, writeTask} from './service/service-backend'
 import {copy, past, cut} from "./service/cpc";
 import {NodeSelector} from "./editor/node-ui/node-ui";
 
@@ -79,7 +79,7 @@ function Root() {
         // console.log(e.code.toLowerCase())
     }
 
-    const addHistory = (name, data) => {
+    const addHistory = (name) => {
         history.addHistory(name, nui.svg.innerHTML);
         writeProject(nui.svg);
     }
@@ -101,7 +101,7 @@ function Root() {
             case 'link-remove':
             case 'node-remove':
             case 'add-node':
-                addHistory(name, nui.svg.innerHTML);
+                addHistory(name);
                 break;
 
             case 'undo':
@@ -123,11 +123,11 @@ function Root() {
                 break;
             case 'past':
                 past(nui);
-                addHistory('past', nui.svg.innerHTML);
+                addHistory('past');
                 break;
             case 'cut':
                 cut(nui);
-                addHistory('cut', nui.svg.innerHTML);
+                addHistory('cut');
                 break;
             case 'delete':
                 if (arrSelected!.length > 0)
@@ -141,7 +141,7 @@ function Root() {
                 eventBus.dispatchEvent('menu-property-show')
                 break;
             case 'property-change':
-                addHistory('property', nui.svg.innerHTML);
+                addHistory('property');
                 break;
             case 'save':
                 writeProject(nui.svg);
@@ -165,8 +165,7 @@ function Root() {
         <div className="node-editor" onDoubleClick={({target}) => onEventHandler({name: 'property', data: target})}>
             <Toolbox onNodeSelect={(data) => setNodeDataSelected(data)} listNode={listNode}/>
             <Editor newNode={nodeDataSelected} onEvent={onEventHandler}/>
-            <Property setNode={nodeProp} onChange={() => onEventHandler({name: 'property-change'})}
-                      listNode={null/*listNode*/}/>
+            <Property setNode={nodeProp} onChange={onEventHandler}/>
         </div>
         <MenuConfirm name={'confirm'}/>
     </>)
