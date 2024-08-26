@@ -1,10 +1,9 @@
 <g class="group-path" transform="translate(0,0)">
-<path class="link" stroke-linecap="round" d="M68 47.375 C 79.69547526041667 47.375, 73.84773763020833 57.535491943359375, 85.543212890625 57.535491943359375" id="um6E9Fb-um6EcoP">
+
+<path class="link" stroke-linecap="round" d="M69.03703703703702 81.96296095357508 C 80.04115226337447 81.96296095357508, 74.53909465020574 72.44444243505656, 85.54320987654319 72.44444243505656" id="um6Eaq2-um6EcoQ">
 </path>
-<path class="link" stroke-linecap="round" d="M69.03703308105469 82.26388549804688 C 80.04115295410156 82.26388549804688, 74.53909301757812 73.53549194335938, 85.543212890625 73.53549194335938" id="um6Eaq2-um6EcoQ">
-</path>
-</g>
-<text x="0" y="0" class="pin-text" opacity="0" id="temp-node-for-width-text">sum</text>
+<path class="link" stroke-linecap="round" d="M85.54320987654319 56.444442435056565 C 74.01234567901233 56.444442435056565, 79.77777777777776 47.28806584362139, 68.2469135802469 47.28806584362139" id="umyp5ql-um6EcoP"></path></g>
+<text x="0" y="0" class="pin-text" opacity="0" id="temp-node-for-width-text">value</text>
 <rect x="111" y="183" width="0" height="0" fill="#ccccee" fill-opacity="0.3" stroke="#222255" stroke-dasharray="4">
 </rect>
 <rect x="116" y="211" width="0" height="0" fill="#ccccee" fill-opacity="0.3" stroke="#222255" stroke-dasharray="4">
@@ -13,15 +12,8 @@
 </rect>
 <rect x="249" y="223" width="0" height="54" fill="#ccccee" fill-opacity="0.3" stroke="#222255" stroke-dasharray="4">
 </rect>
-<g x="71" y="82" class="node selected" data-node-name="value" data-cfg="N4IkfCCIIgi8IGhMIFgGEEPIgIBcBtUA7AhgWwFM0QA3HAGwFcCBBEAGhABcBPAByNRC0rwCMCAJwakKaAIwBWRkwCWTcpxCB0EESBxEECsIFEAcIBoC0dAL71s+JWSoEAQiNYdiPfkJEW0AZhnzFxVQk079G2NTQmILagBhW3YlRwFhRldUAAZPBSVff109KMYcQUEAeTY5AHssNHQQACYQAF1DOsZYQCEQMEABEGRKkPMKagARaPsuOOdEsVRxNO8uTK1sweDuMzC+ggBRIdjeeJcJ6umM9Xn9TaXcUK5wggAxLYcdsdFyNFTmLyO/E707xsYIDQtQAyIN1lpcQLI2PcuABnJiCWRYADmexeXHEAE5qgA6cQANgAHNjkti3LYPsRIXoEIAWEHaGggInyRRKsnKlQaTRA2iggBEQMCgi5KAAmBBhAGMEaz2TIYsQ4QjkajiIA8EEA/CDaCAIAJMgrFMoVDAQrDkRFERgIpEACyYIitwk5hiAA==" transform="translate(38,35)" id="um6E9F9">
-<rect x="0" y="0" width="30" height="24" rx="2" stroke="#25334b" fill="#ebf5ec" class="handle">
-</rect>
-<circle cx="30" cy="12" r="4" stroke="#25334b" fill="#ffc69a" class="pin-out" id="um6E9Fb" data-name="x" data-to="um6EcoP">
-</circle>
-<text x="16" y="15" class="pin-text">x</text>
-<text x="0" y="-2" class="pin-text">value</text>
-</g>
-<g x="81.29629629629629" y="92" class="node" data-node-name="value" data-cfg="N4IkfCCIIgi8IGhMIFgGEEPIgIBcBtUA7AhgWwFM0QA3HAGwFcCBBEAGhABcBPAByNRC0rwCMCAJwakKaAIyMmASyblOIQOggiQOIggVhAogDhA1AWjqMcgwQHk2MgPZY06EACYQAXQC+9bPgVkqBAEIjWHYh5+IRFPNFspWXliZQR1LV1fAyNTCysMO0cXN0JiT2oAYT92BSCBYUYw1AAGSLkFWPjtHSLkkzNpS2tM5wdGWEAhEDBAARBkaxyPCmoAEWKArjKQyrFUSWYohtUNZtns7nc8qYIAUTnS3nLQlYj1+pithJ1TvdxcrnyCADEzwIul0XIaFqt2iXEa2103ycfRAEDUA0AMiDjfZvEDSNg/LgAZyYgmkWAA5ldAVxxABOWwAOnEADYAByU6qUgDMfg2xHROgQgBYQYZqCAiQztNLWXqMTRQQAiIGBka8FAATAhYgDGeI6XSkJWIOLxhOJxEAeCCAfhBNBAEAlBSl1ekbPjyPiiIw8QSABZMEQu4S9JxAA===" transform="translate(40,69.88888888888869)" id="um6Eaq0">
+
+<g x="81.29629629629629" y="92" class="node" data-node-name="value" data-cfg="N4IkfCCIIgi8IGhMIFgGEEPIgIBcBtUA7AhgWwFM0QA3HAGwFcCBBEAGhABcBPAByNRC0rwCMCAJwakKaAIwBWRkwCWTcpxCB0EESBxEECsIFEAcIBoC0dAL71s+JWSoEAQiNYdiPfkJEW0AJhnzFxVQk079G0YcQUEAeTY5AHssNHQQNxAAXWNTQmILagBhW3YlRwFhRldUAAZPBSVff109HODQiOjYjATkwyTGWEAhEDBAARBkOLTzCmoAEVz7LgLnYrFUcQrvLmqtWonU7jMM0YIAUUn83kKXeY9mLyr1Nf0Dzdx0rkyCADFDh2PZ0XI0covKnzXAJ6N4dRgQDTdQAyIEMto8QLI2O8uABnJiCWRYADmpx+XHEAE43AA6cQANgAHMTSsSAMy2S7ERF6BCAFhA+hoICIQuFIrIYnEUp0QNooIAREDAsIeSgAJgQUQBjDF8gUyPLENEY7G44iAPBBAPwg2ggCAC3MaKpa8Ux5ExREYGKxAAsmCJHcIhYYgA" transform="translate(40,69.88888888888869)" id="um6Eaq0">
 <rect x="0" y="0" width="29.037036895751953" height="24" rx="2" stroke="#25334b" fill="#ebf5ec" class="handle">
 </rect>
 <circle cx="29.037036895751953" cy="12" r="4" stroke="#25334b" fill="#ffc69a" class="pin-out" id="um6Eaq2" data-name="x" data-to="um6EcoQ">
@@ -29,10 +21,10 @@
 <text x="16" y="15" class="pin-text">x</text>
 <text x="0" y="-2" class="pin-text">value</text>
 </g>
-<g x="138.48148148148147" y="104.7037037037037" class="node" data-node-name="sum" data-cfg="N4IkfCCIwgiSIIHCCKwgIBcBtUA7AhgWwKZJACY4DOAxgE4CWADgC6UD2aIANCLQJ7V6IjG1U0Ac1YgAbhgA2+QHgggfhAYgQRBADCCBeEHij6tSTxCB0EFUZA4iBx1cALRzlgARBlgHhA4gIRBrojOXIB5Oo2YoAugC+LOjYugCOAO5hmly6aACuWABGOOSiEtKIACwAdABMbFo6+IBYIMqAXCBggJwg5o5gAARWtg7OIAGBQA=" transform="translate(85.54320987654302,45.16049382716059)" id="um6EcoN">
+<g x="138.48148148148147" y="104.7037037037037" class="node" data-node-name="sum" data-cfg="N4IkfCCIwgiSIIHCCKwgIBcBtUA7AhgWwKZJACY4DOAxgE4CWADgC6UD2aIANCLQJ7V6IjG1U0Ac1YgAbhgA2+QHgggfhAYgQRBADCCBeEHij6tSTxCB0EFUZA4iBx1cALRzlgARBlgHhA4gIRBrojOXIB5Oo2YoAugC+LOjYugCOAO5hmly6aACuWABGOOSiEtKIACwAdABMbFo6+IBYIMqAXCBggJwg5o5gAARWtg7OIAGBQA=" transform="translate(85.54320987654302,44.370370370370466)" id="um6EcoN">
 <rect x="0" y="0" width="35.01851844787598" height="40" rx="2" stroke="#25334b" fill="#f6e6e1" class="handle">
 </rect>
-<circle cx="0" cy="12" r="4" stroke="#25334b" fill="#bcffd6" class="pin-in" id="um6EcoP" data-name="A" data-to="um6E9Fb">
+<circle cx="0" cy="12" r="4" stroke="#25334b" fill="#bcffd6" class="pin-in" id="um6EcoP" data-name="A" data-to="umyp5ql">
 </circle>
 <text x="8" y="15" class="pin-text">A</text>
 <circle cx="0" cy="28" r="4" stroke="#25334b" fill="#bcffd6" class="pin-in" id="um6EcoQ" data-name="B" data-to="um6Eaq2">
@@ -42,4 +34,4 @@
 </circle>
 <text x="22.518518447875977" y="23" class="pin-text">y</text>
 <text x="0" y="-2" class="pin-text">sum</text>
-</g>
+</g><g x="42.66666666666665" y="43.905349794238674" class="node" data-node-name="value" data-cfg="N4IkfCCIIgi8IGhMIFgGEEPIgIBcBtUA7AhgWwFM0QA3HAGwFcCBBEAGhABcBPAByNRC0rwCMCAJwakKaAIyMmASyblOIQOggiQOIggVhAogDhA1AWjqMcgwQHk2MgPZY06EACYQAXQC+9bPgVkqBAEIjWHYh5+IRFPNFspWXliZQR1LV1fAyNTCysMO0cXN0JiT2oAYT92BSCBYUYw1AAGSLkFWPjtHSLkkzNpS2tM5wdGWEAhEDBAARBkaxyPCmoAEWKArjKQyrFUSWYohtUNZtns7nc8qYIAUTnS3nLQlYj1+pithJ1TvdxcrnyCADEzwIul0XIaFqt2iXEa2103ycfRAEDUA0AMiDjfZvEDSNg/LgAZyYgmkWAA5ldAVxxABOWwAOnEADYAByU6qUgDMfg2xHROgQgBYQYZqCAiQztNLWXqMTRQQAiIGBka8FAATAhYgDGeI6XSkJWIOLxhOJxEAeCCAfhBNBAEAlBSl1ekbPjyPiiIw8QSABZMEQu4S9JxAA===" transform="translate(39.703703703703674,35.21399176954732)" id="umyp5qj"><rect x="0" y="0" width="28.54321002960205" height="24" rx="2" stroke="#25334b" fill="#ebf5ec" class="handle"></rect><circle cx="28.54321002960205" cy="12" r="4" stroke="#25334b" fill="#ffc69a" class="pin-out" id="umyp5ql" data-name="x" data-to="um6EcoP"></circle><text x="16" y="15" class="pin-text">x</text><text x="0" y="-2" class="pin-text">value</text></g>

@@ -1,10 +1,16 @@
 import {NodeSelector} from "../editor/node-ui/node-ui";
 import {apiRequest, ApiRequestOptions, ContentType, debounce, decompressString, throttle} from "../utils";
 
+type TCfg = [string, any, string];
+
+interface TApiRequest {
+    status: 'OK' | 'FAILED',
+    data: any
+}
+
 let port = 3000;
 let routService: string = `http://localhost:${port}/api/v1/service/`;
 
-type TCfg = [string, any, string];
 
 interface TNodeTask {
     id: string,

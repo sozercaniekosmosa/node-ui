@@ -9,7 +9,7 @@ import {Header, TEventHeader} from "./header/header";
 import History from './service/history'
 import {MenuConfirm} from "./auxiliary/menu/menu-confirm";
 import {apiRequest, camelToKebab, compressString, decompressString, eventBus} from "./utils"
-import {writeProject, readProject, getNodeStruct, startTask, stopTask, loadModule, getToolbox, writeTask} from './service/service-backend'
+import {writeProject, readProject, startTask, stopTask, loadModule, getToolbox, writeTask} from './service/service-backend'
 import {copy, past, cut} from "./service/cpc";
 import {NodeSelector} from "./editor/node-ui/node-ui";
 
@@ -73,7 +73,7 @@ function Root() {
         if (arrKey?.['control-left'] && arrKey?.['key-x']) onEventHandler({name: 'cut'})
 
         if (arrKey?.['delete'] && nodeFocus?.classList.contains('editor')) onEventHandler({name: 'delete'})
-        if ((arrKey?.['enter'] || arrKey?.['numpadenter']) && nodeFocus.classList.contains('editor')) onEventHandler({name: 'property'});
+        if ((arrKey?.['enter'] || arrKey?.['numpad-enter']) && nodeFocus.classList.contains('editor')) onEventHandler({name: 'property'});
 
         // console.log(arrKey)
         // console.log(e.code.toLowerCase())

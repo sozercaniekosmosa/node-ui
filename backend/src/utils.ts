@@ -28,7 +28,7 @@ export const readFileAsync = async (path: string, options?): Promise<any> => {
     }
 };
 
-export const writeFileAsync = async (path: string, data: any): any => {
+export const writeFileAsync = async (path: string, data: any): Promise<any> => {
     try {
         await fsPromises.writeFile(path, data);
     } catch (err) {
@@ -56,7 +56,7 @@ export async function getDirectories(srcPath: string) {
 export async function getDataFromArrayPath(arrPaths: string[]) {
     const filesContent = [];
 
-    for (const p: string of arrPaths) {
+    for (const p of arrPaths) {
         try {
             const stat = await fsPromises.stat(p);
             if (stat.isFile()) {

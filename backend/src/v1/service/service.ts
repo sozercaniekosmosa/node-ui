@@ -42,7 +42,7 @@ export async function decompressGzip(buffer: Buffer): Promise<Buffer> {
     }
 }
 
-export const readData = async (path: string, options?): any => {
+export const readData = async (path: string, options?): Promise<any> => {
     try {
         const data = await readFileAsync(path, options);
         return data;
@@ -63,6 +63,12 @@ export const writeTasks = (tasks: TTaskList): any => {
     try {
         const strTask = JSON.stringify(tasks, null, 2);
         writeFileAsync(pathResolveRoot('./database/tasks.json'), strTask);
+
+        let mapNodes = {}
+        let arrTask = Object.values(tasks);
+        arrTask.forEach(it => {
+            mapNodes
+        })
     } catch (error) {
         throw error;
     }

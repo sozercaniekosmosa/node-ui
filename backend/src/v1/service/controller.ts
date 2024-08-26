@@ -1,4 +1,4 @@
-import {getComponents, launchTasks, readProject, TTask, writeData, writeProject, writeTasks} from "./service";
+import {getComponents, launchTasks, readProject, TTaskList, writeData, writeProject, writeTasks} from "./service";
 import {validationResult} from "express-validator";
 
 export const getToolbox = async (req: any, res: any) => {

@@ -1,55 +1,9 @@
 {
-  "um6E9F9": {
-    "cfg": [
-      [
-        "valueA",
-        15,
-        "number"
-      ],
-      [
-        "valueB",
-        3,
-        "number"
-      ],
-      [
-        "valueC",
-        0,
-        "number"
-      ],
-      [
-        "valueD",
-        1,
-        "number"
-      ],
-      [
-        "valueE",
-        2,
-        "number"
-      ],
-      [
-        "valueF",
-        0,
-        "number"
-      ],
-      [
-        "ip",
-        "192.168.0.3",
-        "string"
-      ]
-    ],
-    "id": "um6E9F9",
-    "nodeName": "value",
-    "out": {
-      "x": [
-        "um6EcoN.A"
-      ]
-    }
-  },
   "um6Eaq0": {
     "cfg": [
       [
         "valueA",
-        1,
+        15,
         "number"
       ],
       [
@@ -103,10 +57,56 @@
     "nodeName": "sum",
     "in": {
       "A": [
-        "um6E9F9.x"
+        "umyp5qj.x"
       ],
       "B": [
         "um6Eaq0.x"
+      ]
+    }
+  },
+  "umyp5qj": {
+    "cfg": [
+      [
+        "valueA",
+        1,
+        "number"
+      ],
+      [
+        "valueB",
+        2,
+        "number"
+      ],
+      [
+        "valueC",
+        0,
+        "number"
+      ],
+      [
+        "valueD",
+        1,
+        "number"
+      ],
+      [
+        "valueE",
+        2,
+        "number"
+      ],
+      [
+        "valueF",
+        0,
+        "number"
+      ],
+      [
+        "ip",
+        "192.168.0.3",
+        "string"
+      ]
+    ],
+    "id": "umyp5qj",
+    "nodeName": "value",
+    "out": {
+      "x": [
+        "um6EcoN.A"
       ]
     }
   }

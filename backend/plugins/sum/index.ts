@@ -33,11 +33,30 @@ function update() {
 const routerIn = express.Router();
 const routerService = express.Router();
 routerIn.post('/a', (req: any, res: any) => {
-    const {body} = req
-    res.send({status: 'OK', data: 'привет из сервиса'});
-    console.log(body)
+    try {
+        const {body: {data}} = req
+
+        a = data;
+
+        res.send({status: 'OK', data: 'привет из сервиса '+data});
+        console.log(data)
+        update();
+    } catch (e) {
+
+    }
 });
 routerIn.post('/b', (req: any, res: any) => {
+    try {
+        const {body: {data}} = req
+
+        b = data;
+
+        res.send({status: 'OK', data: 'привет из сервиса '+data});
+        console.log(data)
+        update();
+    } catch (e) {
+
+    }
 });
 
 routerService.post('/kill', (req: any, res: any) => {
