@@ -2,7 +2,7 @@ import {getDataFromArrayPath, getDirectories, readFileAsync, writeFileAsync} fro
 import zlib, {InputType} from "node:zlib"
 import {resolve} from "path";
 import * as Buffer from "buffer";
-import {exec, spawn} from "child_process";
+import {spawn} from "child_process";
 
 
 type TTypeName = string;
@@ -66,9 +66,9 @@ export const writeTasks = (tasks: TTaskList): any => {
 
         let mapNodes = {}
         let arrTask = Object.values(tasks);
-        arrTask.forEach(it => {
-            mapNodes
-        })
+        arrTask.forEach(({id, ip, port}) => mapNodes[id] = {ip, port})
+        const strMapNodes = JSON.stringify(mapNodes, null, 2);
+        writeFileAsync(pathResolveRoot('./database/hosts.json'), strMapNodes);
     } catch (error) {
         throw error;
     }
@@ -89,10 +89,6 @@ export async function readProject() {
 }
 
 export function writeProject(data) {
-    // debugger
-    // var buf: Buffer = Buffer.from(body, 'utf8');
-    // let html: string = (<Buffer>await decompressGzip(buf)).toString();
-    // let htmlSan = sanitizeHtml(html.toString(), {allowedTags: ['svg', 'g', 'defs', 'linearGradient', 'stop', 'circle'], allowedAttributes: false})
     writeData('database/project.db', data);
 }
 
@@ -115,3 +111,15 @@ export async function launchTasks() {
 
     return;
 }
+
+export const getTaskData = async (id: string) => {
+    const strTasks = await readData('./database/tasks.json', 'utf-8');
+    const tasks = JSON.parse(strTasks);
+    const strHosts = await readData('./database/hosts.json', 'utf-8');
+    const hosts = JSON.parse(strHosts);
+
+    let task = tasks[id]
+    task.host = hosts;
+
+    return task;
+};

@@ -14,6 +14,8 @@ let routService: string = `http://localhost:${port}/api/v1/service/`;
 
 interface TNodeTask {
     id: string,
+    ip: string,
+    port: number,
     nodeName: string,
     cfg: TCfg[],
     in?: {},
@@ -27,7 +29,7 @@ interface TTaskList {
 
 function getComponentStruct(node, nodeProject): TNodeTask {
 
-    let data: TNodeTask = {cfg: [], id: "", nodeName: ""};
+    let data: TNodeTask = {cfg: [], id: '', nodeName: '', ip: ''};
     data.id = node.id;
     data.nodeName = node.dataset.nodeName;
     data.cfg = [];
@@ -35,11 +37,21 @@ function getComponentStruct(node, nodeProject): TNodeTask {
     type TParam = { name: string, type: string, val: any, title: string, arrOption: [string] }
     type TArrCfg = [string, [TParam]]
 
-    const cfg = JSON.parse(decompressString(node.dataset.cfg)!);
+    const arrCfg = JSON.parse(decompressString(node.dataset.cfg)!);
 
     const excludeFields = new Set(['description']);
-    (Object.entries(cfg) as [TArrCfg]).forEach(([tabName, arrParam]) =>
-        arrParam.forEach(({name, type, val}) => !excludeFields.has(name) && (data.cfg.push([name, val, type]))));
+    (Object.entries(arrCfg) as [TArrCfg]).forEach(([tabName, arrParam]) =>
+        arrParam.forEach(({name, type, val}) => {
+            if (name === 'ip') {
+                data.ip = val;
+                return;
+            }
+            if (name === 'port') {
+                data.port = val;
+                return;
+            }
+            !excludeFields.has(name) && (data.cfg.push([name, val, type]));
+        }));
 
     var arrIn = [...node.querySelectorAll('.' + NodeSelector.pinIn) as NodeListOf<HTMLElement>];
     var arrOut = [...node.querySelectorAll('.' + NodeSelector.pinOut) as NodeListOf<HTMLElement>];

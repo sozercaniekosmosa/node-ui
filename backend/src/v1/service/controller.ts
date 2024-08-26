@@ -1,4 +1,4 @@
-import {getComponents, launchTasks, readProject, TTaskList, writeData, writeProject, writeTasks} from "./service";
+import {getComponents, getTaskData, launchTasks, readProject, writeProject, writeTasks} from "./service";
 import {validationResult} from "express-validator";
 
 export const getToolbox = async (req: any, res: any) => {
@@ -25,13 +25,22 @@ export const getProject = async (req: any, res: any) => {
 export const updateProject = async (req: any, res: any) => {
     const {body: data} = req;
     try {
-        writeProject(data);
+        await writeProject(data);
         res.send({status: 'OK', data: 'project written'});
     } catch (error: any) {
         res.status(error?.status || 500).send({status: 'FAILED', data: {error: error?.message || error}});
     }
 };
 
+export const getTask = async (req: any, res: any) => {
+    const {query: {id}} = req;
+    try {
+        let data = await getTaskData(id);
+        res.send({status: 'OK', data: data});
+    } catch (error: any) {
+        res.status(error?.status || 500).send({status: 'FAILED', data: {error: error?.message || error}});
+    }
+};
 
 export const updateTasks = (req: any, res: any) => {
     const {body: tasks} = req;

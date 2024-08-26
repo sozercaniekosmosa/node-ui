@@ -8,7 +8,7 @@ export type TEventProperty = {
     data?: any
 }
 
-let arrKey = [];
+let arrKey = {};
 
 export function Property({setNode, onChange}) {
 
@@ -23,6 +23,7 @@ export function Property({setNode, onChange}) {
     let refPropTabs = useRef(null);
 
     const show = (isShow) => {
+        arrKey = {};
         setUpdateNow(conut => conut + 1); //при каждом показе/скрытиии перерисовываем}
         refProp.current.classList[isShow ? 'remove' : 'add']('prop--hide');
         refProp.current.focus();
@@ -114,7 +115,7 @@ export function Property({setNode, onChange}) {
         arrKey[code] = true;
 
         if (arrKey?.['escape']) {
-            arrKey = [];
+            arrKey = {};
             onCancel();
         }
 

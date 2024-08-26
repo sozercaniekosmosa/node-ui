@@ -1,112 +1,58 @@
 {
-  "um6Eaq0": {
-    "cfg": [
-      [
-        "valueA",
-        15,
-        "number"
-      ],
-      [
-        "valueB",
-        2,
-        "number"
-      ],
-      [
-        "valueC",
-        0,
-        "number"
-      ],
-      [
-        "valueD",
-        1,
-        "number"
-      ],
-      [
-        "valueE",
-        2,
-        "number"
-      ],
-      [
-        "valueF",
-        0,
-        "number"
-      ],
-      [
-        "ip",
-        "192.168.0.3",
-        "string"
-      ]
-    ],
-    "id": "um6Eaq0",
-    "nodeName": "value",
-    "out": {
-      "x": [
-        "um6EcoN.B"
-      ]
-    }
-  },
-  "um6EcoN": {
+  "umzYt3H": {
     "cfg": [
       [
         "qwq",
-        4.2,
+        2.2,
         "number"
       ]
     ],
-    "id": "um6EcoN",
+    "id": "umzYt3H",
     "nodeName": "sum",
+    "ip": "localhost",
+    "port": 3003,
     "in": {
       "A": [
-        "umyp5qj.x"
+        "umA2XVr.x"
       ],
       "B": [
-        "um6Eaq0.x"
+        "umA2ZLM.x"
       ]
     }
   },
-  "umyp5qj": {
+  "umA2XVr": {
     "cfg": [
       [
         "valueA",
         1,
         "number"
-      ],
-      [
-        "valueB",
-        2,
-        "number"
-      ],
-      [
-        "valueC",
-        0,
-        "number"
-      ],
-      [
-        "valueD",
-        1,
-        "number"
-      ],
-      [
-        "valueE",
-        2,
-        "number"
-      ],
-      [
-        "valueF",
-        0,
-        "number"
-      ],
-      [
-        "ip",
-        "192.168.0.3",
-        "string"
       ]
     ],
-    "id": "umyp5qj",
+    "id": "umA2XVr",
     "nodeName": "value",
+    "ip": "localhost",
+    "port": 3001,
     "out": {
       "x": [
-        "um6EcoN.A"
+        "umzYt3H.A"
+      ]
+    }
+  },
+  "umA2ZLM": {
+    "cfg": [
+      [
+        "valueA",
+        1,
+        "number"
+      ]
+    ],
+    "id": "umA2ZLM",
+    "nodeName": "value",
+    "ip": "localhost",
+    "port": 3002,
+    "out": {
+      "x": [
+        "umzYt3H.B"
       ]
     }
   }

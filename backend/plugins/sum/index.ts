@@ -5,11 +5,13 @@ import {config} from "dotenv";
 import bodyParser from "body-parser";
 import axios from "axios";
 
-
+let cfg;
 const env = config();
 const app = express();
 
-const PORT = process.argv[2] || 3070;
+const id = process.argv[2];
+
+const PORT = 3070;
 
 app.use(bodyParser.json());
 app.use(bodyParser.raw());
@@ -38,7 +40,7 @@ routerIn.post('/a', (req: any, res: any) => {
 
         a = data;
 
-        res.send({status: 'OK', data: 'привет из сервиса '+data});
+        res.send({status: 'OK', data: 'привет из сервиса ' + data});
         console.log(data)
         update();
     } catch (e) {
@@ -51,7 +53,7 @@ routerIn.post('/b', (req: any, res: any) => {
 
         b = data;
 
-        res.send({status: 'OK', data: 'привет из сервиса '+data});
+        res.send({status: 'OK', data: 'привет из сервиса ' + data});
         console.log(data)
         update();
     } catch (e) {
@@ -68,8 +70,16 @@ routerService.post('/kill', (req: any, res: any) => {
 app.use('/in', routerIn);
 app.use('/service', routerService);
 
-app.listen(PORT, () => {
-    console.log(`Серввис запущен на порте ${PORT}`);
+axios.get('http://localhost:3000/api/v1/service/task', {params: {id}}
+).then(function (res) {
+    const {data: {data}} = res;
+    cfg = data;
+    console.log(data);
+    app.listen(cfg.port, () => {
+        console.log(`Сервис запущен на порте ${cfg.port}`);
+    });
+}).catch(function (error) {
+    console.log(error);
 });
 
 console.log(env.parsed)

@@ -7,8 +7,11 @@
     "arrOut": ["y"],
     "cfg": {
         "общие": [
-            {"name": "description", "type": "string", "val": "Описание", "title": "Знaчение-параметр", "arrOption": []},
             {"name": "qwq", "type": "number", "val": 2.2, "title": "Какой-то параметр", "arrOption": []}
+        ],
+        "сеть": [
+            {"name": "ip", "type": "string", "val": "localhost", "title": "ip-адрес", "arrOption": []},
+            {"name": "port", "type": "number", "val": 3000, "title": "порт", "arrOption": []}
         ]
     },
 

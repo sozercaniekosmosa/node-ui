@@ -7,7 +7,7 @@
   "scripts": {
     "build-back": "tsc && tsc-alias",
     "dev-back": "npx tsx watch ./src",
-    "dev-plugins": "npx tsx watch ./plugins/sum 3008"
+    "dev-plugins": "npx tsx watch ./plugins/sum umzYt3H"
   },
   "keywords": [],
   "author": "",

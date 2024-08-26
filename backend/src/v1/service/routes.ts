@@ -1,6 +1,6 @@
 import express from "express";
 
-import {getProject, getToolbox, startTasks, stopTasks, updateProject, updateTasks} from "./controller";
+import {getProject, getTask, getToolbox, startTasks, stopTasks, updateProject, updateTasks} from "./controller";
 
 
 const router = express.Router();
@@ -14,6 +14,8 @@ router.get('/project', getProject);
 // PUT — полное обновление данных.
 // router.put('/', updateProject);
 router.put('/project', updateProject);
+
+router.get('/task', getTask);
 router.put('/task', updateTasks);
 router.post('/task/start', startTasks);
 router.post('/task/stop', stopTasks);
