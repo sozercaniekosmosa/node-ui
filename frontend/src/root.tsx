@@ -8,12 +8,12 @@ import {Editor, TEventEditor} from "./editor/editor";
 import {Header, TEventHeader} from "./header/header";
 import History from './service/history'
 import {MenuConfirm} from "./auxiliary/menu/menu-confirm";
-import {apiRequest, camelToKebab, compressString, decompressString, eventBus} from "./utils"
-import {writeProject, readProject, startTask, stopTask, loadModule, getToolbox, writeTask} from './service/service-backend'
+import {camelToKebab, compressString, decompressString, eventBus} from "./utils"
+import {writeProject, readProject, startTask, stopTask, getToolbox, sendCmd} from './service/service-backend'
 import {copy, past, cut} from "./service/cpc";
 import {NodeSelector} from "./editor/node-ui/node-ui";
 
-// if (!import.meta.env.PROD) import listNode from "../../plugins/src/nodes"
+// if (!import.meta.env.PROD) import listNode from "../../nodes/src/nodes"
 
 
 const root = ReactDOM.createRoot(document.querySelector('.root') as HTMLElement);
@@ -43,9 +43,9 @@ function Root() {
 
     // (async () => {
     //     if (import.meta.env.PROD) {
-    //         !listNode && setListNode((await import("../../plugins/dist/plugins.js")).default);
+    //         !listNode && setListNode((await import("../../nodes/dist/nodes.js")).default);
     //     } else {//@ts-ignore
-    //         !listNode && setListNode((await import("../../plugins/src/nodes.ts")).default);
+    //         !listNode && setListNode((await import("../../nodes/src/nodes.ts")).default);
     //     }
     // })();
 
@@ -154,8 +154,12 @@ function Root() {
                 break;
             case 'module':
                 setListNode(await getToolbox() as [Object])
-                // let d = await import("../../plugins/dist/plugins.js");
+                // let d = await import("../../nodes/dist/nodes.js");
                 // setListNode(d.default)
+                break;
+            case 'node-cmd':
+                sendCmd(data.id, data.cmd)
+                console.log(name, data)
                 break;
         }
     }

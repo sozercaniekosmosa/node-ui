@@ -1,6 +1,6 @@
 import express from "express";
 
-import {getProject, getTask, getToolbox, startTasks, stopTasks, updateProject, updateTasks} from "./controller";
+import {getProject, getTask, getToolbox, nodeCMD, startTask, startTasks, stopTasks, updateProject, updateTasks} from "./controller";
 
 
 const router = express.Router();
@@ -15,9 +15,11 @@ router.get('/project', getProject);
 // router.put('/', updateProject);
 router.put('/project', updateProject);
 
-router.get('/task', getTask);
+router.get('/task/:id', getTask);
 router.put('/task', updateTasks);
+router.post('/task/:id', startTask);
 router.post('/task/start', startTasks);
 router.post('/task/stop', stopTasks);
+router.post('/cmd/:id', nodeCMD);
 
 export default router;

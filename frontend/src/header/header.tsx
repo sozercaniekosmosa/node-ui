@@ -15,7 +15,7 @@ export function Header({onEvent}) {
     }
 
     return <div className="header">
-        <button onClick={() => eventEmit('save')} title="Сохранить">
+        <button onClick={() => eventEmit('save')} title="Сохранить ctrl+s">
             <div className="icon-save"/>
         </button>
         <button onClick={() => eventEmit('undo')} title="Отмена ctrl+z">

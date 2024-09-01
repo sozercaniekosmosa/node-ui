@@ -16,16 +16,16 @@ export const NodeSelector = {
     linkRemove: 'link-remove',
     pinIn: 'pin-in',
     pinOut: 'pin-out',
-    pinText: 'pin-text',
+    nodeText: 'node-text',
 }
 
 interface TNodeParam {
     x?: number;
     y?: number;
-    widthEmpty?: number;
     nodeName?: string;
     arrIn?: string[];
     arrOut?: string[];
+    arrButton?: string[];
     id?: string;
     cfg?: object;
     color?: string;
@@ -56,11 +56,19 @@ export class NodeUI extends Svg {
         this.linkCreate = new EditorLinkCreate(this);
         this.linkRemove = new EditorLinkRemove(this);
 
-        document.addEventListener('keydown', e => this.handlerKeyDown(e));
-        document.addEventListener('keyup', e => this.handlerKeyUp(e));
+        // document.addEventListener('keydown', e => this.handlerKeyDown(e));
+        // document.addEventListener('keyup', e => this.handlerKeyUp(e));
 
-        //@ts-ignore
-        window.removeConnection = this.removeConnection;
+        this.svg.addEventListener('click', ({target}) => {
+            try {
+                const node = (target as HTMLElement).closest<HTMLElement>('.' + NodeSelector.node)
+                const id = node.id;
+                const {cmd} = (target as HTMLElement).dataset;
+                this.svg.dispatchEvent(new CustomEvent('node-cmd', {detail: {cmd, id}}));
+            } catch (e) {
+
+            }
+        })
     }
 
     public setMode(mode: string): void {
@@ -78,10 +86,15 @@ export class NodeUI extends Svg {
 
     public createNode(nodeParam: TNodeParam) {
         const {
-            x = 50, y = 50, widthEmpty = 0, nodeName = 'empty',
+            x = 50, y = 50, nodeName = 'empty',
             arrIn = [], arrOut = [], id = getID(), cfg,
-            color = '#d7d7d7'
+            color = '#d7d7d7', arrButton,
         } = nodeParam
+
+        let midWidth = 0;
+        let midHeight = 0;
+        let midDimCalc: DOMRect;
+        let midHtml = ''
 
         const numberIn: number = arrIn!.length;
         const numberOut: number = arrOut!.length;
@@ -93,14 +106,24 @@ export class NodeUI extends Svg {
 
         const maxNumber: number = Math.max(numberIn, numberOut);
 
-        let arrWidthIn = arrIn?.length ? arrIn.map(it => this.calculateTextBox(it, NodeSelector.pinText).width) : [0];
-        let arrWidthOut = arrOut?.length ? arrOut.map(it => this.calculateTextBox(it, NodeSelector.pinText).width) : [0];
+        let arrDimIn = arrIn?.length ? arrIn.map(it => this.calculateTextBox(it, NodeSelector.nodeText)) : [];
+        let arrDimOut = arrOut?.length ? arrOut.map(it => this.calculateTextBox(it, NodeSelector.nodeText)) : [];
+        let arrWidthIn = arrDimIn?.length ? arrDimIn.map(it => it.width) : [0];
+        let arrWidthOut = arrDimOut?.length ? arrDimOut.map(it => it.width) : [0];
         const maxWidthIn: number = Math.max(...arrWidthIn)
         const maxWidthOut: number = Math.max(...arrWidthOut)
-        const boxNodeDesc: DOMRect = this.calculateTextBox(nodeName!, NodeSelector.pinText)
+        const boxNodeDesc: DOMRect = this.calculateTextBox(nodeName!, NodeSelector.nodeText)
 
-        let width = Math.max(maxWidthIn + maxWidthOut + offEdge * 3 + widthEmpty, boxNodeDesc.width);
-        let height = offEdge + maxNumber * (r * 2 + step);
+        if (arrButton) {
+            arrButton.forEach(item => midHtml += `<button data-cmd="${item}">${item}</button>`);
+
+            midDimCalc = this.calculateHtmlBox(`<div class="button-panel">${midHtml}</div>`)
+            midWidth = midDimCalc.width;
+            midHeight = midDimCalc.height;
+        }
+
+        let width = Math.max(maxWidthIn + maxWidthOut + offEdge * 4 + midWidth, boxNodeDesc.width);
+        let height = Math.max(offEdge + maxNumber * (r * 2 + step), midHeight);
 
         const inX: number = 0;//r + offEdge;
         const inY: number = height * .5 - numberIn * (r * 2 + step) * .5 + step;
@@ -112,16 +135,22 @@ export class NodeUI extends Svg {
         const fillNode: string = color!;
         const stroke: string = '#25334b';
 
-        const nodeGroup = this.group(
-            {x, y, class: NodeSelector.node, data: {nodeName, cfg: compressString(JSON.stringify(cfg))}});
+        const nodeGroup = this.group({x, y, class: NodeSelector.node, data: {nodeName, cfg: compressString(JSON.stringify(cfg))}});
 
-        this.rectangle({
-            x: 0, y: 0, width, height, rx,
-            stroke, fill: fillNode,
-            to: nodeGroup,
-            class: NodeSelector.handle,
-        });
+        this.rectangle({x: 0, y: 0, width, height, rx, stroke, fill: fillNode, to: nodeGroup, class: NodeSelector.handle,});
         nodeGroup.id = id!;
+
+        if (arrButton) {
+            let nodeEmbed = this.createElement('foreignObject', {
+                x: maxWidthIn + offEdge * 2, y: (height - midHeight) * .5, width: midWidth, height: midHeight,
+                to: nodeGroup, class: ['svg-embed']
+            })
+
+            let div = this.createElement('div', {
+                data: {id}, to: nodeEmbed, class: ['button-panel']
+            }, 'http://www.w3.org/1999/xhtml')
+            div.innerHTML = midHtml;
+        }
 
         for (let i = 0, offY = 0; i < numberIn; i++, offY += r * 2 + step) {
             const idIn = getID();
@@ -132,9 +161,10 @@ export class NodeUI extends Svg {
                     id: idIn, data: {name: arrIn?.[i]}
                 });
             this.text({
-                x: inX + offEdge, y: inY + offY + 3,
+                x: inX + offEdge, y: inY + offY + 1,
                 text: arrIn?.[i],
-                to: nodeGroup, class: [NodeSelector.pinText],
+                to: nodeGroup, class: [NodeSelector.nodeText],
+                alignmentBaseline: 'middle'
             })
         }
         for (let i = 0, offY = 0; i < numberOut; i++, offY += r * 2 + step) {
@@ -146,16 +176,17 @@ export class NodeUI extends Svg {
                     id: idOut, data: {name: arrOut?.[i]}
                 });
             this.text({
-                x: outX - offEdge - arrWidthOut[i], y: outY + offY + 3,
+                x: outX - offEdge - arrWidthOut[i], y: outY + offY + 1,
                 text: arrOut?.[i],
-                to: nodeGroup, class: [NodeSelector.pinText],
+                to: nodeGroup, class: [NodeSelector.nodeText],
+                alignmentBaseline: 'middle'
             })
         }
 
         this.text({
             x: 0, y: -2,
             text: nodeName,
-            to: nodeGroup, class: [NodeSelector.pinText],
+            to: nodeGroup, class: [NodeSelector.nodeText],
         })
 
         return nodeGroup;
@@ -177,16 +208,16 @@ export class NodeUI extends Svg {
         if (didRemove) this.svg.dispatchEvent(new CustomEvent('node-remove', {detail: {}}));
     }
 
-    private handlerKeyDown(e: KeyboardEvent) {
-        this.key[e.code.toLowerCase()] = true;
-        if (this.key['escape']) this.resetMode(this.mode);
-        // console.log(this.key)
-        if (this.key['f5'] || this.key['f12']) return
-        document.dispatchEvent(new CustomEvent('svgkeydown', {detail: {...this.key}}))
-    }
-
-    private handlerKeyUp(e: KeyboardEvent) {
-        this.key[e.code.toLowerCase()] = false;
-        document.dispatchEvent(new CustomEvent('svgkeyup', {detail: {...this.key}}))
-    }
+    // private handlerKeyDown(e: KeyboardEvent) {
+    //     this.key[e.code.toLowerCase()] = true;
+    //     if (this.key['escape']) this.resetMode(this.mode);
+    //     // console.log(this.key)
+    //     if (this.key['f5'] || this.key['f12']) return
+    //     document.dispatchEvent(new CustomEvent('svgkeydown', {detail: {...this.key}}))
+    // }
+    //
+    // private handlerKeyUp(e: KeyboardEvent) {
+    //     this.key[e.code.toLowerCase()] = false;
+    //     document.dispatchEvent(new CustomEvent('svgkeyup', {detail: {...this.key}}))
+    // }
 }

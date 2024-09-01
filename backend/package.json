@@ -7,15 +7,17 @@
   "scripts": {
     "build-back": "tsc && tsc-alias",
     "dev-back": "npx tsx watch ./src",
-    "dev-plugins": "npx tsx watch ./plugins/sum umzYt3H"
+    "dev-nodes": "npx tsx watch nodes/sum 3000 umWGlpu"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/axios": "^0.14.0",
     "@types/express": "^4.17.21",
-    "@types/node": "^22.5.0",
+    "@types/node": "^22.5.1",
     "@types/sanitize-html": "^2.13.0",
+    "@types/typescript": "^2.0.0",
     "nodemon": "^3.1.4",
     "tsc-alias": "^1.8.10",
     "tsx": "^4.17.0",

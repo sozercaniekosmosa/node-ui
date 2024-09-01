@@ -1,5 +1,41 @@
 {
-  "umzYt3H": {
+  "umWGiky": {
+    "cfg": [
+      [
+        "valueA",
+        1,
+        "number"
+      ]
+    ],
+    "id": "umWGiky",
+    "nodeName": "value",
+    "ip": "localhost",
+    "port": 3000,
+    "out": {
+      "x": [
+        "umWGlpu.A"
+      ]
+    }
+  },
+  "umWGj8I": {
+    "cfg": [
+      [
+        "valueA",
+        1,
+        "number"
+      ]
+    ],
+    "id": "umWGj8I",
+    "nodeName": "value",
+    "ip": "localhost",
+    "port": 3000,
+    "out": {
+      "x": [
+        "umWGlpu.B"
+      ]
+    }
+  },
+  "umWGlpu": {
     "cfg": [
       [
         "qwq",
@@ -7,53 +43,30 @@
         "number"
       ]
     ],
-    "id": "umzYt3H",
+    "id": "umWGlpu",
     "nodeName": "sum",
     "ip": "localhost",
     "port": 3003,
     "in": {
       "A": [
-        "umA2XVr.x"
+        "umWGiky.x"
       ],
       "B": [
-        "umA2ZLM.x"
+        "umWGj8I.x"
       ]
     }
   },
-  "umA2XVr": {
+  "un0FsrJ": {
     "cfg": [
       [
-        "valueA",
-        1,
+        "qwq",
+        2.2,
         "number"
       ]
     ],
-    "id": "umA2XVr",
-    "nodeName": "value",
+    "id": "un0FsrJ",
+    "nodeName": "action",
     "ip": "localhost",
-    "port": 3001,
-    "out": {
-      "x": [
-        "umzYt3H.A"
-      ]
-    }
-  },
-  "umA2ZLM": {
-    "cfg": [
-      [
-        "valueA",
-        1,
-        "number"
-      ]
-    ],
-    "id": "umA2ZLM",
-    "nodeName": "value",
-    "ip": "localhost",
-    "port": 3002,
-    "out": {
-      "x": [
-        "umzYt3H.B"
-      ]
-    }
+    "port": 3003
   }
 }

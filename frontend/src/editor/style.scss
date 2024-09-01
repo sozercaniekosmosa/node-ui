@@ -9,6 +9,10 @@
   stroke-width: 2;
 }
 
+//.selected > * > * * {
+//  pointer-events: none;
+//}
+
 .link {
   stroke: #505050;
   stroke-width: 4;
@@ -23,8 +27,38 @@
   fill: transparent;
 }
 
-.pin-text {
-  font: normal 9px sans-serif;
+.node-text {
+  font: normal 12px sans-serif;
   user-select: none;
   pointer-events: none;
+}
+
+#temp-node-for-html {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+}
+
+.svg-embed {
+  pointer-events: none;
+}
+
+.button-panel {
+  //border: 1px solid gray;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 2px;
+  padding-bottom: 4px;
+}
+
+.button-panel > * {
+  font: normal 12px sans-serif;
+  user-select: none;
+  pointer-events: all;
+  margin-top: 2px;
+  width: 100%;
+  padding: .2em .5em;
 }

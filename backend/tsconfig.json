@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     /* Language and Environment */
-    "target": "es2020",
+    "target": "ESNext",
     /* Modules */
-    "module": "esnext",
+    "module": "ESNext",
     "moduleResolution": "node",
     "allowImportingTsExtensions": false,
     "resolveJsonModule": true,
@@ -21,7 +21,9 @@
     /* Type Checking */
     "strict": false,
     /* Completeness */
-    "skipLibCheck": true
+//    "skipLibCheck": true,
+
+    "lib": ["ESNext"]
   },
   "tsc-alias": {
     //подключение плагина который добавляет .js в импортах при компиляции
@@ -29,6 +31,7 @@
     "verbose": false
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "nodes/**/*",
   ]
 }

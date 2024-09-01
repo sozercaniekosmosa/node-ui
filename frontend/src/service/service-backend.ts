@@ -29,7 +29,7 @@ interface TTaskList {
 
 function getComponentStruct(node, nodeProject): TNodeTask {
 
-    let data: TNodeTask = {cfg: [], id: '', nodeName: '', ip: ''};
+    let data: TNodeTask = {cfg: [], id: '', nodeName: '', ip: '', port: 0};
     data.id = node.id;
     data.nodeName = node.dataset.nodeName;
     data.cfg = [];
@@ -106,36 +106,24 @@ const writeProjectNow = async (node: HTMLElement) => {
     try {
         let project = node.innerHTML;
         let dataProject = await put(routService + 'project', 'text/plain', project)
-        console.log(dataProject);
+        console.log(dataProject.text);
 
         let arrTask = getTasks(node);
         let dataTask = await put(routService + 'task', 'application/json', arrTask)
-        console.log(dataTask);
+        console.log(dataTask.text);
 
     } catch (error) {
         console.error('Error fetching data:', error);
     }
 };
-
-const writeTaskNow = async (node: HTMLElement, nodeProject: HTMLElement) => {
-    try {
-
-    } catch (error) {
-        console.error('Error fetching data:', error);
-    }
-};
-
-
 export const writeProject = <(node: HTMLElement) => void>debounce(writeProjectNow, 1000)
-export const writeTask = <(node: HTMLElement, nodeProject: HTMLElement) => void>debounce(writeTaskNow, 50)
-
 
 export async function readProject() {
     try {
         //@ts-ignore
         const data = await get(routService + 'project', 'text/plain')
         console.log('project загружен');
-        return data;
+        return data.text;
     } catch (error) {
         console.error('Error fetching data:', error);
     }
@@ -146,7 +134,7 @@ export async function getToolbox() {
         //@ts-ignore
         const data = await get(routService + 'toolbox', 'application/json')
         console.log('toolbox загружен');
-        return data;
+        return data.json;
     } catch (error) {
         console.error('Error fetching data:', error);
     }
@@ -155,7 +143,7 @@ export async function getToolbox() {
 export async function startTask() {
     try {
         let resp = await post(routService + 'task/start', 'text/plain')
-        console.log(resp);
+        console.log(resp.text);
     } catch (error) {
         console.error('Error fetching data:', error);
     }
@@ -164,9 +152,18 @@ export async function startTask() {
 export async function stopTask() {
     try {
         let resp = await post(routService + 'task/stop', 'text/plain')
-        console.log(resp);
+        console.log(resp.text);
     } catch (error) {
         console.error('Error fetching data:', error);
+    }
+}
+
+export async function sendCmd(id, cmd) {
+    try {
+        let resp = await post(routService + `cmd/${id}`, 'text/plain', cmd)
+        console.log(resp.text);
+    } catch (error) {
+        console.error(`Ошибка команды: ${id}.${cmd}`, error);
     }
 }
 
@@ -195,6 +192,7 @@ export async function loadModule(moduleUrl) {
     }
 
 }
+
 
 // function myRecursiveFunction() {
 //     console.log("Эта функция выполняется каждые 2 секунды");

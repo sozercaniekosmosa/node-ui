@@ -23,10 +23,39 @@
   fill: transparent;
 }
 
-.pin-text {
-  font: normal 9px sans-serif;
+.node-text {
+  font: normal 12px sans-serif;
   user-select: none;
   pointer-events: none;
+}
+
+#temp-node-for-html {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+}
+
+.svg-embed {
+  pointer-events: none;
+}
+
+.button-panel {
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 2px;
+  padding-bottom: 4px;
+}
+
+.button-panel > * {
+  font: normal 12px sans-serif;
+  user-select: none;
+  pointer-events: all;
+  margin-top: 2px;
+  width: 100%;
+  padding: 0.2em 0.5em;
 }
 
 /*# sourceMappingURL=style.css.map */

@@ -179,6 +179,8 @@ export interface INodeProp {
     strokeLinecap?: string,
     shapeRendering?: string,
     text?: string,
+    html?: string,
+    alignmentBaseline?: string,
 }
 
 type TViewBox = { x: number; width: number; y: number; height: number };
@@ -195,6 +197,7 @@ export class Svg {
     protected readonly mouse: TMouseEvent;
     private startPoint: Point | null = null;
     private tempNodeForWidthText: SVGGraphicsElement | null = null;
+    private tempNodeForHtml: HTMLHtmlElement | null = null;
 
     constructor(dest: HTMLElement = document.body) {
         let {width, height} = dest.getBoundingClientRect();
@@ -221,6 +224,8 @@ export class Svg {
         this.svg.addEventListener('mousedown', e => this.handlerMouseDown(e));
         this.svg.addEventListener('mouseup', e => this.handlerMouseUp(e));
         this.svg.addEventListener('mousemove', e => this.handlerMouseMove(e));
+
+        window['calculateHtmlBox'] = this.calculateHtmlBox;
     }
 
     /**
@@ -302,6 +307,8 @@ export class Svg {
                 val && Object.entries(val).forEach(([k, v]) => (node as HTMLElement).dataset[k] = String(v));
             } else if (key == 'text') {
                 node.textContent = val;
+            } else if (key == 'html') {
+                node.innerHTML = val;
             } else if (key == 'id') {
                 node.id = val;
             } else if (key == 'class') {
@@ -313,9 +320,9 @@ export class Svg {
         return node;
     }
 
-    private createElement(nameNode: string, prop: INodeProp) {
+    public createElement(nameNode: string, prop: INodeProp, xmlns?): any {
         if (!prop?.to) prop.to = this.svg;
-        const node = document.createElementNS('http://www.w3.org/2000/svg', nameNode);
+        const node = document.createElementNS(xmlns ?? 'http://www.w3.org/2000/svg', nameNode);
         this.setProperty(node, prop);
         return node;
     }
@@ -330,6 +337,23 @@ export class Svg {
         if (!this.tempNodeForWidthText || !document.body.contains(this.tempNodeForWidthText)) this.tempNodeForWidthText = this.svg.querySelector('#' + id);
         this.tempNodeForWidthText = (this.tempNodeForWidthText ? this.setProperty(this.tempNodeForWidthText, prop) : this.text(prop)) as SVGGraphicsElement
         return this.tempNodeForWidthText.getBBox();
+    }
+
+    public calculateHtmlBox(html: string, css?: string): DOMRect {
+        // Добавляем HTML элемент
+        let id = 'temp-node-for-html';
+        let prop = {x: 0, y: 0, html, opacity: 0, id};
+        css && (prop["class"] = css)
+
+        if (!this.tempNodeForHtml || !document.body.contains(this.tempNodeForHtml)) {
+            this.tempNodeForHtml = document.querySelector('#' + id);
+            if (!this.tempNodeForHtml) {
+                this.tempNodeForHtml = document.createElement('div') as HTMLHtmlElement;
+                document.body.append(this.tempNodeForHtml)
+            }
+        }
+        this.tempNodeForHtml = this.setProperty(this.tempNodeForHtml, prop) as HTMLHtmlElement;
+        return this.tempNodeForHtml.getBoundingClientRect();
     }
 
     public circle = (prop: INodeProp): SVGElement | SVGGraphicsElement => this.createElement('circle', prop);
@@ -373,7 +397,9 @@ export class Svg {
 
     private handlerMouseWheel(e: WheelEvent) {
         const zoomFactor = 1.5;
-        const {offsetX, offsetY, deltaY} = e;
+        const {deltaY} = e;
+
+        const {offsetX, offsetY} = this.getOffset(e, this.svg);
 
         const zoomDirection = deltaY < 0 ? 1 / zoomFactor : zoomFactor;
         const off = new Point(offsetX, offsetY);
@@ -401,8 +427,9 @@ export class Svg {
         if (e.button == 2) this.mouse.button[2] = true;
 
         this.mouse.target = e.target;
-        this.off = new Point(e.clientX - e.offsetX, e.clientY - e.offsetY);
-        this.startPoint = new Point(e.offsetX, e.offsetY); //сохраняем позицию что бы обновить её если изменится zoom
+        const {offsetX, offsetY} = this.getOffset(e, this.svg);
+        this.off = new Point(e.clientX - offsetX, e.clientY - offsetY);
+        this.startPoint = new Point(offsetX, offsetY); //сохраняем позицию что бы обновить её если изменится zoom
         this.mouse.start = this.getPosZoom(this.startPoint);
 
         //считаем центр target
@@ -421,7 +448,8 @@ export class Svg {
 
         this.updateZoom();
         this.mouse.target = e.target;
-        this.mouse.end = this.getPosZoom(new Point(e.offsetX, e.offsetY));
+        const {offsetX, offsetY} = this.getOffset(e, this.svg);
+        this.mouse.end = this.getPosZoom(new Point(offsetX, offsetY));
 
         //считаем центр target
         const {x, y, width, height} = this.getBox(e.target as Element);
@@ -431,16 +459,29 @@ export class Svg {
         this.svg.dispatchEvent(new CustomEvent('svgmouseup', {detail: {...this.mouse}}))
     }
 
+    getOffset(event, referenceElement) {
+        let bbox_rect = referenceElement.getBoundingClientRect()
+        let offsetX = event.clientX - bbox_rect.left
+        let offsetY = event.clientY - bbox_rect.top
+        return {offsetX, offsetY}
+    }
+
     private handlerMouseMove(e: MouseEvent) {
         this.updateZoom();
         this.mouse.target = e.target;
 
-        this.off = new Point(e.clientX - e.offsetX, e.clientY - e.offsetY);
+        // была большая проблема с объектами которые встраивались через foreignObject
+        // все offset-ы внутри него расчитывались относительно foreignObject а не svg
+        const {offsetX, offsetY} = this.getOffset(e, this.svg);
+        this.off = new Point(e.clientX - offsetX, e.clientY - offsetY);
 
-        this.mouse.p = new Point(e.offsetX, e.offsetY)
+        this.mouse.p = new Point(offsetX, offsetY)
         if (!this.mouse._p) this.mouse._p = this.mouse.p.clone();
         // this.mouse.delta = this.mouse.p.clone().add(this.mouse._p.neg());
         this.mouse.delta = this.mouse.p.clone().add(this.mouse._p.neg()).mul(this.kZoom!);
+        // this.mouse.delta = new Point(e.movementX, e.movementY).mul(this.kZoom!);
+        // console.log(this.mouse.delta)
+
         this.mouse._p = this.mouse.p.clone();
         this.mouse.p = this.getPosZoom(this.mouse.p);
 
