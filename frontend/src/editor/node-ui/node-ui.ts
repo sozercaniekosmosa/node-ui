@@ -17,6 +17,7 @@ export const NodeSelector = {
     pinIn: 'pin-in',
     pinOut: 'pin-out',
     nodeText: 'node-text',
+    nodeStatus: 'node-status',
 }
 
 interface TNodeParam {
@@ -62,9 +63,9 @@ export class NodeUI extends Svg {
         this.svg.addEventListener('click', ({target}) => {
             try {
                 const node = (target as HTMLElement).closest<HTMLElement>('.' + NodeSelector.node)
-                const id = node.id;
+                const id = node?.id;
                 const {cmd} = (target as HTMLElement).dataset;
-                this.svg.dispatchEvent(new CustomEvent('node-cmd', {detail: {cmd, id}}));
+                if (cmd) this.svg.dispatchEvent(new CustomEvent('node-cmd', {detail: {cmd, id}}));
             } catch (e) {
 
             }
@@ -122,7 +123,7 @@ export class NodeUI extends Svg {
             midHeight = midDimCalc.height;
         }
 
-        let width = Math.max(maxWidthIn + maxWidthOut + offEdge * 4 + midWidth, boxNodeDesc.width);
+        let width = Math.max(maxWidthIn + maxWidthOut + offEdge * 4 + midWidth, boxNodeDesc.width + offEdge);
         let height = Math.max(offEdge + maxNumber * (r * 2 + step), midHeight);
 
         const inX: number = 0;//r + offEdge;
@@ -130,6 +131,7 @@ export class NodeUI extends Svg {
         const outX: number = width;// - r - offEdge;
         const outY: number = height * .5 - numberOut * (r * 2 + step) * .5 + step;
 
+        const fillGray: string = '#d5d5d5';
         const fillIn: string = '#bcffd6';
         const fillOut: string = '#ffc69a';
         const fillNode: string = color!;
@@ -137,18 +139,20 @@ export class NodeUI extends Svg {
 
         const nodeGroup = this.group({x, y, class: NodeSelector.node, data: {nodeName, cfg: compressString(JSON.stringify(cfg))}});
 
+        this.rectangle({
+            x: 0, y: -offEdge, width: 5, height: 5, rx: 1, stroke, fill: fillGray, to: nodeGroup, class: [NodeSelector.nodeStatus]
+        });
+
         this.rectangle({x: 0, y: 0, width, height, rx, stroke, fill: fillNode, to: nodeGroup, class: NodeSelector.handle,});
         nodeGroup.id = id!;
+
 
         if (arrButton) {
             let nodeEmbed = this.createElement('foreignObject', {
                 x: maxWidthIn + offEdge * 2, y: (height - midHeight) * .5, width: midWidth, height: midHeight,
                 to: nodeGroup, class: ['svg-embed']
             })
-
-            let div = this.createElement('div', {
-                data: {id}, to: nodeEmbed, class: ['button-panel']
-            }, 'http://www.w3.org/1999/xhtml')
+            let div = this.createElement('div', {data: {id}, to: nodeEmbed, class: ['button-panel']}, 'http://www.w3.org/1999/xhtml')
             div.innerHTML = midHtml;
         }
 
@@ -184,7 +188,7 @@ export class NodeUI extends Svg {
         }
 
         this.text({
-            x: 0, y: -2,
+            x: offEdge, y: -2,
             text: nodeName,
             to: nodeGroup, class: [NodeSelector.nodeText],
         })

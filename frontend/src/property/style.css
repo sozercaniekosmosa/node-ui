@@ -73,6 +73,9 @@
   max-width: 16em;
   border: 1px solid rgba(128, 128, 128, 0.21);
 }
+.prop__param--text-center {
+  text-align: center;
+}
 .prop__footer {
   display: flex;
   justify-content: center;
@@ -106,7 +109,7 @@
   margin: 0 0.5px;
 }
 .tab__header__item:hover {
-  background-color: rgba(0, 0, 0, 0.3137254902);
+  background-color: rgba(0, 0, 0, 0.47);
 }
 .tab__header__item--active {
   background-color: rgba(0, 0, 0, 0.2509803922);

@@ -1,40 +1,4 @@
 {
-  "umWGiky": {
-    "cfg": [
-      [
-        "valueA",
-        1,
-        "number"
-      ]
-    ],
-    "id": "umWGiky",
-    "nodeName": "value",
-    "ip": "localhost",
-    "port": 3000,
-    "out": {
-      "x": [
-        "umWGlpu.A"
-      ]
-    }
-  },
-  "umWGj8I": {
-    "cfg": [
-      [
-        "valueA",
-        1,
-        "number"
-      ]
-    ],
-    "id": "umWGj8I",
-    "nodeName": "value",
-    "ip": "localhost",
-    "port": 3000,
-    "out": {
-      "x": [
-        "umWGlpu.B"
-      ]
-    }
-  },
   "umWGlpu": {
     "cfg": [
       [
@@ -43,30 +7,11 @@
         "number"
       ]
     ],
+    "hostPort": {
+      "host": "localhost",
+      "port": "3001"
+    },
     "id": "umWGlpu",
-    "nodeName": "sum",
-    "ip": "localhost",
-    "port": 3003,
-    "in": {
-      "A": [
-        "umWGiky.x"
-      ],
-      "B": [
-        "umWGj8I.x"
-      ]
-    }
-  },
-  "un0FsrJ": {
-    "cfg": [
-      [
-        "qwq",
-        2.2,
-        "number"
-      ]
-    ],
-    "id": "un0FsrJ",
-    "nodeName": "action",
-    "ip": "localhost",
-    "port": 3003
+    "nodeName": "sum"
   }
 }

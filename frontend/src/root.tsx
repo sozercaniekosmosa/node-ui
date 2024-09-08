@@ -9,7 +9,9 @@ import {Header, TEventHeader} from "./header/header";
 import History from './service/history'
 import {MenuConfirm} from "./auxiliary/menu/menu-confirm";
 import {camelToKebab, compressString, decompressString, eventBus} from "./utils"
-import {writeProject, readProject, startTask, stopTask, getToolbox, sendCmd} from './service/service-backend'
+import {
+    writeProject, readProject, startTask, stopTask, getToolbox, sendCmd, createMessageSocket, isAllowHostPort, webSocket
+} from './service/service-backend'
 import {copy, past, cut} from "./service/cpc";
 import {NodeSelector} from "./editor/node-ui/node-ui";
 
@@ -39,6 +41,7 @@ function Root() {
         document.addEventListener('keydown', onKeyDown, true);
         document.addEventListener('blur', () => arrKey = [], true);
         document.addEventListener('focus', ({target}) => nodeFocus = target, true);
+
     }, [])
 
     // (async () => {
@@ -92,6 +95,7 @@ function Root() {
                 history = new History(nui.svg.innerHTML, 20);
                 nui.selection.clearSelection();
                 nui.selection.clearRectSelection();
+                await createMessageSocket();
                 break;
             case 'selected':
                 arrSelected = data;
@@ -152,11 +156,6 @@ function Root() {
             case 'stop':
                 eventBus.dispatchEvent('confirm', (isYes) => isYes && stopTask(), 'Остановить стстему?')
                 break;
-            case 'module':
-                setListNode(await getToolbox() as [Object])
-                // let d = await import("../../nodes/dist/nodes.js");
-                // setListNode(d.default)
-                break;
             case 'node-cmd':
                 sendCmd(data.id, data.cmd)
                 console.log(name, data)
@@ -169,7 +168,7 @@ function Root() {
         <div className="node-editor" onDoubleClick={({target}) => onEventHandler({name: 'property', data: target})}>
             <Toolbox onNodeSelect={(data) => setNodeDataSelected(data)} listNode={listNode}/>
             <Editor newNode={nodeDataSelected} onEvent={onEventHandler}/>
-            <Property setNode={nodeProp} onChange={onEventHandler}/>
+            <Property setNode={nodeProp} onEvent={onEventHandler}/>
         </div>
         <MenuConfirm name={'confirm'}/>
     </>)
@@ -180,3 +179,4 @@ root.render(
     <Root/>
     //</StrictMode>
 );
+

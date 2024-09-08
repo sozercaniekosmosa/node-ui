@@ -1,18 +1,6 @@
 {
-  "umWGiky": {
-    "ip": "localhost",
-    "port": 3000
-  },
-  "umWGj8I": {
-    "ip": "localhost",
-    "port": 3000
-  },
   "umWGlpu": {
-    "ip": "localhost",
-    "port": 3003
-  },
-  "un0FsrJ": {
-    "ip": "localhost",
-    "port": 3003
+    "host": "localhost",
+    "port": "3001"
   }
 }

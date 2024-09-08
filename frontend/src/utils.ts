@@ -1010,7 +1010,7 @@ export interface ApiRequestOptions {
 export async function apiRequest<T>(
     url: string,
     {method = 'GET', body = null, headers = {}, contentType}: ApiRequestOptions = {}
-): Promise<T> {
+) {
 
     const options: RequestInit = ({
         method, headers: new Headers({...(contentType ? {'Content-Type': contentType} : {}), ...headers}),
@@ -1037,14 +1037,82 @@ export async function apiRequest<T>(
     try {
         const response = await fetch(url, options);
 
+
         if (!response.ok) throw new Error(`Error: ${response.status} ${response.statusText}`);
 
-        const {json, text, bin} = await response.json();
-
-        //@ts-ignore
-        return {json, text, bin};
+        const contentType = response.headers.get('Content-Type')
+        if (contentType.includes('json')) {
+            return await response.json();
+        } else if (contentType.includes('text')) {
+            return await response.text();
+        } else if (contentType.includes('application/octet-stream')) {
+            return await response.arrayBuffer();
+        }
     } catch (error) {
         console.error('API request error:', error);
         throw error; // Пробрасываем ошибку дальше
     }
+}
+
+
+export function webSocket(
+    {host, port, protocol = 'json', clbOpen = null, clbMessage = null, clbClose = null, clbError = null, timeReconnect = 1000}) {
+
+    let isConnected = false;
+    const reconnect = (param) => {
+        if (isConnected) return;
+        isConnected = true;
+        setTimeout(() => {
+            isConnected = false;
+            console.log('попытка соединения с сервером ...')
+            _webSocket(param)
+        }, timeReconnect);
+    }
+
+    function _webSocket(param) {
+        const ws = new WebSocket(`ws://${host}:${port}`, protocol) as WebSocket;
+
+
+        ws.onopen = () => {
+            isConnected = false;
+            try {
+                if (clbOpen) {
+                    const objSend = clbOpen();
+                    if (objSend) {
+                        ws.send(objSend);
+                    }
+                }
+                console.log('WebSocket соединение открыто')
+            } catch (e) {
+                // console.log(e)
+            }
+        };
+        ws.onmessage = (message) => {
+            try {
+                clbMessage && clbMessage(message);
+            } catch (e) {
+                // console.log(e)
+            }
+        };
+
+        ws.onclose = (ev) => {
+            try {
+                clbClose && clbClose(ev);
+                console.log('WebSocket соединение закрыто')
+                // ws.terminate()
+            } catch (e) {
+                // console.log(e)
+            } finally {
+                reconnect(...arguments);
+            }
+        };
+        ws.onerror = err => {
+            // console.log(err)
+            return clbError && clbError(err);
+        };
+
+        return ws
+    }
+
+    return _webSocket(...arguments);
 }

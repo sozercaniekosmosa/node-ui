@@ -1,0 +1,45 @@
+$color-gray: rgba(128, 128, 128, 0.5);
+
+.host-port {
+
+  &__group {
+    display: flex;
+    flex-direction: row;
+  }
+
+  &__host {
+    min-width: 2em;
+    max-width: 8em;
+    border: 1px solid rgba(128, 128, 128, 0.21);
+    margin: 0 .5em;
+    text-align: center;
+  }
+
+  &__port {
+    min-width: 2em;
+    max-width: 4em;
+    border: 1px solid rgba(128, 128, 128, 0.21);
+    margin: 0 .5em;
+    text-align: center;
+  }
+
+  &--invalid {
+    outline: 1px solid #ee0047;
+  }
+
+  &__state--valid {
+    font-weight: 800;
+    text-align: center;
+    width: 1em;
+    padding: 0 .5em;
+    color: #4bdf00;
+  }
+
+  &__state--error {
+    font-weight: 800;
+    text-align: center;
+    width: 1em;
+    padding: 0 .5em;
+    color: #ee0047;
+  }
+}

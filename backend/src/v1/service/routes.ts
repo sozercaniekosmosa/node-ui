@@ -1,6 +1,9 @@
 import express from "express";
 
-import {getProject, getTask, getToolbox, nodeCMD, startTask, startTasks, stopTasks, updateProject, updateTasks} from "./controller";
+import {
+    getProject, getTask, getToolbox, cmdTask, startTask, startTasks, stopTasks, updateProject, updateTasks, addMessage, getAllMessage,
+    isAllowHostPort
+} from "./controller";
 
 
 const router = express.Router();
@@ -20,6 +23,8 @@ router.put('/task', updateTasks);
 router.post('/task/:id', startTask);
 router.post('/task/start', startTasks);
 router.post('/task/stop', stopTasks);
-router.post('/cmd/:id', nodeCMD);
+router.post('/cmd/:id', cmdTask);
+router.post('/message', addMessage);
+router.get('/host-port/:host/:port/:id', isAllowHostPort);
 
 export default router;

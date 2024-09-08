@@ -1,0 +1,10 @@
+$color-gray: rgba(128, 128, 128, 0.5);
+
+.param {
+
+  &__string {
+    min-width: 2em;
+    max-width: 16em;
+    border: 1px solid rgba(128, 128, 128, 0.21);
+  }
+}

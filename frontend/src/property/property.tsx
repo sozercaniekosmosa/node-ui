@@ -1,7 +1,11 @@
 import "./style.css"
-import React, {createElement, InputHTMLAttributes, useRef, useState} from "react";
+import React, {createElement, InputHTMLAttributes, useEffect, useRef, useState} from "react";
 import {camelToKebab, compressString, decompressString, eventBus} from '../utils'
-
+import {TMessage} from "../../../general/types";
+import backend from "../../src/service/service-backend";
+import Number from "./components/number/number"
+import HostPort from "./components/host-port/host-port";
+import String from "./components/string/string";
 
 export type TEventProperty = {
     name: 'property-change',
@@ -10,11 +14,11 @@ export type TEventProperty = {
 
 let arrKey = {};
 
-export function Property({setNode, onChange}) {
-
+export function Property({setNode, onEvent}) {
     const [, setUpdateNow] = useState(0); //для перерисовки компонента
     let nodeName: string = '';
 
+    let refHeader = useRef(null); //флаг -- капсула запущена
     let refChanged = useRef(null); //флаг -- компонент изменен
     let refArrCfg = useRef([]);
     let refIsWasChange = useRef(false);
@@ -40,34 +44,45 @@ export function Property({setNode, onChange}) {
         show(true)
     })
 
+    eventBus.addEventListener('message-socket', ({type, data: {id, state}}) => {
+
+        if (setNode && setNode.id != id) return;
+
+        switch (type) {
+            case "log":
+                break;
+            case "node-status":
+                let fill = '#dcdcdc';
+                if (state) {
+                    (state === 'run') && (fill = '#b6ffc8');
+                    (state === 'error') && (fill = '#ff5967');
+                    (state === 'stop') && (fill = '#dcdcdc');
+                }
+                refHeader.current.style.backgroundColor = fill;
+
+                break;
+        }
+    })
+
     const noType = (typeName) => () => <b style={{color: "#cc0000"}}>[{typeName}]</b>
 
     const listTypeComponent = {
-        'number': function ({name, val, onChange}) {
-            return <>
-                <input className="prop__param__number" type="number" defaultValue={val}
-                       onBlur={({target}) => onChange(name, Number(target.value), val)}
-                       onKeyDown={({target, key}) => {
-                           if (key == 'Enter') onChange(name, Number((target as InputHTMLAttributes<string>).value), val)
-                       }}/></>
-        },
-        'string': function ({name, val, onChange}) {
-            return <>
-                <input className="prop__param__string" type="text" defaultValue={val}
-                       onBlur={({target}) => onChange(name, target.value)}
-                       onKeyDown={({target, key}) => {
-                           if (key == 'Enter') onChange(name, (target as InputHTMLAttributes<string>).value)
-                       }}/></>
-        }
+        'number': Number,
+        'string': String,
+        'host-port': HostPort,
     }
 
-    const onChangeParam = (name, val, _val) => {
-        Object.entries(refArrCfg.current).forEach(([key, param]) => {
-            param.forEach(({name: _name, type, val: _val, title}, i) => {
-                if (_name == name && _val != val) {
-                    refIsWasChange.current = true;
-                    refArrCfg.current[key][i] = {name, type, val, title}
-                    refChanged.current.innerHTML = '*';
+    const onChangeParam = (name, val) => {
+
+        Object.entries(refArrCfg.current).forEach(([tabName, arrParam]) => {
+            arrParam.forEach(({name: _name, type, val: _val, title}, i) => {
+                if (_name == name) {
+                    let isChanged: boolean = typeof val == 'object' ? JSON.stringify(val) != JSON.stringify(_val) : val != _val;
+                    if (isChanged) {
+                        refIsWasChange.current = true;
+                        refArrCfg.current[tabName][i] = {name, type, val, title}
+                        refChanged.current.innerHTML = '*';
+                    }
                 }
             })
         })
@@ -79,7 +94,7 @@ export function Property({setNode, onChange}) {
     let onApply = () => {
         if (refIsWasChange.current) {
             setNode.dataset.cfg = compressString(JSON.stringify(refArrCfg.current));
-            onChange({name: 'property-change', data: setNode})
+            onEvent({name: 'property-change', data: setNode})
         }
         show(false)
     };
@@ -130,7 +145,7 @@ export function Property({setNode, onChange}) {
              onKeyUp={onKeyUp}
              onClick={({target}) => (target as Element).classList.contains('prop') && onCancel()}>
             <div className="prop__menu">
-                <div className="prop__header">
+                <div className="prop__header" ref={refHeader}>
                     <div>
                         Конфигуратор: {nodeName}
                         <div ref={refChanged} style={{display: 'inline'}}></div>
@@ -162,7 +177,8 @@ export function Property({setNode, onChange}) {
                                         })
                                     }
 
-                                    let props = {name, val, title, key: i, onChange: onChangeParam};
+                                    let modeRun = setNode.querySelector('.node-status').dataset.state == "run";
+                                    let props = {name, val, title, key: i, onChange: onChangeParam, node: setNode};
                                     return <div className={"prop__param " + arrStyle.join(' ')} key={i}>
                                         {title ? <div className="prop__param__name">{title + ':'}</div> : ''}
                                         {createElement(comp, props)}

@@ -1,35 +1,15 @@
 import {NodeSelector} from "../editor/node-ui/node-ui";
-import {apiRequest, ApiRequestOptions, ContentType, debounce, decompressString, throttle} from "../utils";
+import {apiRequest, ContentType, debounce, decompressString, eventBus, webSocket} from "../utils";
+import {TMessage, TTask, TTaskList} from "../../../general/types"
 
-type TCfg = [string, any, string];
-
-interface TApiRequest {
-    status: 'OK' | 'FAILED',
-    data: any
-}
 
 let port = 3000;
 let routService: string = `http://localhost:${port}/api/v1/service/`;
 
 
-interface TNodeTask {
-    id: string,
-    ip: string,
-    port: number,
-    nodeName: string,
-    cfg: TCfg[],
-    in?: {},
-    out?: {},
-}
+function getComponentStruct(node, nodeProject): TTask {
 
-interface TTaskList {
-    [key: string]: TNodeTask
-}
-
-
-function getComponentStruct(node, nodeProject): TNodeTask {
-
-    let data: TNodeTask = {cfg: [], id: '', nodeName: '', ip: '', port: 0};
+    let data: TTask = {cfg: [], hostPort: {host: "", port: 0}, id: "", nodeName: ""};
     data.id = node.id;
     data.nodeName = node.dataset.nodeName;
     data.cfg = [];
@@ -42,12 +22,8 @@ function getComponentStruct(node, nodeProject): TNodeTask {
     const excludeFields = new Set(['description']);
     (Object.entries(arrCfg) as [TArrCfg]).forEach(([tabName, arrParam]) =>
         arrParam.forEach(({name, type, val}) => {
-            if (name === 'ip') {
-                data.ip = val;
-                return;
-            }
-            if (name === 'port') {
-                data.port = val;
+            if (name === 'hostPort') {
+                data.hostPort = val;
                 return;
             }
             !excludeFields.has(name) && (data.cfg.push([name, val, type]));
@@ -94,7 +70,7 @@ async function put(route: string, contentType: ContentType, data: any) {
     return await apiRequest(route, {method: 'PUT', contentType, body: data});
 }
 
-async function get(route: string, contentType: ContentType) {
+async function get(route: string, contentType?: ContentType) {
     return await apiRequest(route, {method: 'GET', contentType});
 }
 
@@ -105,12 +81,12 @@ async function post(route: string, contentType: ContentType, data?: any) {
 const writeProjectNow = async (node: HTMLElement) => {
     try {
         let project = node.innerHTML;
-        let dataProject = await put(routService + 'project', 'text/plain', project)
-        console.log(dataProject.text);
+        let htmlProject = await put(routService + 'project', 'text/plain', project)
+        console.log(htmlProject);
 
         let arrTask = getTasks(node);
-        let dataTask = await put(routService + 'task', 'application/json', arrTask)
-        console.log(dataTask.text);
+        let textTask = await put(routService + 'task', 'application/json', arrTask)
+        console.log(textTask);
 
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -121,9 +97,9 @@ export const writeProject = <(node: HTMLElement) => void>debounce(writeProjectNo
 export async function readProject() {
     try {
         //@ts-ignore
-        const data = await get(routService + 'project', 'text/plain')
+        const html = await get(routService + 'project', 'text/plain')
         console.log('project загружен');
-        return data.text;
+        return html;
     } catch (error) {
         console.error('Error fetching data:', error);
     }
@@ -132,9 +108,9 @@ export async function readProject() {
 export async function getToolbox() {
     try {
         //@ts-ignore
-        const data = await get(routService + 'toolbox', 'application/json')
+        const listToolbox = await get(routService + 'toolbox', 'application/json')
         console.log('toolbox загружен');
-        return data.json;
+        return listToolbox;
     } catch (error) {
         console.error('Error fetching data:', error);
     }
@@ -142,8 +118,8 @@ export async function getToolbox() {
 
 export async function startTask() {
     try {
-        let resp = await post(routService + 'task/start', 'text/plain')
-        console.log(resp.text);
+        let text = await post(routService + 'task/start', 'text/plain')
+        console.log(text);
     } catch (error) {
         console.error('Error fetching data:', error);
     }
@@ -151,8 +127,8 @@ export async function startTask() {
 
 export async function stopTask() {
     try {
-        let resp = await post(routService + 'task/stop', 'text/plain')
-        console.log(resp.text);
+        let text = await post(routService + 'task/stop', 'text/plain')
+        console.log(text);
     } catch (error) {
         console.error('Error fetching data:', error);
     }
@@ -160,10 +136,31 @@ export async function stopTask() {
 
 export async function sendCmd(id, cmd) {
     try {
-        let resp = await post(routService + `cmd/${id}`, 'text/plain', cmd)
-        console.log(resp.text);
+        let text = await post(routService + `cmd/${id}`, 'text/plain', cmd)
+        console.log(text);
     } catch (error) {
         console.error(`Ошибка команды: ${id}.${cmd}`, error);
+    }
+}
+
+let _old = 0;
+let _isPortInUse;
+let old = 0;
+
+export async function isAllowHostPort(host, port, id) {
+    try {
+
+        old++;
+        let isPortInUse = await get(routService + `host-port/${host}/${port}/${id}`)
+
+        //эта часть нужна на случай когда на сервер отправлено несколько запросов, нужно оставить только самый последний
+        if (old == _old) isPortInUse = _isPortInUse; // если вернулся ответ сервера от более раннего запроса ответ игнорируем
+        _isPortInUse = isPortInUse;
+        _old = old;
+
+        return isPortInUse;
+    } catch (error) {
+        console.error(`Ошибка проверки порта: ${port}`, error);
     }
 }
 
@@ -194,9 +191,21 @@ export async function loadModule(moduleUrl) {
 }
 
 
-// function myRecursiveFunction() {
-//     console.log("Эта функция выполняется каждые 2 секунды");
-//     setTimeout(myRecursiveFunction, 2000);
-// }
-// // Запускаем функцию
-// myRecursiveFunction();
+export async function createMessageSocket() {
+    try {
+        webSocket({
+            host: 'localhost', port: 3000, timeReconnect: 1500,
+            clbMessage: ({data: mess}) => {
+                console.log("Получены данные: " + mess);
+                const {type, data} = <TMessage>JSON.parse(mess);
+                eventBus.dispatchEvent('message-socket', {type, data})
+            }
+        })
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    } finally {
+        // setTimeout(() => messageSocket(nui), 2000);
+    }
+}
+
+export default {isAllowHostPort}

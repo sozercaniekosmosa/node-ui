@@ -19,7 +19,8 @@ export function copy(nui) {
             arrIn,
             arrOut,
             color: node.querySelector('.handle').getAttribute('fill'),
-            cfg: JSON.parse(decompressString(node.dataset.cfg)!)
+            cfg: JSON.parse(decompressString(node.dataset.cfg)!),
+            arrButton: [...node.querySelectorAll('.button-panel button')].map(node => node.dataset.cmd),
         };
         return nodeParam;
     }

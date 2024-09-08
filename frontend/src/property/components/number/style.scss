@@ -1,0 +1,9 @@
+$color-gray: rgba(128, 128, 128, 0.5);
+
+.param {
+
+  &__number {
+    min-width: 2em;
+    max-width: 4em;
+  }
+}

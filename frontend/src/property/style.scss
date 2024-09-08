@@ -1,7 +1,6 @@
 $color-gray: rgba(128, 128, 128, 0.5);
 
 .prop {
-
   position: absolute;
   left: 0;
   top: 0;
@@ -98,6 +97,10 @@ $color-gray: rgba(128, 128, 128, 0.5);
       max-width: 16em;
       border: 1px solid rgba(128, 128, 128, 0.21);
     }
+
+    &--text-center {
+      text-align: center;
+    }
   }
 
   &__footer {
@@ -137,7 +140,7 @@ $color-gray: rgba(128, 128, 128, 0.5);
   }
 
   &__item:hover {
-    background-color: #00000050;
+    background-color: rgba(0, 0, 0, 0.47);
   }
 
   &__item--active {
@@ -163,5 +166,4 @@ $color-gray: rgba(128, 128, 128, 0.5);
       margin: .5em 0;
     }
   }
-
 }

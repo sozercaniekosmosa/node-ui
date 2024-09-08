@@ -1,40 +1,20 @@
-import {getDataFromArrayPath, getDirectories, readFileAsync, writeFileAsync} from "../../utils";
+import {config} from "dotenv";
+import {debounce, getDataFromArrayPath, getDirectories, readFileAsync, WEBSocket, writeFileAsync} from "../../utils";
 import zlib, {InputType} from "node:zlib"
 import {resolve} from "path";
 import * as Buffer from "buffer";
 import {spawn} from "child_process";
 
-import {port} from "../../index"
+import global from "../../global"
 import axios from "axios";
-
-
-type TTypeName = string;
-type TValue = any;
-type TName = string;
-type TConfig = [TName, TValue, TTypeName];
-
-type TPath = string;
-
-interface TLink {
-    [key: string]: TPath[];
-}
-
-interface TTask {
-    nodeName: string;
-    id: string,
-    ip: string,
-    port: number,
-    cfg: TConfig[];
-    in?: TLink;
-    out?: TLink;
-}
-
-export interface TTaskList {
-    [key: string]: TTask
-}
+import {THost, THostPort, TMessage, TStatus, TTaskList} from "../../../../general/types";
+import isLocalhost from "is-localhost-ip";
+import {domainToASCII} from "node:url";
+import net from "net";
 
 
 const pathRoot = process.cwd();
+const {parsed: {MAX_MESSAGE_TASK, TIME_MESSAGE_CYCLE}} = config();
 
 const pathResolveRoot = (path: string) => resolve(pathRoot, ...path.split(/\\|\//));
 
@@ -47,6 +27,42 @@ export async function decompressGzip(buffer: Buffer): Promise<Buffer> {
     }
 }
 
+const getHosts = async (): Promise<THost> => {
+    let hosts;
+    try {
+        const strHosts = await readData('./database/hosts.json', 'utf-8');
+        hosts = JSON.parse(strHosts);
+    } catch (e) {
+        console.log(e)
+    }
+
+    return hosts;
+}
+const getTasks = async (): Promise<TTaskList> => {
+    let tasks;
+    try {
+        const strTasks = await readData('./database/tasks.json', 'utf-8');
+        tasks = JSON.parse(strTasks);
+    } catch (e) {
+        console.log(e)
+    }
+
+    return tasks;
+}
+const getListRun = async (): Promise<THost> => {
+    let listRun: THost;
+
+    try {
+        const strListRun = (await readData('database/running.json', 'utf-8')).toString();
+        listRun = JSON.parse(strListRun);
+    } catch (e) {
+        console.log('Файл: "Список запущенных задач" еще не создан')
+    }
+
+    return listRun;
+}
+
+
 export const readData = async (path: string, options?): Promise<any> => {
     try {
         const data = await readFileAsync(path, options);
@@ -55,7 +71,6 @@ export const readData = async (path: string, options?): Promise<any> => {
         throw error;
     }
 };
-
 export const writeData = (path: string, data: any): any => {
     try {
         writeFileAsync(pathResolveRoot(path), data);
@@ -64,16 +79,43 @@ export const writeData = (path: string, data: any): any => {
     }
 };
 
-export const writeTasks = (tasks: TTaskList): any => {
+export const killTask = async ({id = null, host = null, port = null}): any => {
     try {
-        const strTask = JSON.stringify(tasks, null, 2);
-        writeFileAsync(pathResolveRoot('./database/tasks.json'), strTask);
+        if (id) {
+            const hosts = getHosts();
+            host = hosts[id].host;
+            port = hosts[id].port;
+        }
 
-        let mapNodes = {}
+        await axios.post(`http://${host}:${port}/service/kill`)
+        console.warn(`Процессу (${host}:${port}) отправлена команда на завершение`)
+    } catch (e) {
+        console.warn(`Процесс (${host}:${port}) не ответил на команду завершения, возможно не был запущен`)
+    }
+}
+
+export const writeTasks = async (tasks: TTaskList): any => {
+    let oldHosts = await getHosts();
+
+    try {
+        let newHosts = {}
         let arrTask = Object.values(tasks);
-        arrTask.forEach(({id, ip, port}) => mapNodes[id] = {ip, port})
-        const strMapNodes = JSON.stringify(mapNodes, null, 2);
-        writeFileAsync(pathResolveRoot('./database/hosts.json'), strMapNodes);
+        arrTask.forEach(({id, hostPort: {host, port}}) => newHosts[id] = {host, port})
+
+        if (oldHosts) {//если есть старые хосты
+            for (const [oldID, hostPort] of Object.entries(oldHosts)) {//перебераем все старые
+                const newHost = newHosts[oldID];
+                if (!newHost || newHost.host != hostPort.host || newHost.port != hostPort.port) { //если среди новых нет старого ID прибиваем процесс по строму ID
+                    killTask(hostPort)
+                }
+            }
+        }
+
+        const strMapNodes = JSON.stringify(newHosts, null, 2);
+        const strTask = JSON.stringify(tasks, null, 2);
+
+        await writeData('./database/tasks.json', strTask);
+        await writeData('./database/hosts.json', strMapNodes);
     } catch (error) {
         throw error;
     }
@@ -94,59 +136,74 @@ export async function readProject() {
 }
 
 export function writeProject(data) {
-    writeData('database/project.db', data);
+    writeData('./database/project.db', data);
 }
 
 export async function launchTasks() {
-    const strTasks = (await readData('database/tasks.json', 'utf-8')).toString();
-    const taskList = JSON.parse(strTasks) as TTaskList
+    const taskList: TTaskList = await getTasks();
     Object.values(taskList).forEach(({id, nodeName, cfg, in: input, out}) => {
 
     })
-
-    let port = '3000';
-    let path = pathResolveRoot('./nodes/sum/launch.bat')
-    const child = spawn('start', ['/B', path, port, 'umWGlpu'], {
-        cwd: './nodes/sum',
-        shell: true,
-        // detached: true,     // Открепляет процесс
-        stdio: 'ignore'     // Игнорирует стандартные потоки ввода/вывода
-    });
-    child.unref();
-
     return;
+}
+
+export async function getStatusTask({id = null, host = null, port = null}): Promise<TStatus> {
+    try {
+        if (id && !(host || port)) {
+            const hosts = getHosts();
+            host = hosts[id].host;
+            port = hosts[id].port;
+        }
+
+        const status: TStatus = await axios.get(`http://${host}:${port}/service/cmd/status`);
+        return status;
+    } catch (e) {
+        return <TStatus>{state: 'stop', hostPort: {host, port}, id}
+    }
 }
 
 export async function launchTask(id) {
-    const strTasks = (await readData('database/tasks.json', 'utf-8')).toString();
-    const taskList = JSON.parse(strTasks) as TTaskList
-    const {port: portNode, nodeName, cfg, in: input, out} = taskList[id];
+    const taskList: TTaskList = await getTasks();
+    const {nodeName, cfg, in: input, out, hostPort: {host, port: portNode}} = taskList[id];
 
     let path = pathResolveRoot(`./nodes/${nodeName}/launch.bat`)
 
-    try {
-        const child = spawn('start', ['/B', path, port, id], {
-            cwd: './nodes/sum',
-            shell: true,
-            // detached: true,  // Открепляет процесс
-            stdio: 'ignore'     // Игнорирует стандартные потоки ввода/вывода
-        });
-        child.unref();
-        console.log(child)
-    } catch (e) {
-        console.log(e)
-    }
 
-    return;
+    let {state} = await getStatusTask({host, port: portNode});
+    if (state == 'run') {
+        return `Сервис ${id} уже запущен`
+    } else {
+        //если сервис еще не запущен
+        try {
+            if (await isAllowHostPortServ(host, portNode)) {
+                const child = spawn('start', ['/B', path, global.port, id], { //запускаем
+                    cwd: './nodes/sum',
+                    shell: true,
+                    // detached: true,  // Открепляет процесс
+                    stdio: 'ignore'     // Игнорирует стандартные потоки ввода/вывода
+                });
+                child.unref();
+                console.log(child)
+                return `Команда на запуск сервиса ${id} принята`;
+            } else {
+                await addMess(<TMessage>{
+                    type: 'log',
+                    data: `Сервис:${id} запустить не удалось ${host}:${portNode} заняты`
+                })
+            }
+        } catch (e) {
+            console.log(e)
+            throw {status: 500, message: `Сервис ${id} запустить не удалось`};
+        }
+    }
 }
 
-export async function taskCMD(id, cmd) {
-    const strTasks = (await readData('database/tasks.json', 'utf-8')).toString();
-    const taskList = JSON.parse(strTasks) as TTaskList
-    const {port: portNode, nodeName, cfg, in: input, out, ip} = taskList[id];
+export async function taskCMD(id, cmd, data) {
+    const taskList: TTaskList = await getTasks();
+    const {nodeName, cfg, in: input, out, hostPort: {host, port: portNode}} = taskList[id];
 
     try {
-        const res = await axios.post(`http://${ip}:${portNode}/service/cmd`, {cmd})
+        const res = await axios.post(`http://${host}:${portNode}/service/cmd/${cmd}`, {data})
         console.log(res.data)
         return res.data.text;
     } catch (error) {
@@ -156,15 +213,107 @@ export async function taskCMD(id, cmd) {
 
 }
 
-
 export const getTaskData = async (id: string) => {
-    const strTasks = await readData('./database/tasks.json', 'utf-8');
-    const tasks = JSON.parse(strTasks);
-    const strHosts = await readData('./database/hosts.json', 'utf-8');
-    const hosts = JSON.parse(strHosts);
+    const tasks: TTaskList = await getTasks();
+    const hosts = await getHosts();
 
     let task = tasks[id]
-    task.host = hosts;
 
-    return task;
+    return {task, hosts};
+};
+
+export const addMess = async (mess: TMessage) => {
+    try {
+        if (mess.type == 'node-status') await updateListRunning(mess.data as TStatus);
+
+        (global.messageSocket as WEBSocket).send(mess)
+    } catch (e) {
+        throw e;
+    }
+
+    return `Сообщение добавлено`;
+};
+
+const clearListRunningNow = async () => {
+    let listRun: THost = await getListRun() || {};
+    let hosts = await getHosts() || {};
+
+    for (const [idr, {host, port}] of Object.entries(listRun)) {
+        const hp = hosts[idr];
+        if (!hp || hp.host != host || hp.port != port) {
+            await killTask({host, port})
+            delete listRun[idr];
+        }
+    }
+    for (const [idr, {host, port}] of Object.entries(listRun)) {
+        const {state} = await getStatusTask({host, port});
+        if (state == 'stop') {
+            delete listRun[idr];
+        }
+    }
+
+};
+
+export const clearListRunning = debounce(clearListRunningNow, 2000)
+
+export const updateListRunning = async ({id, hostPort, state}: TStatus) => {
+    let listRun: THost = await getListRun() ?? {};
+
+    if (state == "run" || state == "error") {
+        listRun[id] = <THostPort>hostPort;
+    }
+    if (listRun?.[id] && state == "stop") {
+        delete listRun[id];
+    }
+
+    await clearListRunning();
+
+
+    const strListRun = JSON.stringify(listRun);
+    writeData('./database/running.json', strListRun);
+}
+
+
+export const isAllowHostPortServ = async (host, portNode, id = null): Promise<boolean> => {
+    try {
+        if (id) {
+            const hosts = await getHosts()
+            if (hosts[id].host == host && hosts[id].port == portNode) {
+                return new Promise<boolean>(r => r(true))
+            }
+        }
+
+        const isLocal = await isLocalhost(domainToASCII(host), true);
+        if (isLocal) {
+            return new Promise<boolean>((resolve) => {
+
+                const server = net.createServer();
+
+                server.once('error', function (err) {
+                    if (err.code === 'EADDRINUSE') {
+                        resolve(false)
+                    }
+                });
+
+                server.once('listening', function () {
+                    server.close();
+                    resolve(true)
+                });
+
+                server.listen(portNode);
+            });
+        } else {
+            try {
+                //TODO: 3000 - порт заменить на значение порта из карты агентов
+                const {data: isAllow} = await axios.get(`http://${host}:3000/api/v1/service/host-port/${host}/${portNode}`)
+                return isAllow;
+            } catch (e) {
+                return false;
+            }
+        }
+
+    } catch (error) {
+        if (error?.name == 'AxiosError') throw {status: error.response.status, message: error.message};
+        throw error;
+    }
 };

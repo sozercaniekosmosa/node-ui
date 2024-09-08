@@ -5,12 +5,11 @@
     "arrIn": ["A", "B"],
     "arrOut": ["y"],
     "cfg": {
+        "сеть": [
+            {"name": "hostPort", "type": "host-port", "val": {"host":"localhost", "port": 0}, "title": "Адрес и порт", "arrOption": []}
+        ],
         "общие": [
             {"name": "qwq", "type": "number", "val": 2.2, "title": "Какой-то параметр", "arrOption": []}
-        ],
-        "сеть": [
-            {"name": "ip", "type": "string", "val": "localhost", "title": "ip-адрес", "arrOption": []},
-            {"name": "port", "type": "number", "val": 3000, "title": "порт", "arrOption": []}
         ]
     },
 

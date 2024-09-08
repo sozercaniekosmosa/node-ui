@@ -2,7 +2,8 @@ import React, {useEffect, useRef, useState} from 'react';
 import './style.css';
 import {NodeUI} from "./node-ui/node-ui";
 import {Point} from "./node-ui/svg";
-import {decompress, compress, decompressString, compressString} from '../utils'
+import {decompress, compress, decompressString, compressString, eventBus} from '../utils'
+import {TMessage} from "../../../general/types";
 
 
 export type TEventEditor = {
@@ -33,8 +34,27 @@ export function Editor({newNode, onEvent}) {
         nui.svg.addEventListener('node-remove', (e: CustomEvent) => eventEmit({name: 'node-remove'}))
         nui.svg.addEventListener('node-cmd', (e: CustomEvent) => eventEmit({name: 'node-cmd', data: e.detail}))
 
-
         eventEmit({name: 'init', data: nuiRef.current})
+
+        eventBus.addEventListener('message-socket', ({type, data: {id, state}}: TMessage) => {
+            switch (type) {
+                case "node-status":
+                    const node = nui.svg.querySelector(`#${id}`);
+                    if (node) {
+                        const nodeDest = node.querySelector(`.node-status`)
+                        let fill = '#dcdcdc';
+                        if (state) {
+                            (state === 'run') && (fill = '#00ff3c');
+                            (state === 'error') && (fill = '#ff006a');
+                            (state === 'stop') && (fill = '#dcdcdc');
+                        }
+                        nui.setProperty(nodeDest, {fill, data: {state}})
+                    } else {
+                        console.log(type, state)
+                    }
+                    break;
+            }
+        })
     }, []);
 
     function onMouseDown(e) {
