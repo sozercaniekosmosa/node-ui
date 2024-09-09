@@ -36,13 +36,6 @@ export default function ({name, val, onChange, node}) {
     const refHost = useRef(null)
     const refPort = useRef(null)
 
-    // eventBus.addEventListener('message-socket', ({type, dest, data}: TMessage) => {
-    //     switch (type) {
-    //         case "node-status":
-    //             break;
-    //     }
-    // })
-
     useEffect(() => {
         changeHandling();
     }, [])

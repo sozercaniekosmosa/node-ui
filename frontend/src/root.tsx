@@ -56,19 +56,19 @@ function Root() {
     const [nodeDataSelected, setNodeDataSelected] = useState(null);
 
     function onKeyDown(e) {
-        if (!e.target.classList.contains('editor')){
-            // e.preventDefault();
-            return;
-        }
+
         const code = camelToKebab(e.code).toLowerCase();
         if (arrKey[code]) return;
         arrKey[code] = true;
 
-        if (arrKey?.['escape']) arrKey = [];
         if (arrKey?.['control-left'] && arrKey?.['key-s']) {
             onEventHandler({name: 'save'});
             e.preventDefault();
         }
+
+        if (!e.target.classList.contains('editor')) return;
+
+        if (arrKey?.['escape']) arrKey = [];
         if (arrKey?.['control-left'] && arrKey?.['key-z']) onEventHandler({name: 'undo'});
         if (arrKey?.['control-left'] && arrKey?.['key-y']) onEventHandler({name: 'redo'});
         if (arrKey?.['control-left'] && arrKey?.['key-c']) {

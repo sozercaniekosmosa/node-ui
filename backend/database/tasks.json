@@ -3,35 +3,39 @@
     "cfg": [
       [
         "qwq",
-        2.2,
+        5.2,
         "number"
       ]
     ],
     "hostPort": {
       "host": "localhost",
-      "port": "3001"
+      "port": 3001
     },
     "id": "umWGlpu",
     "nodeName": "sum",
     "in": {
       "A": [
-        "unRTo2Z.out"
+        "unT15yu.out"
       ]
     }
   },
-  "unRTo2Z": {
+  "unT15yu": {
     "cfg": [
       [
         "ce",
-        "for (var i = 0; i < Things.length; i++) {\n    Things[i]\n}",
+        {
+          "code": "def fname(`indent('.') ? 'self' : ''`):\n    \"\"\"docstring for fname\"\"\"\n    # some comments",
+          "lang": "python",
+          "theme": "textmate"
+        },
         "code-editor"
       ]
     ],
     "hostPort": {
       "host": "localhost",
-      "port": 3000
+      "port": 3004
     },
-    "id": "unRTo2Z",
+    "id": "unT15yu",
     "nodeName": "action",
     "out": {
       "out": [

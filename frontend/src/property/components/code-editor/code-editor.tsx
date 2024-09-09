@@ -24,14 +24,12 @@ import "ace-builds/src-noconflict/snippets/javascript";
 import "ace-builds/src-noconflict/mode-python";
 import "ace-builds/src-noconflict/snippets/python";
 
-
+let code;
 export default function ({name, val, onChange, node}) {
 
-    const [theme, setTheme] = useState('github')
-    const [lang, setLang] = useState('javascript')
-    const refHostPort = useRef(null)
-    const refHost = useRef(null)
-    const refPort = useRef(null)
+    code = val.code
+    const [lang, setLang] = useState(val.lang ?? 'javascript')
+    const [theme, setTheme] = useState(val.theme ?? 'github')
 
     // eventBus.addEventListener('message-socket', ({type, dest, data}: TMessage) => {
     //     switch (type) {
@@ -40,13 +38,24 @@ export default function ({name, val, onChange, node}) {
     //     }
     // })
 
-    async function changeHandling(newValue) {
-        onChange(name, newValue)
+    function changeCode(newValue) {
+        code = newValue;
+        onChange(name, {code, lang, theme})
     }
 
-    return <div className="code-editor" ref={refHostPort}>
-        <div>
-            <select name="Theme" onChange={({target}) => setTheme(target.value)} value={theme}>
+    function changeTheme({target}) {
+        setTheme(target.value)
+        onChange(name, {code, lang, theme: target.value})
+    }
+
+    function changeLang({target}) {
+        setLang(target.value)
+        onChange(name, {code, lang: target.value, theme})
+    }
+
+    return <div className="code-editor">
+        <div className="code-editor__control">
+            <select name="Theme" onChange={changeTheme} value={theme!}>
                 <option value="monokai">monokai</option>
                 <option value="github">github</option>
                 <option value="tomorrow">tomorrow</option>
@@ -57,10 +66,8 @@ export default function ({name, val, onChange, node}) {
                 <option value="solarized_dark">solarized_dark</option>
                 <option value="solarized_light">solarized_light</option>
                 <option value="terminal">terminal</option>
-            </select>
-        </div>
-        <div>
-            <select name="Lang" onChange={({target}) => setLang(target.value)}>
+            </select>&nbsp;
+            <select name="Lang" onChange={changeLang} value={lang!}>
                 <option value="javascript">javascript</option>
                 <option value="python">python</option>
             </select>
@@ -71,7 +78,7 @@ export default function ({name, val, onChange, node}) {
             height="100%"
             mode={lang}
             theme={theme}
-            onChange={changeHandling}
+            onChange={changeCode}
             name="ace-editor"
             editorProps={{$blockScrolling: true}}
             setOptions={{
@@ -80,7 +87,7 @@ export default function ({name, val, onChange, node}) {
                 enableLiveAutocompletion: true,
                 enableSnippets: true
             }}
-            value={val}
+            value={code}
         />
     </div>
 }

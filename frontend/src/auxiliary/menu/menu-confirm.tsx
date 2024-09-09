@@ -35,16 +35,20 @@ export const MenuConfirm: React.FC<IMenuConfirmProps> = (
         showMenu(false);
     }
 
-    function onCancel() {
+    function onNo() {
         onClickNo && onClickNo();
         refCallback.current(false)
+        showMenu(false);
+    }
+
+    function onCancel() {
         showMenu(false);
     }
 
     function onKeyDown(e) {
         const key = e.code.toLowerCase();
         if (key == 'enter' || key == 'numpadenter') {
-            if (refSelBtn.current == refOk.current) onOk(); else onCancel();
+            if (refSelBtn.current == refOk.current) onOk(); else onNo();
         }
         if (key == 'escape') onCancel();
         if (key == 'arrowright') {
@@ -72,7 +76,7 @@ export const MenuConfirm: React.FC<IMenuConfirmProps> = (
                 <div>{desc}</div>
                 <div className="menu-confirm__buttons">
                     <button onClick={onOk} ref={refOk} tabIndex={-1}>Да</button>
-                    <button onClick={onCancel} ref={refCancel} tabIndex={-1}>Нет</button>
+                    <button onClick={onNo} ref={refCancel} tabIndex={-1}>Нет</button>
                 </div>
             </div>
         </div>);

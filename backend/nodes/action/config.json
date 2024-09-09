@@ -10,7 +10,7 @@
             {"name": "hostPort", "type": "host-port", "val": {"host":"localhost", "port": 3000}, "title": "Адрес и порт", "arrOption": []}
         ],
         "общие": [
-            {"name": "ce", "type": "code-editor", "val": "", "title": "", "arrOption": ["tab"]}
+            {"name": "ce", "type": "code-editor", "val": {"code": ""}, "title": "", "arrOption": ["tab"]}
         ]
     },
 

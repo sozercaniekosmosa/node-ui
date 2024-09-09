@@ -16,24 +16,20 @@ export type TEventProperty = {
 let arrKey = {};
 
 export function Property({setNode, onEvent}) {
-    const [, setUpdateNow] = useState(0); //для перерисовки компонента
-    let nodeName: string = '';
 
-    let refHeader = useRef(null); //флаг -- капсула запущена
-    let refChanged = useRef(null); //флаг -- компонент изменен
+    let nodeName: string = '';
+    const [show, setShow] = useState(false);
+    useEffect(() => {
+        show && refProp.current.focus();
+    }, [show])
+
+
+    let refHeader = useRef(null);
     let refArrCfg = useRef([]);
-    let refIsWasChange = useRef(false);
+    let [isChanged, setIsChanged] = useState(false); //флаг -- компонент изменен
 
     let refProp = useRef(null);
     let refPropTabs = useRef(null);
-
-    const show = (isShow) => {
-        arrKey = {};
-        setUpdateNow(conut => conut + 1); //при каждом показе/скрытиии перерисовываем}
-        refProp.current.classList[isShow ? 'remove' : 'add']('prop--hide');
-        refProp.current.focus();
-        refChanged.current.innerHTML = '';
-    }
 
     if (setNode) {
         nodeName = setNode.dataset.nodeName;
@@ -42,8 +38,9 @@ export function Property({setNode, onEvent}) {
     }
 
     eventBus.addEventListener('menu-property-show', () => {
-        refIsWasChange.current = false;
-        show(true)
+        setIsChanged(false);
+        arrKey = {};
+        setShow(true)
     })
 
     eventBus.addEventListener('message-socket', ({type, data: {id, state}}) => {
@@ -60,7 +57,7 @@ export function Property({setNode, onEvent}) {
                     (state === 'error') && (fill = '#ff5967');
                     (state === 'stop') && (fill = '#dcdcdc');
                 }
-                refHeader.current.style.backgroundColor = fill;
+                refHeader.current && (refHeader.current.style.backgroundColor = fill);
 
                 break;
         }
@@ -82,36 +79,33 @@ export function Property({setNode, onEvent}) {
                 if (_name == name) {
                     let isChanged: boolean = typeof val == 'object' ? JSON.stringify(val) != JSON.stringify(_val) : val != _val;
                     if (isChanged) {
-                        refIsWasChange.current = true;
+                        setIsChanged(true);
                         refArrCfg.current[tabName][i] = {name, type, val, title, arrOption}
-                        refChanged.current.innerHTML = '*';
                     }
                 }
             })
         })
-        // setNode.dataset.cfg = compressString(JSON.stringify(arrCfg));
-        // console.log(refArrCfg.current)
-        // console.log(setNode.dataset.cfg)
     }
 
     let onApply = () => {
-        if (refIsWasChange.current) {
+        if (isChanged) {
+            console.log('apply')
             setNode.dataset.cfg = compressString(JSON.stringify(refArrCfg.current));
             onEvent({name: 'property-change', data: setNode})
         }
-        show(false)
+        setShow(false)
     };
     let onCancel = () => {
-        if (refIsWasChange.current) {
+        if (isChanged) {
             eventBus.dispatchEvent('confirm', (isYes) => {
                 if (isYes) {
                     setNode.dataset.cfg = compressString(JSON.stringify(refArrCfg.current));
-                    // onChange(setNode, refArrCfg.current)
+                    onEvent({name: 'property-change', data: setNode})
                 }
-                show(false)
+                setShow(false)
             }, 'Сохранить изменения?')
         } else {
-            show(false)
+            setShow(false)
         }
     }
 
@@ -143,15 +137,15 @@ export function Property({setNode, onEvent}) {
 
 
     return (
-        <div className="prop prop--hide" ref={refProp} tabIndex={-1}
-             onKeyDown={onKeyDown}
-             onKeyUp={onKeyUp}
-             onClick={({target}) => (target as Element).classList.contains('prop') && onCancel()}>
+        show ? <div className="prop" ref={refProp} tabIndex={-1}
+                    onKeyDown={onKeyDown}
+                    onKeyUp={onKeyUp}
+                    onClick={({target}) => (target as Element).classList.contains('prop') && onCancel()}>
             <div className="prop__menu">
                 <div className="prop__header" ref={refHeader}>
                     <div>
                         Конфигуратор: {nodeName}
-                        <div ref={refChanged} style={{display: 'inline'}}></div>
+                        <div style={{display: 'inline'}}>{isChanged ? '*' : ''}</div>
                     </div>
                     <button onClick={onCancel}>
                         <div className="icon-cross" style={{width: '16px', height: '16px'}}></div>
@@ -170,7 +164,7 @@ export function Property({setNode, onEvent}) {
                     {Object.entries(refArrCfg.current).map(([tabName, arrParam], iTab) => {
                         const isTab = arrParam?.[0]?.arrOption?.[0] == 'tab';
                         return (
-                            <div className={"tab__body__item" + (isTab ? " tab__body__item--contents":"")} key={iTab}
+                            <div className={"tab__body__item" + (isTab ? " tab__body__item--contents" : "")} key={iTab}
                                  style={iTab !== 0 ? {display: 'none'} : {}}>
                                 {arrParam.map(({name, type, val, title, arrOption}, i) => {
                                     let comp = listTypeComponent[type] ? listTypeComponent[type] : noType(type);
@@ -204,7 +198,7 @@ export function Property({setNode, onEvent}) {
                     <button onClick={onCancel}>Отмена</button>
                 </div>
             </div>
-        </div>
+        </div> : ''
     )
 }
 

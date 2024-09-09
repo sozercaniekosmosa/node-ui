@@ -5,6 +5,10 @@
   height: -webkit-fill-available;
   margin: 1em;
 }
+.code-editor__control {
+  align-self: end;
+  margin-bottom: 0.5em;
+}
 .code-editor__editor {
   border: 1px solid #e7e7e7;
 }

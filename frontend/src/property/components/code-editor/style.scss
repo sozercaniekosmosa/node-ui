@@ -8,6 +8,11 @@ $color-gray: rgba(128, 128, 128, 0.5);
   height: -webkit-fill-available;
   margin: 1em;
 
+  &__control {
+    align-self: end;
+    margin-bottom: 0.5em;
+  }
+
   &__editor {
     border: 1px solid #e7e7e7;
   }

@@ -277,8 +277,9 @@ export const updateListRunning = async ({id, hostPort, state}: TStatus) => {
 export const isAllowHostPortServ = async (host, portNode, id = null): Promise<boolean> => {
     try {
         if (id) {
-            const hosts = await getHosts()
-            if (hosts[id].host == host && hosts[id].port == portNode) {
+            const hosts = await getHosts();
+            const listRun = await getListRun();
+            if (listRun[id] && hosts[id].host == host && hosts[id].port == portNode) { //если сервис запущен и хост с портом совпадают то true
                 return new Promise<boolean>(r => r(true))
             }
         }
