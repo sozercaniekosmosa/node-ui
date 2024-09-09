@@ -1,0 +1,26 @@
+.code-editor {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  height: -webkit-fill-available;
+  margin: 1em;
+}
+.code-editor__editor {
+  border: 1px solid #e7e7e7;
+}
+.code-editor__host {
+  min-width: 2em;
+  max-width: 8em;
+  border: 1px solid rgba(128, 128, 128, 0.21);
+  margin: 0 0.5em;
+  text-align: center;
+}
+.code-editor__port {
+  min-width: 2em;
+  max-width: 4em;
+  border: 1px solid rgba(128, 128, 128, 0.21);
+  margin: 0 0.5em;
+  text-align: center;
+}
+
+/*# sourceMappingURL=style.css.map */

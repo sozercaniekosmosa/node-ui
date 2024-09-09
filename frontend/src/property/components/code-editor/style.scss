@@ -1,0 +1,31 @@
+$color-gray: rgba(128, 128, 128, 0.5);
+
+.code-editor {
+
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  height: -webkit-fill-available;
+  margin: 1em;
+
+  &__editor {
+    border: 1px solid #e7e7e7;
+  }
+
+  &__host {
+    min-width: 2em;
+    max-width: 8em;
+    border: 1px solid rgba(128, 128, 128, 0.21);
+    margin: 0 .5em;
+    text-align: center;
+  }
+
+  &__port {
+    min-width: 2em;
+    max-width: 4em;
+    border: 1px solid rgba(128, 128, 128, 0.21);
+    margin: 0 .5em;
+    text-align: center;
+  }
+
+}
