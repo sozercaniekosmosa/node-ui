@@ -6,6 +6,7 @@ import backend from "../../src/service/service-backend";
 import Number from "./components/number/number"
 import HostPort from "./components/host-port/host-port";
 import String from "./components/string/string";
+import CodeEditor from "./components/code-editor/code-editor";
 
 export type TEventProperty = {
     name: 'property-change',
@@ -37,6 +38,7 @@ export function Property({setNode, onEvent}) {
     if (setNode) {
         nodeName = setNode.dataset.nodeName;
         refArrCfg.current = JSON.parse(decompressString(setNode.dataset.cfg)!);
+        console.log(refArrCfg.current)
     }
 
     eventBus.addEventListener('menu-property-show', () => {
@@ -70,17 +72,18 @@ export function Property({setNode, onEvent}) {
         'number': Number,
         'string': String,
         'host-port': HostPort,
+        'code-editor': CodeEditor,
     }
 
     const onChangeParam = (name, val) => {
 
         Object.entries(refArrCfg.current).forEach(([tabName, arrParam]) => {
-            arrParam.forEach(({name: _name, type, val: _val, title}, i) => {
+            arrParam.forEach(({name: _name, type, val: _val, title, arrOption}, i) => {
                 if (_name == name) {
                     let isChanged: boolean = typeof val == 'object' ? JSON.stringify(val) != JSON.stringify(_val) : val != _val;
                     if (isChanged) {
                         refIsWasChange.current = true;
-                        refArrCfg.current[tabName][i] = {name, type, val, title}
+                        refArrCfg.current[tabName][i] = {name, type, val, title, arrOption}
                         refChanged.current.innerHTML = '*';
                     }
                 }
@@ -165,24 +168,31 @@ export function Property({setNode, onEvent}) {
                 </div>
                 <div className="tab__body" ref={refPropTabs}>
                     {Object.entries(refArrCfg.current).map(([tabName, arrParam], iTab) => {
+                        const isTab = arrParam?.[0]?.arrOption?.[0] == 'tab';
                         return (
-                            <div className="tab__body__item" key={iTab} style={iTab !== 0 ? {display: 'none'} : {}}>
+                            <div className={"tab__body__item" + (isTab ? " tab__body__item--contents":"")} key={iTab}
+                                 style={iTab !== 0 ? {display: 'none'} : {}}>
                                 {arrParam.map(({name, type, val, title, arrOption}, i) => {
                                     let comp = listTypeComponent[type] ? listTypeComponent[type] : noType(type);
                                     let arrStyle = [];
                                     if (arrOption) {
-                                        let setCSS = new Set(['inline', 'center', 'right', 'left', '2', '3', 'hr'])
+                                        let setCSS = new Set(['center', 'right', 'left', '1', '2', '3', 'hr', 'tab'])
                                         arrOption.forEach(it => { //inline, center, right, left, 2, 3, hr
                                             if (setCSS.has(it)) arrStyle.push('prop__param--' + it)
                                         })
                                     }
 
-                                    let modeRun = setNode.querySelector('.node-status').dataset.state == "run";
                                     let props = {name, val, title, key: i, onChange: onChangeParam, node: setNode};
-                                    return <div className={"prop__param " + arrStyle.join(' ')} key={i}>
-                                        {title ? <div className="prop__param__name">{title + ':'}</div> : ''}
-                                        {createElement(comp, props)}
-                                    </div>
+                                    let res: React.ReactElement;
+                                    if (isTab) {
+                                        res = createElement(comp, props);
+                                    } else {
+                                        res = <div className={"prop__param " + arrStyle.join(' ')} key={i}>
+                                            {title ? <div className="prop__param__name">{title + ':'}</div> : ''}
+                                            {createElement(comp, props)}
+                                        </div>;
+                                    }
+                                    return res
                                 })}
                             </div>)
 

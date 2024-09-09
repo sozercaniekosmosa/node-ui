@@ -51,7 +51,7 @@ export default function ({name, val, onChange, node}) {
         setStatus('...')
 
         const host = refHost.current.value;
-        const port = refPort.current.value;
+        const port = +refPort.current.value;
 
         const isValidHost = validationHost(host, refHost.current);
         const isValidPort = validationPort(port, refPort.current);

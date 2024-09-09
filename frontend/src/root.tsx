@@ -1,4 +1,4 @@
-import React, {useEffect, useState, StrictMode} from 'react';
+import React, {useEffect, useState} from 'react';
 import ReactDOM from 'react-dom/client';
 import './style.css';
 import './auxiliary/icon/style.css';
@@ -8,11 +8,11 @@ import {Editor, TEventEditor} from "./editor/editor";
 import {Header, TEventHeader} from "./header/header";
 import History from './service/history'
 import {MenuConfirm} from "./auxiliary/menu/menu-confirm";
-import {camelToKebab, compressString, decompressString, eventBus} from "./utils"
+import {camelToKebab, eventBus} from "./utils"
 import {
-    writeProject, readProject, startTask, stopTask, getToolbox, sendCmd, createMessageSocket, isAllowHostPort, webSocket
+    createMessageSocket, getToolbox, readProject, sendCmd, startTask, stopTask, writeProject
 } from './service/service-backend'
-import {copy, past, cut} from "./service/cpc";
+import {copy, cut, past} from "./service/cpc";
 import {NodeSelector} from "./editor/node-ui/node-ui";
 
 // if (!import.meta.env.PROD) import listNode from "../../nodes/src/nodes"
@@ -23,7 +23,6 @@ let history;
 let nui = null;
 let arrSelected: Element[] | undefined = [];
 let arrKey = [];
-
 let nodeFocus;
 
 console.log(import.meta.env.MODE)
@@ -57,6 +56,10 @@ function Root() {
     const [nodeDataSelected, setNodeDataSelected] = useState(null);
 
     function onKeyDown(e) {
+        if (!e.target.classList.contains('editor')){
+            // e.preventDefault();
+            return;
+        }
         const code = camelToKebab(e.code).toLowerCase();
         if (arrKey[code]) return;
         arrKey[code] = true;
@@ -161,6 +164,10 @@ function Root() {
                 console.log(name, data)
                 break;
         }
+    }
+
+    function onChange(newValue) {
+        console.log("change", newValue);
     }
 
     return (<>

@@ -5,6 +5,7 @@
   right: 0;
   bottom: 0;
   background-color: rgba(80, 80, 80, 0.5019607843);
+  z-index: 999999;
 }
 
 .menu-confirm {

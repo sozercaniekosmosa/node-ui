@@ -32,6 +32,9 @@
   padding: 0.2em 0.4em;
   border-bottom: 1px solid rgba(128, 128, 128, 0.5);
 }
+.prop__param--1 {
+  width: 100%;
+}
 .prop__param--2 {
   width: 50%;
 }
@@ -63,15 +66,6 @@
   text-overflow: ellipsis;
   /* width: 126px; */
   overflow: hidden;
-}
-.prop__param__number {
-  min-width: 2em;
-  max-width: 4em;
-}
-.prop__param__string {
-  min-width: 2em;
-  max-width: 16em;
-  border: 1px solid rgba(128, 128, 128, 0.21);
 }
 .prop__param--text-center {
   text-align: center;
@@ -128,6 +122,9 @@
 }
 .tab__body__item > * {
   margin: 0.5em 0;
+}
+.tab__body__item--contents {
+  display: contents;
 }
 
 /*# sourceMappingURL=style.css.map */

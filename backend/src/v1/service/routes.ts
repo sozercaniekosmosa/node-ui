@@ -1,7 +1,7 @@
 import express from "express";
 
 import {
-    getProject, getTask, getToolbox, cmdTask, startTask, startTasks, stopTasks, updateProject, updateTasks, addMessage, getAllMessage,
+    getProject, getTask, getToolbox, cmdTask, startTask, startTasks, stopTasks, updateProject, updateTasks, addMessage,
     isAllowHostPort
 } from "./controller";
 
