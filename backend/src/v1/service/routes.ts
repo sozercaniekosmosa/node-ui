@@ -1,7 +1,7 @@
 import express from "express";
 
 import {
-    getProject, getTask, getToolbox, cmdTask, startTask, startTasks, stopTasks, updateProject, updateTasks, addMessage,
+    readProject, getTask, getToolbox, cmdTask, startTask, startTasks, stopTasks, updateProject, updateTasks, addMessage,
     isAllowHostPort
 } from "./controller";
 
@@ -12,7 +12,7 @@ const router = express.Router();
 // GET — получение данных.
 // router.get('/', getProject);
 router.get('/toolbox', getToolbox);
-router.get('/project', getProject);
+router.get('/project', readProject);
 
 // PUT — полное обновление данных.
 // router.put('/', updateProject);

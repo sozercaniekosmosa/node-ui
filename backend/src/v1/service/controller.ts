@@ -1,8 +1,7 @@
-import {
-    addMess, getAllMess, getComponents, getTaskData, launchTask, launchTasks, readProject, taskCMD, writeProject, writeTasks,
-    isAllowHostPortServ
-} from "./service";
+import {getComponents} from "./service/service";
 import {validationResult} from "express-validator";
+import {getTaskData, launchTask, launchTasks, taskCMD, writeTasks} from "./service/task";
+import {addMess, isAllowHostPortServ, getProject, setProject} from "./service/general";
 
 export const getToolbox = async (req: any, res: any) => {
     try {
@@ -14,11 +13,11 @@ export const getToolbox = async (req: any, res: any) => {
     }
 };
 
-export const getProject = async (req: any, res: any) => {
+export const readProject = async (req: any, res: any) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) res.status(400).send({error: errors.array()});
     try {
-        const data = await readProject();
+        const data = await getProject();
         res.send(data);
     } catch (error: any) {
         res.status(error.status || 500).send({error: error?.message || error},);
@@ -28,7 +27,7 @@ export const getProject = async (req: any, res: any) => {
 export const updateProject = async (req: any, res: any) => {
     const {body: data} = req;
     try {
-        await writeProject(data);
+        await setProject(data);
         res.send('project written');
     } catch (error: any) {
         res.status(error?.status || 500).send({error: error?.message || error});

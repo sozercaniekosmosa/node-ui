@@ -1,5 +1,5 @@
 import fs, {promises as fsPromises} from "fs";
-import path from "path";
+import path, {resolve} from "path";
 import net from "net";
 import isLocalhost from "is-localhost-ip";
 import {domainToASCII} from "node:url"
@@ -40,6 +40,7 @@ export const writeFileAsync = async (path: string, data: any): Promise<any> => {
         throw 'Ошибка записи файла: ' + path
     }
 };
+
 
 export async function getDirectories(srcPath: string) {
     const files = await fsPromises.readdir(srcPath);
@@ -185,3 +186,22 @@ export const throttle = (clb, ms) => {
 
     return wrapper;
 }
+
+const pathRoot = process.cwd();
+export const pathResolveRoot = (path: string) => resolve(pathRoot, ...path.split(/\\|\//));
+
+export const readData = async (path: string, options?): Promise<any> => {
+    try {
+        const data = await readFileAsync(path, options);
+        return data;
+    } catch (error) {
+        throw error;
+    }
+};
+export const writeData = (path: string, data: any): any => {
+    try {
+        writeFileAsync(pathResolveRoot(path), data);
+    } catch (error) {
+        throw error;
+    }
+};

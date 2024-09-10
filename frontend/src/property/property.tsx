@@ -31,7 +31,7 @@ export function Property({setNode, onEvent}) {
     let refProp = useRef(null);
     let refPropTabs = useRef(null);
 
-    if (setNode) {
+    if (show && setNode) {
         nodeName = setNode.dataset.nodeName;
         refArrCfg.current = JSON.parse(decompressString(setNode.dataset.cfg)!);
         console.log(refArrCfg.current)

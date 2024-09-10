@@ -6,10 +6,10 @@ import bodyParser from "body-parser";
 import apicache from "apicache";
 import v1ServiceRouter from "./v1/service/routes";
 import global from "./global";
-import {WEBSocket} from "./utils";
-import {addMess, getStatusTask, readData} from "./v1/service/service";
-import {TState, TStatus, TTaskList} from "../../general/types";
-import axios from "axios";
+import {readData, WEBSocket} from "./utils";
+import {TTaskList} from "../../general/types";
+import {getStatusTask} from "./v1/service/service/task";
+import {addMess, getTasks} from "./v1/service/service/general";
 
 
 const {parsed: {PORT}} = config();
@@ -25,9 +25,10 @@ function createWebServer(port): any | null {
     const app = express();
     const cache = apicache.middleware;
 
-    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+    app.use(bodyParser.json({limit: '50mb'}));
     app.use(bodyParser.raw());
-    app.use(bodyParser.text());
+    app.use(bodyParser.text({limit: '50mb'}));
 // app.use(express.raw({ type: 'application/octet-stream' }));
 // app.use(cache('2 minutes'));
     app.use('/api/v1/service', v1ServiceRouter);
@@ -40,8 +41,7 @@ function createWebServer(port): any | null {
         clbAddConnection: async () => {
             let _id, _hostPort;
             try {
-                const strTasks = (await readData('database/tasks.json', 'utf-8')).toString();
-                const taskList = JSON.parse(strTasks) as TTaskList
+                const taskList = await getTasks() as TTaskList
                 for (const {hostPort, id} of Object.values(taskList)) {
                     _hostPort = hostPort;
                     const {host, port: portNode} = hostPort;
