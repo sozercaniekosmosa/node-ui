@@ -6,7 +6,7 @@ import * as Buffer from "buffer";
 
 import global from "../../../global"
 import axios from "axios";
-import {THost, THostPort, TMessage, TStatus, TTaskList} from "../../../../../general/types";
+import {THost, THostPort, TMessage, TRunningList, TStatus, TTaskList} from "../../../../../general/types";
 import isLocalhost from "is-localhost-ip";
 import {domainToASCII} from "node:url";
 import net from "net";
@@ -39,33 +39,41 @@ export const getCashFileData = async <T>(path, name, asString = false): Promise<
     return <T>data;
 }
 
-export const setCashFileDataNow = async (path, name, data, asString = false): Promise<void> => {
+let listQueue = {};
+export const setCashFileDataWait = throttle(async (list): Promise<void> => {
     let strData: string;
     try {
-        global[name] = data;
-        strData = asString ? data : JSON.stringify(data, null, 2);
-        await writeData(path, strData);
-        console.log('файл:' + path, 'сохранен')
+        for (const {path, name, data, asString = false} of Object.values(list)) {
+            global[name] = data;
+            strData = asString ? data : JSON.stringify(data, null, 2);
+            await writeData(path, strData);
+            console.log('файл:' + path, 'сохранен')
+        }
+        listQueue = {}
     } catch (e) {
         console.log(e)
     }
-}
+}, 2000)
 
-export const setCashFileData = <(path, name, data, asString?) => Promise<void>>throttle(setCashFileDataNow, 2000);
+export const setCashFileData = async (path, name, data, asString = false): Promise<void> => {
+    listQueue[name] = {path, name, data, asString};
+    global[name] = data;
+    await setCashFileDataWait(<any>listQueue)
+};
 
-export const getTasks = async (): Promise<TTaskList> => await getCashFileData('./database/tasks.json', 'tasks')
-export const setTasks = async (tasks): Promise<void> => await setCashFileData('./database/tasks.json', 'tasks', tasks)
+export const readTasks = async (): Promise<TTaskList> => await getCashFileData('./database/tasks.json', 'tasks')
+export const writeTasks = async (tasks): Promise<void> => await setCashFileData('./database/tasks.json', 'tasks', tasks)
 
-export const getHosts = async (): Promise<THost> => await getCashFileData('./database/hosts.json', 'hosts')
-export const setHosts = async (hosts): Promise<void> => await setCashFileData('./database/hosts.json', 'hosts', hosts)
+export const readHosts = async (): Promise<THost> => await getCashFileData('./database/hosts.json', 'hosts')
+export const writeHosts = async (hosts): Promise<void> => await setCashFileData('./database/hosts.json', 'hosts', hosts)
 
-export const getRunning = async (): Promise<THost> => await getCashFileData('./database/running.json', 'running')
-export const setRunning = async (running): Promise<void> => await setCashFileData('./database/running.json', 'running', running)
+export const readRunning = async (): Promise<TRunningList> => await getCashFileData('./database/running.json', 'running')
+export const writeRunning = async (running): Promise<void> => await setCashFileData('./database/running.json', 'running', running)
 
-export const getProject = async (): Promise<string> => await getCashFileData('./database/project.db', 'project', true)
-export const setProject = async (str): Promise<void> => await setCashFileData('./database/project.db', 'project', str, true)
+export const readProject = async (): Promise<string> => await getCashFileData('./database/project.db', 'project', true)
+export const writeProject = async (str): Promise<void> => await setCashFileData('./database/project.db', 'project', str, true)
 
-export const getComponents = async () => {
+export const readToolbox = async () => {
     let arrDir = await getDirectories('./nodes/');
     let arrPath = arrDir.map(dir => './nodes/' + dir + '/config.json');
     let arrFile = await getDataFromArrayPath(arrPath);
@@ -75,7 +83,7 @@ export const getComponents = async () => {
 
 export const addMess = async (mess: TMessage) => {
     try {
-        if (mess.type == 'node-status') await updaterunningning(mess.data as TStatus);
+        if (mess.type == 'node-status') await setStateRunning(mess.data as TStatus);
 
         (global.messageSocket as WEBSocket).send(mess)
     } catch (e) {
@@ -85,50 +93,54 @@ export const addMess = async (mess: TMessage) => {
     return `Сообщение добавлено`;
 };
 
-const clearrunningningNow = async () => {
-    let running: THost = await getRunning() || {};
-    let hosts = await getHosts() || {};
+export const updateStatesRunningNow = async () => {
+    let running: TRunningList = await readRunning() || {};
+    let hosts = await readHosts() || {};
 
-    for (const [idr, {host, port}] of Object.entries(running)) {
-        const hp = hosts[idr];
+    //удаляем все которые не соответствуют настройкам
+    for (const [id, {host, port}] of Object.entries(running)) {
+        const hp = hosts[id];
         if (!hp || hp.host != host || hp.port != port) {
-            await killTask({host, port})
-            delete running[idr];
+            await killTask({host, port});
+            delete running[id];
         }
     }
-    for (const [idr, {host, port}] of Object.entries(running)) {
-        const {state} = await getStatusTask({host, port});
-        if (state == 'stop') {
-            delete running[idr];
+    for (const [id, {host, port}] of Object.entries(hosts)) {
+        const status = await getStatusTask({host, port});
+        if (status.state == 'stop') {
+            delete running[id];
+        } else { //если не stop значит запущен (run или error)
+            running[id] = status;
         }
     }
 
 };
 
-export const clearrunningning = debounce(clearrunningningNow, 2000)
+export const updateStatesRunning = debounce(updateStatesRunningNow, 2000)
 
-export const updaterunningning = async ({id, hostPort, state}: TStatus) => {
-    let running: THost = await getRunning() ?? {};
+export const setStateRunning = async (status: TStatus) => {
+    let running: TRunningList = await readRunning() ?? {};
+    const {id, hostPort, state} = status;
 
     if (state == "run" || state == "error") {
-        running[id] = <THostPort>hostPort;
+        running[id] = status;
     }
     if (running?.[id] && state == "stop") {
         delete running[id];
     }
 
-    await clearrunningning();
+    await updateStatesRunning();
 
 
-    await setRunning(running)
+    await writeRunning(running)
 }
 
 
 export const isAllowHostPortServ = async (host, portNode, id = null): Promise<boolean> => {
     try {
         if (id) {
-            const hosts = await getHosts();
-            const running = await getRunning();
+            const hosts = await readHosts();
+            const running = await readRunning();
             if (running[id] && hosts[id].host == host && hosts[id].port == portNode) { //если сервис запущен и хост с портом совпадают то true
                 return new Promise<boolean>(r => r(true))
             }

@@ -5,14 +5,14 @@ import {spawn} from "child_process";
 import global from "../../../global"
 import axios from "axios";
 import {TMessage, TStatus, TTaskList} from "../../../../../general/types";
-import {addMess, getHosts, getTasks, isAllowHostPortServ, setHosts, setTasks} from "./general";
+import {addMess, readHosts, readTasks, isAllowHostPortServ, writeHosts, writeTasks} from "./general";
 import {pathResolveRoot} from "../../../utils";
 
 
 export const killTask = async ({id = null, host = null, port = null}): any => {
     try {
         if (id) {
-            const hosts = getHosts();
+            const hosts = readHosts();
             host = hosts[id].host;
             port = hosts[id].port;
         }
@@ -24,8 +24,8 @@ export const killTask = async ({id = null, host = null, port = null}): any => {
     }
 }
 
-export const writeTasks = async (tasks: TTaskList): any => {
-    let oldHosts = await getHosts();
+export const storeTasks = async (tasks: TTaskList): any => {
+    let oldHosts = await readHosts();
 
     try {
         let newHosts = {}
@@ -41,8 +41,8 @@ export const writeTasks = async (tasks: TTaskList): any => {
             }
         }
 
-        await setTasks(tasks)
-        await setHosts(newHosts)
+        await writeTasks(tasks)
+        await writeHosts(newHosts)
 
     } catch (error) {
         throw error;
@@ -50,7 +50,7 @@ export const writeTasks = async (tasks: TTaskList): any => {
 };
 
 export async function launchTasks() {
-    const taskList: TTaskList = await getTasks();
+    const taskList: TTaskList = await readTasks();
     Object.values(taskList).forEach(({id, nodeName, cfg, in: input, out}) => {
 
     })
@@ -60,7 +60,7 @@ export async function launchTasks() {
 export async function getStatusTask({id = null, host = null, port = null}): Promise<TStatus> {
     try {
         if (id && !(host || port)) {
-            const hosts = getHosts();
+            const hosts = readHosts();
             host = hosts[id].host;
             port = hosts[id].port;
         }
@@ -73,7 +73,7 @@ export async function getStatusTask({id = null, host = null, port = null}): Prom
 }
 
 export async function launchTask(id) {
-    const taskList: TTaskList = await getTasks();
+    const taskList: TTaskList = await readTasks();
     const {nodeName, cfg, in: input, out, hostPort: {host, port: portNode}} = taskList[id];
 
     let path = pathResolveRoot(`./nodes/${nodeName}/launch.bat`)
@@ -109,7 +109,7 @@ export async function launchTask(id) {
 }
 
 export async function taskCMD(id, cmd, data) {
-    const taskList: TTaskList = await getTasks();
+    const taskList: TTaskList = await readTasks();
     const {nodeName, cfg, in: input, out, hostPort: {host, port: portNode}} = taskList[id];
 
     try {
@@ -123,9 +123,9 @@ export async function taskCMD(id, cmd, data) {
 
 }
 
-export const getTaskData = async (id: string) => {
-    const tasks: TTaskList = await getTasks();
-    const hosts = await getHosts();
+export const readTask = async (id: string) => {
+    const tasks: TTaskList = await readTasks();
+    const hosts = await readHosts();
 
     let task = tasks[id]
 

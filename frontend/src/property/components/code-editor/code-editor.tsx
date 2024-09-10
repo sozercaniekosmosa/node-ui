@@ -25,11 +25,19 @@ import "ace-builds/src-noconflict/mode-python";
 import "ace-builds/src-noconflict/snippets/python";
 
 let code;
-export default function ({name, val, onChange, node}) {
+let lang = 'javascript';
+let theme = 'github';
 
-    code = val.code
-    const [lang, setLang] = useState(val.lang ?? 'javascript')
-    const [theme, setTheme] = useState(val.theme ?? 'github')
+export default function ({name, val, onChange, node}) {
+    const [update, setUpdate] = useState(new Date())
+
+    useEffect(() => {
+        code = val.code
+        lang = val.lang ?? lang
+        theme = val.theme ?? theme
+        setUpdate((v) => v + 1)
+    }, [])
+
 
     // eventBus.addEventListener('message-socket', ({type, dest, data}: TMessage) => {
     //     switch (type) {
@@ -44,12 +52,14 @@ export default function ({name, val, onChange, node}) {
     }
 
     function changeTheme({target}) {
-        setTheme(target.value)
+        theme = target.value;
+        setUpdate(new Date())
         onChange(name, {code, lang, theme: target.value})
     }
 
     function changeLang({target}) {
-        setLang(target.value)
+        lang = target.value;
+        setUpdate(new Date())
         onChange(name, {code, lang: target.value, theme})
     }
 

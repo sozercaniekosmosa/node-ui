@@ -13,6 +13,7 @@ export interface THostPort {
     port: number
 }
 
+
 export interface THost {
     [key: string]: THostPort;
 }
@@ -46,4 +47,8 @@ export interface TStatus {
     state: TState;
     id: string;
     hostPort: THostPort;
+}
+
+export interface TRunningList {
+    [key: string]: TStatus;
 }

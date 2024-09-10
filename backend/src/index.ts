@@ -9,13 +9,15 @@ import global from "./global";
 import {readData, WEBSocket} from "./utils";
 import {TTaskList} from "../../general/types";
 import {getStatusTask} from "./v1/service/service/task";
-import {addMess, getTasks} from "./v1/service/service/general";
+import {addMess, readRunning, readTasks, updateStatesRunningNow} from "./v1/service/service/general";
 
 
 const {parsed: {PORT}} = config();
 const port = +process.env.PORT || +PORT;
 
 global.port = port
+await updateStatesRunningNow();
+
 createWebServer(global.port);
 
 
@@ -39,14 +41,9 @@ function createWebServer(port): any | null {
 
     global.messageSocket = new WEBSocket(webServ, {
         clbAddConnection: async () => {
-            let _id, _hostPort;
             try {
-                const taskList = await getTasks() as TTaskList
-                for (const {hostPort, id} of Object.values(taskList)) {
-                    _hostPort = hostPort;
-                    const {host, port: portNode} = hostPort;
-                    _id = id;
-                    let status = await getStatusTask({host, port: portNode, id})
+                const runningList = await readRunning();
+                for (const status of Object.values(runningList)) {
                     addMess({type: 'node-status', data: status});
                 }
             } catch (e) {

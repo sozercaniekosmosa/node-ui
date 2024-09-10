@@ -1,11 +1,10 @@
-import {getComponents} from "./service/service";
 import {validationResult} from "express-validator";
-import {getTaskData, launchTask, launchTasks, taskCMD, writeTasks} from "./service/task";
-import {addMess, isAllowHostPortServ, getProject, setProject} from "./service/general";
+import {readTask, launchTask, launchTasks, storeTasks, taskCMD} from "./service/task";
+import {addMess, readToolbox, isAllowHostPortServ, readProject, writeProject} from "./service/general";
 
-export const getToolbox = async (req: any, res: any) => {
+export const readToolboxController = async (req: any, res: any) => {
     try {
-        let arrData = await getComponents();
+        let arrData = await readToolbox();
         res.send(arrData);
 
     } catch (error: any) {
@@ -13,47 +12,47 @@ export const getToolbox = async (req: any, res: any) => {
     }
 };
 
-export const readProject = async (req: any, res: any) => {
+export const readProjectController = async (req: any, res: any) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) res.status(400).send({error: errors.array()});
     try {
-        const data = await getProject();
+        const data = await readProject();
         res.send(data);
     } catch (error: any) {
         res.status(error.status || 500).send({error: error?.message || error},);
     }
 };
 
-export const updateProject = async (req: any, res: any) => {
+export const writeProjectController = async (req: any, res: any) => {
     const {body: data} = req;
     try {
-        await setProject(data);
+        await writeProject(data);
         res.send('project written');
     } catch (error: any) {
         res.status(error?.status || 500).send({error: error?.message || error});
     }
 };
 
-export const getTask = async (req: any, res: any) => {
+export const readTaskController = async (req: any, res: any) => {
     const id = req.params.id;
     try {
-        let task = await getTaskData(id);
+        let task = await readTask(id);
         res.send(task);
     } catch (error: any) {
         res.status(error?.status || 500).send({error: error?.message || error});
     }
 };
 
-export const updateTasks = (req: any, res: any) => {
+export const writeTasksController = (req: any, res: any) => {
     const {body: tasks} = req;
     try {
-        writeTasks(tasks)
+        storeTasks(tasks)
         res.send('task written');
     } catch (error: any) {
         res.status(error?.status || 500).send({error: error?.message || error});
     }
 };
-export const startTasks = async (req: any, res: any) => {
+export const startTasksController = async (req: any, res: any) => {
     try {
         await launchTasks()
         console.log('start')
@@ -63,7 +62,7 @@ export const startTasks = async (req: any, res: any) => {
     }
 };
 
-export const startTask = async (req: any, res: any) => {
+export const startTaskController = async (req: any, res: any) => {
     const id = req.params.id
     try {
         let text = await launchTask(id)
@@ -74,7 +73,7 @@ export const startTask = async (req: any, res: any) => {
     }
 };
 
-export const stopTasks = (req: any, res: any) => {
+export const stopTasksController = (req: any, res: any) => {
     try {
         console.log('stop')
         res.send('stop');
@@ -83,7 +82,7 @@ export const stopTasks = (req: any, res: any) => {
     }
 };
 
-export const cmdTask = async (req: any, res: any) => {
+export const cmdTaskController = async (req: any, res: any) => {
     const {body: cmd, data} = req;
     const id = req.params.id;
     try {
@@ -94,7 +93,7 @@ export const cmdTask = async (req: any, res: any) => {
     }
 };
 
-export const addMessage = (req: any, res: any) => {
+export const addMessageController = (req: any, res: any) => {
     const {body: message} = req;
     try {
         let text = addMess(message);
@@ -104,7 +103,7 @@ export const addMessage = (req: any, res: any) => {
     }
 };
 
-export const isAllowHostPort = async (req: any, res: any) => {
+export const isAllowHostPortController = async (req: any, res: any) => {
     const {host, port, id} = req.params;
     try {
         let isUse = await isAllowHostPortServ(host, port, id);

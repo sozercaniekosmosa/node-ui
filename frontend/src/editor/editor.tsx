@@ -3,7 +3,7 @@ import './style.css';
 import {NodeUI} from "./node-ui/node-ui";
 import {Point} from "./node-ui/svg";
 import {decompress, compress, decompressString, compressString, eventBus} from '../utils'
-import {TMessage} from "../../../general/types";
+import {TMessage, TStatus} from "../../../general/types";
 
 
 export type TEventEditor = {
@@ -36,9 +36,10 @@ export function Editor({newNode, onEvent}) {
 
         eventEmit({name: 'init', data: nuiRef.current})
 
-        eventBus.addEventListener('message-socket', ({type, data: {id, state}}: TMessage) => {
+        eventBus.addEventListener('message-socket', ({type, data}: TMessage) => {
             switch (type) {
                 case "node-status":
+                    const {id, state} = data as TStatus;
                     const node = nui.svg.querySelector(`#${id}`);
                     if (node) {
                         const nodeDest = node.querySelector(`.node-status`)
