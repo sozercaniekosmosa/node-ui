@@ -57,7 +57,7 @@ export async function launchTasks() {
     return;
 }
 
-export async function getStatusTask({id = null, host = null, port = null}): Promise<TStatus> {
+export async function requestStatusTask({id = null, host = null, port = null}): Promise<TStatus> {
     try {
         if (id && !(host || port)) {
             const hosts = readHosts();
@@ -65,7 +65,7 @@ export async function getStatusTask({id = null, host = null, port = null}): Prom
             port = hosts[id].port;
         }
 
-        const status: TStatus = await axios.get(`http://${host}:${port}/service/cmd/status`);
+        const {data: status}: TStatus = await axios.get(`http://${host}:${port}/service/status`);
         return status;
     } catch (e) {
         return <TStatus>{state: 'stop', hostPort: {host, port}, id}
@@ -79,7 +79,7 @@ export async function launchTask(id) {
     let path = pathResolveRoot(`./nodes/${nodeName}/launch.bat`)
 
 
-    let {state} = await getStatusTask({host, port: portNode});
+    let {state} = await requestStatusTask({host, port: portNode});
     if (state == 'run') {
         return `Сервис ${id} уже запущен`
     } else {

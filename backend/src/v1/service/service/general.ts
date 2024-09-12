@@ -1,6 +1,6 @@
 import {config} from "dotenv";
 import {debounce, getDataFromArrayPath, getDirectories, readData, throttle, WEBSocket, writeData} from "../../../utils";
-import {getStatusTask, killTask} from "./task";
+import {requestStatusTask, killTask} from "./task";
 import zlib, {InputType} from "node:zlib"
 import * as Buffer from "buffer";
 
@@ -22,15 +22,16 @@ export async function decompressGzip(buffer: Buffer): Promise<Buffer> {
     }
 }
 
-export const getCashFileData = async <T>(path, name, asString = false): Promise<T> => {
+const _cashFileData = {};
+export const getCashFileData = async <T>(path, asString = false): Promise<T> => {
     let data;
     try {
-        if (global[name]) {
-            data = global[name]
+        if (_cashFileData[path]) {
+            data = _cashFileData[path]
         } else {
             const strData = await readData(path, 'utf-8');
             data = asString ? strData : JSON.parse(strData);
-            global[name] = data;
+            _cashFileData[path] = data;
         }
     } catch (e) {
         console.log(e)
@@ -43,8 +44,8 @@ let listQueue = {};
 export const setCashFileDataWait = throttle(async (list): Promise<void> => {
     let strData: string;
     try {
-        for (const {path, name, data, asString = false} of Object.values(list)) {
-            global[name] = data;
+        for (const {path, data, asString = false} of Object.values(list)) {
+            _cashFileData[path] = data;
             strData = asString ? data : JSON.stringify(data, null, 2);
             await writeData(path, strData);
             console.log('файл:' + path, 'сохранен')
@@ -55,23 +56,23 @@ export const setCashFileDataWait = throttle(async (list): Promise<void> => {
     }
 }, 2000)
 
-export const setCashFileData = async (path, name, data, asString = false): Promise<void> => {
-    listQueue[name] = {path, name, data, asString};
-    global[name] = data;
+export const setCashFileData = async (path, data, asString = false): Promise<void> => {
+    listQueue[path] = {path, data, asString};
+    _cashFileData[path] = data;
     await setCashFileDataWait(<any>listQueue)
 };
 
-export const readTasks = async (): Promise<TTaskList> => await getCashFileData('./database/tasks.json', 'tasks')
-export const writeTasks = async (tasks): Promise<void> => await setCashFileData('./database/tasks.json', 'tasks', tasks)
+export const readTasks = async (): Promise<TTaskList> => await getCashFileData('./database/tasks.json',)
+export const writeTasks = async (tasks): Promise<void> => await setCashFileData('./database/tasks.json', tasks)
 
-export const readHosts = async (): Promise<THost> => await getCashFileData('./database/hosts.json', 'hosts')
-export const writeHosts = async (hosts): Promise<void> => await setCashFileData('./database/hosts.json', 'hosts', hosts)
+export const readHosts = async (): Promise<THost> => await getCashFileData('./database/hosts.json',)
+export const writeHosts = async (hosts): Promise<void> => await setCashFileData('./database/hosts.json', hosts)
 
-export const readRunning = async (): Promise<TRunningList> => await getCashFileData('./database/running.json', 'running')
-export const writeRunning = async (running): Promise<void> => await setCashFileData('./database/running.json', 'running', running)
+export const readRunning = async (): Promise<TRunningList> => await getCashFileData('./database/running.json',)
+export const writeRunning = async (running): Promise<void> => await setCashFileData('./database/running.json', running)
 
-export const readProject = async (): Promise<string> => await getCashFileData('./database/project.db', 'project', true)
-export const writeProject = async (str): Promise<void> => await setCashFileData('./database/project.db', 'project', str, true)
+export const readProject = async (): Promise<string> => await getCashFileData('./database/project.db', true)
+export const writeProject = async (str): Promise<void> => await setCashFileData('./database/project.db', str, true)
 
 export const readToolbox = async () => {
     let arrDir = await getDirectories('./nodes/');
@@ -98,7 +99,7 @@ export const updateStatesRunningNow = async () => {
     let hosts = await readHosts() || {};
 
     //удаляем все которые не соответствуют настройкам
-    for (const [id, {host, port}] of Object.entries(running)) {
+    for (const {id, hostPort: {host, port}, state} of Object.values(running)) {
         const hp = hosts[id];
         if (!hp || hp.host != host || hp.port != port) {
             await killTask({host, port});
@@ -106,7 +107,7 @@ export const updateStatesRunningNow = async () => {
         }
     }
     for (const [id, {host, port}] of Object.entries(hosts)) {
-        const status = await getStatusTask({host, port});
+        const status = await requestStatusTask({host, port});
         if (status.state == 'stop') {
             delete running[id];
         } else { //если не stop значит запущен (run или error)
@@ -114,6 +115,7 @@ export const updateStatesRunningNow = async () => {
         }
     }
 
+    await writeRunning(running)
 };
 
 export const updateStatesRunning = debounce(updateStatesRunningNow, 2000)
@@ -128,11 +130,9 @@ export const setStateRunning = async (status: TStatus) => {
     if (running?.[id] && state == "stop") {
         delete running[id];
     }
+    await writeRunning(running)
 
     await updateStatesRunning();
-
-
-    await writeRunning(running)
 }
 
 

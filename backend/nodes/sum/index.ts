@@ -25,8 +25,6 @@ const {task, hosts}: TInitData = await getInitData();
 const routerIn = express.Router();
 const routerService = express.Router();
 
-const timeStart = process.hrtime()[0]
-
 app.use(bodyParser.json());
 app.use(bodyParser.raw());
 app.use(bodyParser.text());

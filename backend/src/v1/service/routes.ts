@@ -1,30 +1,30 @@
 import express from "express";
 
 import {
-    readProjectController, readTaskController, readToolboxController, cmdTaskController, startTaskController, startTasksController,
-    stopTasksController, writeProjectController, writeTasksController, addMessageController, isAllowHostPortController
+    getReadProject, getReadTask, getReadToolbox, postCmdTask, postStartTask, postStartTasks, postStopTasks, putWriteProject, putWriteTasks,
+    postAddMessage, getIsAllowHostPort, getRunningTasks
 } from "./controller";
-
 
 const router = express.Router();
 
 
 // GET — получение данных.
 // router.get('/', getProject);
-router.get('/toolbox', readToolboxController);
-router.get('/project', readProjectController);
+router.get('/toolbox', getReadToolbox);
+router.get('/project', getReadProject);
 
 // PUT — полное обновление данных.
 // router.put('/', updateProject);
-router.put('/project', writeProjectController);
+router.put('/project', putWriteProject);
 
-router.get('/task/:id', readTaskController);
-router.put('/task', writeTasksController);
-router.post('/task/:id', startTaskController);
-router.post('/task/start', startTasksController);
-router.post('/task/stop', stopTasksController);
-router.post('/cmd/:id', cmdTaskController);
-router.post('/message', addMessageController);
-router.get('/host-port/:host/:port/:id', isAllowHostPortController);
+router.get('/running', getRunningTasks);
+router.get('/task/:id', getReadTask);
+router.put('/task', putWriteTasks);
+router.post('/task/:id', postStartTask);
+router.post('/task/start', postStartTasks);
+router.post('/task/stop', postStopTasks);
+router.post('/cmd/:id', postCmdTask);
+router.post('/message', postAddMessage);
+router.get('/host-port/:host/:port/:id', getIsAllowHostPort);
 
 export default router;

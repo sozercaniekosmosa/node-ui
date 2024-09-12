@@ -1,8 +1,6 @@
 import "./style.css"
-import React, {createElement, InputHTMLAttributes, useEffect, useRef, useState} from "react";
+import React, {createElement, useEffect, useRef, useState} from "react";
 import {camelToKebab, compressString, decompressString, eventBus} from '../utils'
-import {TMessage} from "../../../general/types";
-import backend from "../../src/service/service-backend";
 import Number from "./components/number/number"
 import HostPort from "./components/host-port/host-port";
 import String from "./components/string/string";
@@ -18,11 +16,12 @@ let arrKey = {};
 export function Property({setNode, onEvent}) {
 
     let nodeName: string = '';
+    let [statusColor, setStatusColor] = useState('#fff');
     const [show, setShow] = useState(false);
     useEffect(() => {
         show && refProp.current.focus();
+        messageSocket(null, "node-status", setNode?.dataset.state);
     }, [show])
-
 
     let refHeader = useRef(null);
     let refArrCfg = useRef([]);
@@ -34,7 +33,7 @@ export function Property({setNode, onEvent}) {
     if (show && setNode) {
         nodeName = setNode.dataset.nodeName;
         refArrCfg.current = JSON.parse(decompressString(setNode.dataset.cfg)!);
-        console.log(refArrCfg.current)
+        // console.log(refArrCfg.current)
     }
 
     eventBus.addEventListener('menu-property-show', () => {
@@ -43,9 +42,7 @@ export function Property({setNode, onEvent}) {
         setShow(true)
     })
 
-    eventBus.addEventListener('message-socket', ({type, data: {id, state}}) => {
-
-        if (setNode && setNode.id != id) return;
+    function messageSocket(id, type, state) {
 
         switch (type) {
             case "log":
@@ -57,11 +54,14 @@ export function Property({setNode, onEvent}) {
                     (state === 'error') && (fill = '#ff5967');
                     (state === 'stop') && (fill = '#dcdcdc');
                 }
-                refHeader.current && (refHeader.current.style.backgroundColor = fill);
-
+                setStatusColor(fill);
                 break;
         }
-    })
+    }
+
+
+    eventBus.addEventListener('message-socket', ({type, data: {id, state}}) =>
+        (setNode && setNode.id == id) && messageSocket(id, type, state));
 
     const noType = (typeName) => () => <b style={{color: "#cc0000"}}>[{typeName}]</b>
 
@@ -89,7 +89,7 @@ export function Property({setNode, onEvent}) {
 
     let onApply = () => {
         if (isChanged) {
-            console.log('apply')
+            // console.log('apply')
             setNode.dataset.cfg = compressString(JSON.stringify(refArrCfg.current));
             onEvent({name: 'property-change', data: setNode})
         }
@@ -137,12 +137,10 @@ export function Property({setNode, onEvent}) {
 
 
     return (
-        show ? <div className="prop" ref={refProp} tabIndex={-1}
-                    onKeyDown={onKeyDown}
-                    onKeyUp={onKeyUp}
+        show ? <div className="prop" ref={refProp} tabIndex={-1} onKeyDown={onKeyDown} onKeyUp={onKeyUp}
                     onClick={({target}) => (target as Element).classList.contains('prop') && onCancel()}>
             <div className="prop__menu">
-                <div className="prop__header" ref={refHeader}>
+                <div className="prop__header" ref={refHeader} style={{backgroundColor: statusColor}}>
                     <div>
                         Конфигуратор: {nodeName}
                         <div style={{display: 'inline'}}>{isChanged ? '*' : ''}</div>

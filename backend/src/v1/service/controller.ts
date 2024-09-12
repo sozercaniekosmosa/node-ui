@@ -1,8 +1,8 @@
 import {validationResult} from "express-validator";
 import {readTask, launchTask, launchTasks, storeTasks, taskCMD} from "./service/task";
-import {addMess, readToolbox, isAllowHostPortServ, readProject, writeProject} from "./service/general";
+import {addMess, readToolbox, isAllowHostPortServ, readProject, writeProject, isRunningTask, readRunning} from "./service/general";
 
-export const readToolboxController = async (req: any, res: any) => {
+export const getReadToolbox = async (req: any, res: any) => {
     try {
         let arrData = await readToolbox();
         res.send(arrData);
@@ -12,7 +12,7 @@ export const readToolboxController = async (req: any, res: any) => {
     }
 };
 
-export const readProjectController = async (req: any, res: any) => {
+export const getReadProject = async (req: any, res: any) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) res.status(400).send({error: errors.array()});
     try {
@@ -23,7 +23,7 @@ export const readProjectController = async (req: any, res: any) => {
     }
 };
 
-export const writeProjectController = async (req: any, res: any) => {
+export const putWriteProject = async (req: any, res: any) => {
     const {body: data} = req;
     try {
         await writeProject(data);
@@ -33,7 +33,7 @@ export const writeProjectController = async (req: any, res: any) => {
     }
 };
 
-export const readTaskController = async (req: any, res: any) => {
+export const getReadTask = async (req: any, res: any) => {
     const id = req.params.id;
     try {
         let task = await readTask(id);
@@ -43,7 +43,7 @@ export const readTaskController = async (req: any, res: any) => {
     }
 };
 
-export const writeTasksController = (req: any, res: any) => {
+export const putWriteTasks = (req: any, res: any) => {
     const {body: tasks} = req;
     try {
         storeTasks(tasks)
@@ -52,7 +52,7 @@ export const writeTasksController = (req: any, res: any) => {
         res.status(error?.status || 500).send({error: error?.message || error});
     }
 };
-export const startTasksController = async (req: any, res: any) => {
+export const postStartTasks = async (req: any, res: any) => {
     try {
         await launchTasks()
         console.log('start')
@@ -62,7 +62,7 @@ export const startTasksController = async (req: any, res: any) => {
     }
 };
 
-export const startTaskController = async (req: any, res: any) => {
+export const postStartTask = async (req: any, res: any) => {
     const id = req.params.id
     try {
         let text = await launchTask(id)
@@ -73,7 +73,7 @@ export const startTaskController = async (req: any, res: any) => {
     }
 };
 
-export const stopTasksController = (req: any, res: any) => {
+export const postStopTasks = (req: any, res: any) => {
     try {
         console.log('stop')
         res.send('stop');
@@ -81,8 +81,16 @@ export const stopTasksController = (req: any, res: any) => {
         res.status(error?.status || 500).send({error: error?.message || error});
     }
 };
+export const getRunningTasks = async (req: any, res: any) => {
+    try {
+        const runningList = await readRunning()
+        res.send(runningList);
+    } catch (error: any) {
+        res.status(error?.status || 500).send({error: error?.message || error});
+    }
+};
 
-export const cmdTaskController = async (req: any, res: any) => {
+export const postCmdTask = async (req: any, res: any) => {
     const {body: cmd, data} = req;
     const id = req.params.id;
     try {
@@ -93,7 +101,7 @@ export const cmdTaskController = async (req: any, res: any) => {
     }
 };
 
-export const addMessageController = (req: any, res: any) => {
+export const postAddMessage = (req: any, res: any) => {
     const {body: message} = req;
     try {
         let text = addMess(message);
@@ -103,7 +111,7 @@ export const addMessageController = (req: any, res: any) => {
     }
 };
 
-export const isAllowHostPortController = async (req: any, res: any) => {
+export const getIsAllowHostPort = async (req: any, res: any) => {
     const {host, port, id} = req.params;
     try {
         let isUse = await isAllowHostPortServ(host, port, id);

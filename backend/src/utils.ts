@@ -1,10 +1,6 @@
-import fs, {promises as fsPromises} from "fs";
+import {promises as fsPromises} from "fs";
 import path, {resolve} from "path";
-import net from "net";
-import isLocalhost from "is-localhost-ip";
-import {domainToASCII} from "node:url"
-import {WebSocketServer, WebSocket} from "ws";
-import global from "./global";
+import {WebSocket, WebSocketServer} from "ws";
 
 // export const writeToFile = (path: string, data: any) => {
 //     try {
