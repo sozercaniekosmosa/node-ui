@@ -5,13 +5,21 @@ import Number from "./components/number/number"
 import HostPort from "./components/host-port/host-port";
 import String from "./components/string/string";
 import CodeEditor from "./components/code-editor/code-editor";
+import {TMessage} from "../../../general/types";
 
 export type TEventProperty = {
     name: 'property-change',
     data?: any
 }
-
 let arrKey = {};
+
+const noType = (typeName) => () => <b style={{color: "#cc0000"}}>[{typeName}]</b>
+const listTypeComponent = {
+    'number': Number,
+    'string': String,
+    'host-port': HostPort,
+    'code-editor': CodeEditor,
+}
 
 export function Property({setNode, onEvent}) {
 
@@ -20,7 +28,7 @@ export function Property({setNode, onEvent}) {
     const [show, setShow] = useState(false);
     useEffect(() => {
         show && refProp.current.focus();
-        messageSocket(null, "node-status", setNode?.dataset.state);
+        setStatus(setNode?.dataset.state);
     }, [show])
 
     let refHeader = useRef(null);
@@ -42,35 +50,31 @@ export function Property({setNode, onEvent}) {
         setShow(true)
     })
 
-    function messageSocket(id, type, state) {
+    function setStatus(state) {
+        let fill = '#dcdcdc';
+        if (state) {
+            (state === 'run') && (fill = '#b6ffc8');
+            (state === 'error') && (fill = '#ff5967');
+            (state === 'stop') && (fill = '#dcdcdc');
+        }
+        setStatusColor(fill);
+    }
+
+
+    eventBus.addEventListener('message-socket', ({type, data}: TMessage) => {
+        if (!setNode && data && setNode?.id != data.id) return;
 
         switch (type) {
             case "log":
                 break;
+            case "server-init":
+                setStatus('stop');
+                break;
             case "node-status":
-                let fill = '#dcdcdc';
-                if (state) {
-                    (state === 'run') && (fill = '#b6ffc8');
-                    (state === 'error') && (fill = '#ff5967');
-                    (state === 'stop') && (fill = '#dcdcdc');
-                }
-                setStatusColor(fill);
+                setStatus(data.state);
                 break;
         }
-    }
-
-
-    eventBus.addEventListener('message-socket', ({type, data: {id, state}}) =>
-        (setNode && setNode.id == id) && messageSocket(id, type, state));
-
-    const noType = (typeName) => () => <b style={{color: "#cc0000"}}>[{typeName}]</b>
-
-    const listTypeComponent = {
-        'number': Number,
-        'string': String,
-        'host-port': HostPort,
-        'code-editor': CodeEditor,
-    }
+    });
 
     const onChangeParam = (name, val) => {
 
@@ -137,8 +141,8 @@ export function Property({setNode, onEvent}) {
 
 
     return (
-        show ? <div className="prop" ref={refProp} tabIndex={-1} onKeyDown={onKeyDown} onKeyUp={onKeyUp}
-                    onClick={({target}) => (target as Element).classList.contains('prop') && onCancel()}>
+        <div className={"prop " + (show ? '' : 'prop--hide')} ref={refProp} tabIndex={-1} onKeyDown={onKeyDown} onKeyUp={onKeyUp}
+             onClick={({target}) => (target as Element).classList.contains('prop') && onCancel()}>
             <div className="prop__menu">
                 <div className="prop__header" ref={refHeader} style={{backgroundColor: statusColor}}>
                     <div>
@@ -158,7 +162,7 @@ export function Property({setNode, onEvent}) {
                             data-index={iTab}>{tabName}</div>
                     })}
                 </div>
-                <div className="tab__body" ref={refPropTabs}>
+                {show ? <div className="tab__body" ref={refPropTabs}>
                     {Object.entries(refArrCfg.current).map(([tabName, arrParam], iTab) => {
                         const isTab = arrParam?.[0]?.arrOption?.[0] == 'tab';
                         return (
@@ -169,7 +173,7 @@ export function Property({setNode, onEvent}) {
                                     let arrStyle = [];
                                     if (arrOption) {
                                         let setCSS = new Set(['center', 'right', 'left', '1', '2', '3', 'hr', 'tab'])
-                                        arrOption.forEach(it => { //inline, center, right, left, 2, 3, hr
+                                        arrOption.forEach(it => {
                                             if (setCSS.has(it)) arrStyle.push('prop__param--' + it)
                                         })
                                     }
@@ -189,14 +193,14 @@ export function Property({setNode, onEvent}) {
                             </div>)
 
                     })}
-                </div>
+                </div> : ''}
 
                 <div className="prop__footer">
                     <button onClick={onApply}>Применить</button>
                     <button onClick={onCancel}>Отмена</button>
                 </div>
             </div>
-        </div> : ''
+        </div>
     )
 }
 

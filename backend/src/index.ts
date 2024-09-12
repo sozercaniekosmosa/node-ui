@@ -43,8 +43,9 @@ function createWebServer(port): any | null {
         clbAddConnection: async () => {
             try {
                 const runningList = await readRunning();
+                await addMess({type: 'server-init'});
                 for (const status of Object.values(runningList)) { // не отправляет статусы выключено
-                    addMess({type: 'node-status', data: status});
+                    await addMess({type: 'node-status', data: status});
                 }
             } catch (e) {
                 console.log(e)

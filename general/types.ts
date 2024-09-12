@@ -34,7 +34,7 @@ export interface TTaskList {
 }
 
 
-export type TMessageType = 'log' | 'node-status'
+export type TMessageType = 'log' | 'node-status' | 'server-init'
 
 export interface TMessage {
     type?: TMessageType;

@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import './style.css';
-import {NodeUI} from "./node-ui/node-ui";
+import {NodeSelector, NodeUI} from "./node-ui/node-ui";
 import {Point} from "./node-ui/svg";
 import {decompress, compress, decompressString, compressString, eventBus} from '../utils'
 import {TMessage, TStatus} from "../../../general/types";
@@ -38,11 +38,17 @@ export function Editor({newNode, onEvent}) {
 
         eventBus.addEventListener('message-socket', ({type, data}: TMessage) => {
             switch (type) {
+                case "server-init":
+                    [...nui.svg.querySelectorAll('.' + NodeSelector.node)].forEach(node => {
+                        nui.setProperty(node, {data: {state: 'stop'}})
+                        nui.setProperty(node.querySelector('.' + NodeSelector.nodeStatus), {fill: '#dcdcdc'})
+                    })
+                    break;
                 case "node-status":
                     const {id, state} = data as TStatus;
                     const node = nui.svg.querySelector(`#${id}`);
                     if (node) {
-                        const nodeDest = node.querySelector(`.node-status`)
+                        const nodeDest = node.querySelector(`.` + NodeSelector.nodeStatus)
                         let fill = '#dcdcdc';
                         if (state) {
                             (state === 'run') && (fill = '#00ff3c');
