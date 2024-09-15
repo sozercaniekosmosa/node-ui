@@ -8,10 +8,12 @@ import CodeEditor from "./components/code-editor/code-editor";
 import {TMessage} from "../../../general/types";
 
 export type TEventProperty = {
-    name: 'property-change',
+    name: 'property-change' | 'property-open' | 'property-close',
     data?: any
 }
 let arrKey = {};
+// let node = null;
+let nodeName: string = '';
 
 const noType = (typeName) => () => <b style={{color: "#cc0000"}}>[{typeName}]</b>
 const listTypeComponent = {
@@ -21,34 +23,23 @@ const listTypeComponent = {
     'code-editor': CodeEditor,
 }
 
-export function Property({setNode, onEvent}) {
+export function Property({node, onEvent}) {
 
-    let nodeName: string = '';
+    // const [show, setShow] = useState(false);
     let [statusColor, setStatusColor] = useState('#fff');
-    const [show, setShow] = useState(false);
-    useEffect(() => {
-        show && refProp.current.focus();
-        setStatus(setNode?.dataset.state);
-    }, [show])
+    let [isChanged, setIsChanged] = useState(false); //флаг -- компонент изменен
+    let [arrCfg, setArrCfg] = useState([]);
 
     let refHeader = useRef(null);
-    let refArrCfg = useRef([]);
-    let [isChanged, setIsChanged] = useState(false); //флаг -- компонент изменен
-
     let refProp = useRef(null);
     let refPropTabs = useRef(null);
 
-    if (show && setNode) {
-        nodeName = setNode.dataset.nodeName;
-        refArrCfg.current = JSON.parse(decompressString(setNode.dataset.cfg)!);
-        // console.log(refArrCfg.current)
-    }
-
-    eventBus.addEventListener('menu-property-show', () => {
-        setIsChanged(false);
-        arrKey = {};
-        setShow(true)
-    })
+    useEffect(() => {
+        nodeName = node.dataset.nodeName;
+        setStatus(node.dataset.state);
+        setArrCfg(JSON.parse(decompressString(node.dataset.cfg)!));
+        refProp?.current && refProp?.current.focus();
+    }, [])
 
     function setStatus(state) {
         let fill = '#dcdcdc';
@@ -62,7 +53,7 @@ export function Property({setNode, onEvent}) {
 
 
     eventBus.addEventListener('message-socket', ({type, data}: TMessage) => {
-        if (!setNode && data && setNode?.id != data.id) return;
+        if (!node && data && node.id != data.id) return;
 
         switch (type) {
             case "log":
@@ -77,14 +68,13 @@ export function Property({setNode, onEvent}) {
     });
 
     const onChangeParam = (name, val) => {
-
-        Object.entries(refArrCfg.current).forEach(([tabName, arrParam]) => {
+        Object.entries(arrCfg).forEach(([tabName, arrParam]) => {
             arrParam.forEach(({name: _name, type, val: _val, title, arrOption}, i) => {
                 if (_name == name) {
                     let isChanged: boolean = typeof val == 'object' ? JSON.stringify(val) != JSON.stringify(_val) : val != _val;
                     if (isChanged) {
                         setIsChanged(true);
-                        refArrCfg.current[tabName][i] = {name, type, val, title, arrOption}
+                        arrCfg[tabName][i] = {name, type, val, title, arrOption}
                     }
                 }
             })
@@ -94,27 +84,26 @@ export function Property({setNode, onEvent}) {
     let onApply = () => {
         if (isChanged) {
             // console.log('apply')
-            setNode.dataset.cfg = compressString(JSON.stringify(refArrCfg.current));
-            onEvent({name: 'property-change', data: setNode})
+            node.dataset.cfg = compressString(JSON.stringify(arrCfg));
+            onEvent({name: 'property-change', data: node})
         }
-        setShow(false)
+        onEvent({name: 'property-close'})
     };
     let onCancel = () => {
         if (isChanged) {
             eventBus.dispatchEvent('confirm', (isYes) => {
                 if (isYes) {
-                    setNode.dataset.cfg = compressString(JSON.stringify(refArrCfg.current));
-                    onEvent({name: 'property-change', data: setNode})
+                    node.dataset.cfg = compressString(JSON.stringify(arrCfg));
+                    onEvent({name: 'property-change', data: node})
                 }
-                setShow(false)
+                onEvent({name: 'property-close'})
             }, 'Сохранить изменения?')
         } else {
-            setShow(false)
+            onEvent({name: 'property-close'})
         }
     }
 
-    function onClickTab(e) {
-
+    const onClickTab = e => {
         if (!e.target.classList.contains('tab__header__item')) return;
         e.target.parentNode.querySelector('.tab__header__item--active')?.classList.remove('tab__header__item--active')
         e.target.classList.add('tab__header__item--active')
@@ -122,7 +111,7 @@ export function Property({setNode, onEvent}) {
         const index = e.target.dataset.index;
         [...refPropTabs.current.children].forEach(node => node.style.display = 'none')
         refPropTabs.current.children[index].style.display = ''
-    }
+    };
 
     const onKeyUp = (e) => arrKey[camelToKebab(e.code).toLowerCase()] = false
     const onKeyDown = (e) => {
@@ -139,9 +128,8 @@ export function Property({setNode, onEvent}) {
         // console.log(e.code.toLowerCase())
     }
 
-
     return (
-        <div className={"prop " + (show ? '' : 'prop--hide')} ref={refProp} tabIndex={-1} onKeyDown={onKeyDown} onKeyUp={onKeyUp}
+        <div className="prop" ref={refProp} tabIndex={-1} onKeyDown={onKeyDown} onKeyUp={onKeyUp}
              onClick={({target}) => (target as Element).classList.contains('prop') && onCancel()}>
             <div className="prop__menu">
                 <div className="prop__header" ref={refHeader} style={{backgroundColor: statusColor}}>
@@ -153,17 +141,16 @@ export function Property({setNode, onEvent}) {
                         <div className="icon-cross" style={{width: '16px', height: '16px'}}></div>
                     </button>
                 </div>
-
                 <div className="tab__header" onClick={onClickTab}>
-                    {Object.entries(refArrCfg.current).map(([tabName, arrParam], iTab) => {
+                    {Object.entries(arrCfg).map(([tabName, arrParam], iTab) => {
                         return <div
                             className={"tab__header__item " + (iTab == 0 ? 'tab__header__item--active' : '')}
                             key={iTab}
                             data-index={iTab}>{tabName}</div>
                     })}
                 </div>
-                {show ? <div className="tab__body" ref={refPropTabs}>
-                    {Object.entries(refArrCfg.current).map(([tabName, arrParam], iTab) => {
+                <div className="tab__body" ref={refPropTabs}>
+                    {Object.entries(arrCfg).map(([tabName, arrParam], iTab) => {
                         const isTab = arrParam?.[0]?.arrOption?.[0] == 'tab';
                         return (
                             <div className={"tab__body__item" + (isTab ? " tab__body__item--contents" : "")} key={iTab}
@@ -173,12 +160,10 @@ export function Property({setNode, onEvent}) {
                                     let arrStyle = [];
                                     if (arrOption) {
                                         let setCSS = new Set(['center', 'right', 'left', '1', '2', '3', 'hr', 'tab'])
-                                        arrOption.forEach(it => {
-                                            if (setCSS.has(it)) arrStyle.push('prop__param--' + it)
-                                        })
+                                        arrOption.forEach(it => setCSS.has(it) && arrStyle.push('prop__param--' + it))
                                     }
 
-                                    let props = {name, val, title, key: i, onChange: onChangeParam, node: setNode};
+                                    let props = {name, val, title, key: i, onChange: onChangeParam, node: node};
                                     let res: React.ReactElement;
                                     if (isTab) {
                                         res = createElement(comp, props);
@@ -193,7 +178,7 @@ export function Property({setNode, onEvent}) {
                             </div>)
 
                     })}
-                </div> : ''}
+                </div>
 
                 <div className="prop__footer">
                     <button onClick={onApply}>Применить</button>
@@ -201,6 +186,7 @@ export function Property({setNode, onEvent}) {
                 </div>
             </div>
         </div>
+
     )
 }
 

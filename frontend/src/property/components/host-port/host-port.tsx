@@ -1,6 +1,6 @@
 import "./style.css"
+import {isAllowHostPort, startTask, stopTask} from "../../../service/service-backend";
 import React, {useEffect, useRef, useState} from "react";
-import backend from "../../../service/service-backend";
 
 function validationHost(host, node: HTMLElement) {
     const ipv4Regex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
@@ -32,6 +32,8 @@ function validationPort(port, node: HTMLElement) {
 export default function ({name, val, onChange, node}) {
 
     let [status, setStatus] = useState('...');
+    let [host, setHost] = useState(val.host);
+    let [port, setPort] = useState(val.port);
     const refHostPort = useRef(null)
     const refHost = useRef(null)
     const refPort = useRef(null)
@@ -48,23 +50,28 @@ export default function ({name, val, onChange, node}) {
 
         const isValidHost = validationHost(host, refHost.current);
         const isValidPort = validationPort(port, refPort.current);
-        const isAllowHostPort = await backend.isAllowHostPort(host, port, node.id);
 
-        const isAllow = isValidHost && isValidPort && isAllowHostPort;
+        const isAllowHP = await isAllowHostPort(host, port, node.id);
+
+        const isAllow = isValidHost && isValidPort && isAllowHP;
 
         setStatus(isAllow ? '✔' : '✖');
         if (isAllow) onChange(name, {host, port})
     }
 
     return <div className="host-port__group" ref={refHostPort}>
-        <input className="host-port__host" type="text" defaultValue={val.host}
-               onBlur={changeHandling}
-               onKeyDown={({key}) => (key == 'Enter') && changeHandling()}
-               ref={refHost}/>:
-        <input className="host-port__port" type="number" defaultValue={val.port} min="0" max="65535"
-               onBlur={changeHandling}
-               onKeyDown={({key}) => (key == 'Enter') && changeHandling()}
-               ref={refPort}/>
-        <div className={'host-port__state--' + (status == '✔' ? 'valid' : 'error')}>{status}</div>
+        <button onClick={() => startTask(node.id)}>Пуск</button>
+        <button onClick={() => stopTask(node.id)}>Стоп</button>
+            <input className="host-port__host" type="text" value={host!}
+                   onChange={({target}) => setHost(target.value)}
+                   onBlur={changeHandling}
+                   onKeyDown={({key}) => (key == 'Enter') && changeHandling()}
+                   ref={refHost}/>:
+            <input className="host-port__port" type="number" value={port!}
+                   onChange={({target}) => setPort(target.value)} min="0" max="65535"
+                   onBlur={changeHandling}
+                   onKeyDown={({key}) => (key == 'Enter') && changeHandling()}
+                   ref={refPort}/>
+            <div className={'host-port__state--' + (status == '✔' ? 'valid' : 'error')}>{status}</div>
     </div>
 }

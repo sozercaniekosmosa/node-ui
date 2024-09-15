@@ -85,8 +85,8 @@ export const readToolbox = async () => {
 export const addMess = async (mess: TMessage) => {
     try {
         if (mess.type == 'node-status') await setStateRunning(mess.data as TStatus);
-
         (global.messageSocket as WEBSocket).send(mess)
+        console.log(mess)
     } catch (e) {
         throw e;
     }

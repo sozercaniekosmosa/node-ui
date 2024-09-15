@@ -1,8 +1,17 @@
 import express from "express";
 
 import {
-    getReadProject, getReadTask, getReadToolbox, postCmdTask, postStartTask, postStartTasks, postStopTasks, putWriteProject, putWriteTasks,
-    postAddMessage, getIsAllowHostPort, getRunningTasks
+    getIsAllowHostPort,
+    getReadProject,
+    getReadTask,
+    getReadToolbox,
+    getRunningTasks,
+    postAddMessage,
+    postCmdTask,
+    postStartTask,
+    postStopTask,
+    putWriteProject,
+    putWriteTasks
 } from "./controller";
 
 const router = express.Router();
@@ -20,9 +29,9 @@ router.put('/project', putWriteProject);
 router.get('/running', getRunningTasks);
 router.get('/task/:id', getReadTask);
 router.put('/task', putWriteTasks);
-router.post('/task/:id', postStartTask);
-router.post('/task/start', postStartTasks);
-router.post('/task/stop', postStopTasks);
+// router.post('/task/:id', postStartTask);
+router.post('/task/start/:id', postStartTask);
+router.post('/task/stop/:id', postStopTask);
 router.post('/cmd/:id', postCmdTask);
 router.post('/message', postAddMessage);
 router.get('/host-port/:host/:port/:id', getIsAllowHostPort);

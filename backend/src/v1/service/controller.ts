@@ -1,6 +1,6 @@
 import {validationResult} from "express-validator";
-import {readTask, launchTask, launchTasks, storeTasks, taskCMD} from "./service/task";
-import {addMess, readToolbox, isAllowHostPortServ, readProject, writeProject, isRunningTask, readRunning} from "./service/general";
+import {killTask, launchTask, launchTasks, readTask, storeTasks, taskCMD} from "./service/task";
+import {addMess, isAllowHostPortServ, readProject, readRunning, readToolbox, writeProject} from "./service/general";
 
 export const getReadToolbox = async (req: any, res: any) => {
     try {
@@ -66,17 +66,19 @@ export const postStartTask = async (req: any, res: any) => {
     const id = req.params.id
     try {
         let text = await launchTask(id)
-        console.log(text)
-        res.send({text});
+        await addMess({type: 'node-log', data: {id, message: text}});
+        res.send(text);
     } catch (error: any) {
         res.status(error?.status || 500).send({error: error?.message || error});
     }
 };
 
-export const postStopTasks = (req: any, res: any) => {
+export const postStopTask = async (req: any, res: any) => {
+    const id = req.params.id
     try {
-        console.log('stop')
-        res.send('stop');
+        let text = await killTask({id})
+        await addMess({type: 'node-log', data: {id, message: text}});
+        res.send(text);
     } catch (error: any) {
         res.status(error?.status || 500).send({error: error?.message || error});
     }

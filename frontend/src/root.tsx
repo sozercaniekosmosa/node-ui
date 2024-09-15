@@ -32,7 +32,9 @@ console.log(import.meta.env.VITE_SOME_KEY)
 function Root() {
 
 
+    let [nodeProperty, setNodeProperty] = useState(null);
     let [listNode, setListNode] = useState([]);
+    const [nodeCreate, setNodeCreate] = useState(null);
 
     useEffect(() => {
         (async () => setListNode(await getToolbox() as [Object]))()
@@ -42,18 +44,6 @@ function Root() {
         document.addEventListener('focus', ({target}) => nodeFocus = target, true);
 
     }, [])
-
-    // (async () => {
-    //     if (import.meta.env.PROD) {
-    //         !listNode && setListNode((await import("../../nodes/dist/nodes.js")).default);
-    //     } else {//@ts-ignore
-    //         !listNode && setListNode((await import("../../nodes/src/nodes.ts")).default);
-    //     }
-    // })();
-
-
-    const [nodeProp, setNodeProp] = useState(null);
-    const [nodeDataSelected, setNodeDataSelected] = useState(null);
 
     function onKeyDown(e) {
 
@@ -79,7 +69,7 @@ function Root() {
         if (arrKey?.['control-left'] && arrKey?.['key-x']) onEventHandler({name: 'cut'})
 
         if (arrKey?.['delete'] && nodeFocus?.classList.contains('editor')) onEventHandler({name: 'delete'})
-        if ((arrKey?.['enter'] || arrKey?.['numpad-enter']) && nodeFocus.classList.contains('editor')) onEventHandler({name: 'property'});
+        if ((arrKey?.['enter'] || arrKey?.['numpad-enter']) && nodeFocus.classList.contains('editor')) onEventHandler({name: 'property-open'});
 
         // console.log(arrKey)
         // console.log(e.code.toLowerCase())
@@ -140,12 +130,15 @@ function Root() {
                 if (arrSelected!.length > 0)
                     eventBus.dispatchEvent('confirm', (isYes) => isYes && nui.removeNode(), 'Уверены?')
                 break;
-            case 'property':
+            case 'property-open':
                 if (data && !data.classList.contains(NodeSelector.handle)) return
                 if (arrSelected?.length !== 1) return
                 const node = arrSelected[0];
-                setNodeProp(node)
-                eventBus.dispatchEvent('menu-property-show')
+                setNodeProperty(node)
+                // eventBus.dispatchEvent('menu-property-show', node)
+                break;
+            case 'property-close':
+                setNodeProperty(null);
                 break;
             case 'property-change':
                 addHistory('property');
@@ -154,10 +147,10 @@ function Root() {
                 writeProject(nui.svg);
                 break;
             case 'start':
-                eventBus.dispatchEvent('confirm', (isYes) => isYes && startTask(), 'Запустить стстему?')
+                eventBus.dispatchEvent('confirm', (isYes) => isYes /*&& startTask()*/, 'Запустить стстему?')
                 break;
             case 'stop':
-                eventBus.dispatchEvent('confirm', (isYes) => isYes && stopTask(), 'Остановить стстему?')
+                eventBus.dispatchEvent('confirm', (isYes) => isYes /*&& stopTask()*/, 'Остановить стстему?')
                 break;
             case 'node-cmd':
                 sendCmd(data.id, data.cmd)
@@ -170,15 +163,15 @@ function Root() {
         console.log("change", newValue);
     }
 
-    return (<>
+    return <>
         <Header onEvent={onEventHandler}/>
-        <div className="node-editor" onDoubleClick={({target}) => onEventHandler({name: 'property', data: target})}>
-            <Toolbox onNodeSelect={(data) => setNodeDataSelected(data)} listNode={listNode}/>
-            <Editor newNode={nodeDataSelected} onEvent={onEventHandler}/>
-            <Property setNode={nodeProp} onEvent={onEventHandler}/>
+        <div className="node-editor" onDoubleClick={({target}) => onEventHandler({name: 'property-open', data: target})}>
+            <Toolbox onNodeSelect={(data) => setNodeCreate(data)} listNode={listNode}/>
+            <Editor newNode={nodeCreate} onEvent={onEventHandler}/>
+            {nodeProperty ? <Property node={nodeProperty} onEvent={onEventHandler}/> : null}
         </div>
         <MenuConfirm name={'confirm'}/>
-    </>)
+    </>
 }
 
 root.render(

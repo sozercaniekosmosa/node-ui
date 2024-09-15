@@ -3,7 +3,7 @@ import React from "react";
 
 
 export type TEventHeader = {
-    name: 'undo' | 'redo' | 'copy' | 'past' | 'cut' | 'delete' | 'property' | 'save' | 'start' | 'stop'
+    name: 'undo' | 'redo' | 'copy' | 'past' | 'cut' | 'delete' | 'save' | 'start' | 'stop'
         | 'module',
     data?: any
 };

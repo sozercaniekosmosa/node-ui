@@ -1,26 +1,29 @@
-import {config} from "dotenv";
-import {resolve} from "path";
 import {spawn} from "child_process";
-
 import global from "../../../global"
 import axios from "axios";
-import {TMessage, TStatus, TTaskList} from "../../../../../general/types";
-import {addMess, readHosts, readTasks, isAllowHostPortServ, writeHosts, writeTasks} from "./general";
+import {TMessage, TRunningList, TStatus, TTaskList} from "../../../../../general/types";
+import {addMess, isAllowHostPortServ, readHosts, readRunning, readTasks, writeHosts, writeTasks} from "./general";
 import {pathResolveRoot} from "../../../utils";
 
 
 export const killTask = async ({id = null, host = null, port = null}): any => {
     try {
+        const runningList: TRunningList = await readRunning();
         if (id) {
-            const hosts = readHosts();
-            host = hosts[id].host;
-            port = hosts[id].port;
+            let runningTask = runningList?.[id];
+            if (!runningTask) {
+                await addMess({type: 'node-log', data: {id, message: 'Задача не запущена'}});
+                return `Процесс id: ${id}:(${host}:${port}) процесс не запущен`
+            }
+            const {hostPort} = runningTask as TStatus;
+            host = hostPort.host;
+            port = hostPort.port;
         }
 
-        await axios.post(`http://${host}:${port}/service/kill`)
-        console.warn(`Процессу (${host}:${port}) отправлена команда на завершение`)
+        const {data: {text}} = await axios.post(`http://${host}:${port}/service/kill`)
+        return `Процесс (${host}:${port})` + text;
     } catch (e) {
-        console.warn(`Процесс (${host}:${port}) не ответил на команду завершения, возможно не был запущен`)
+        return `Процесс (${host}:${port}) не ответил на команду завершения`
     }
 }
 

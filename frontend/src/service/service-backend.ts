@@ -116,18 +116,18 @@ export async function getToolbox() {
     }
 }
 
-export async function startTask() {
+export async function startTask(id) {
     try {
-        let text = await post(routService + 'task/start', 'text/plain')
+        let text = await post(routService + 'task/start/' + id ?? '', 'text/plain')
         console.log(text);
     } catch (error) {
         console.error('Error fetching data:', error);
     }
 }
 
-export async function stopTask() {
+export async function stopTask(id) {
     try {
-        let text = await post(routService + 'task/stop', 'text/plain')
+        let text = await post(routService + 'task/stop/' + id ?? '', 'text/plain')
         console.log(text);
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -207,5 +207,3 @@ export async function createMessageSocket() {
         // setTimeout(() => messageSocket(nui), 2000);
     }
 }
-
-export default {isAllowHostPort}
