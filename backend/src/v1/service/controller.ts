@@ -93,10 +93,11 @@ export const getRunningTasks = async (req: any, res: any) => {
 };
 
 export const postCmdTask = async (req: any, res: any) => {
-    const {body: cmd, data} = req;
+    const {body: cmd} = req;
     const id = req.params.id;
+    console.log(cmd)
     try {
-        let data = await taskCMD(id, cmd, data);
+        let data = await taskCMD(id, cmd);
         res.send(id + ':' + cmd + ' ' + data);
     } catch (error: any) {
         res.status(error?.status || 500).send({error: error?.message || error});

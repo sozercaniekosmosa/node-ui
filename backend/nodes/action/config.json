@@ -7,10 +7,11 @@
     "arrButton": ["Действие"],
     "cfg": {
         "сеть": [
-            {"name": "hostPort", "type": "host-port", "val": {"host":"localhost", "port": 3000}, "title": "Адрес и порт", "arrOption": []}
+            {"name": "hostPort", "type": "host-port", "val": {"host":"localhost", "port": 3000}, "title": "Адрес и порт", "arrOption": []},
+            {"name": "taskControl", "type": "task-control", "val": null, "title": "Управление", "arrOption": ["1", "right"]}
         ],
         "общие": [
-            {"name": "ce", "type": "code-editor", "val": {"code": ""}, "title": "", "arrOption": ["tab"]}
+            {"name": "codeEditor", "type": "code-editor", "val": {"code": ""}, "title": "", "arrOption": ["tab"]}
         ]
     },
 

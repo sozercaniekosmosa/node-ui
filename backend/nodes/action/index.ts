@@ -4,26 +4,18 @@ import express from "express";
 import {config} from "dotenv";
 import bodyParser from "body-parser";
 import axios from "axios";
-import {THost, TLink, TState, TTask, TMessageType, TStatus, TMessage} from "../../../general/types";
+import {TInitData, TLink, TStatus} from "../../../general/types";
 
-interface TInitData {
-    task: TTask;
-    hosts: THost
-}
-
-let a = 0, b = 0;
-
-const env = config();
 const app = express();
 
+let input;
 let status: TStatus = {id: '', hostPort: undefined, state: "stop"};
 
 const agentPort = process.argv[2];
 const id = process.argv[3];
 const {task, hosts}: TInitData = await getInitData();
 
-const routerIn = express.Router();
-const routerService = express.Router();
+const router = express.Router();
 
 app.use(bodyParser.json());
 app.use(bodyParser.raw());
@@ -43,10 +35,8 @@ const update = debounce(() => {
                 const [id, inputName] = host.split('.');
                 const {ip, port} = hosts[id]
 
-                const res = await axios.post(`http://${ip}:${port}/in/${inputName}`, {data: a + b})
+                const res = await axios.post(`http://${ip}:${port}/in/${inputName}`, {data: input})
                 console.log(res.data)
-
-
                 console.log(id, inputName)
             })
         });
@@ -78,7 +68,6 @@ async function getInitData(): Promise<TInitData> {
             console.log(`Сервис запущен на порте ${task.hostPort.port}`);
         });
 
-        // console.log(task);
         console.log(agentPort)
         console.log(id)
 
@@ -93,23 +82,23 @@ async function getInitData(): Promise<TInitData> {
     }
 }
 
-routerIn.post('/:name', (req: any, res: any) => {
+router.post('in/:name', (req: any, res: any) => {
     const name = req.params.name.toLocaleLowerCase();
     try {
         const {body: {data}} = req
 
-        if (name == 'a') a = data;
-        if (name == 'b') b = data;
+
+        if (name == 'in')
+            input = data;
 
         res.send({status: 'OK', text: 'привет из сервиса ' + data});
-        console.log(data)
+        // console.log(data)
         update();
     } catch (e) {
 
     }
 });
-
-routerService.post('/kill', async (req: any, res: any) => {
+router.post('/kill', async (req: any, res: any) => {
     status.state = 'stop';
     try {
         await sendMessage('node-status', status)
@@ -119,20 +108,17 @@ routerService.post('/kill', async (req: any, res: any) => {
     res.send({status: 'OK', text: 'команда на завершение принята'});
     process.exit(0);
 });
-routerService.post('/cmd', (req: any, res: any) => {
+router.post('/cmd/:cmd', (req: any, res: any) => {
     const cmd = req.params.cmd
     const {body: data} = req;
-    console.log(cmd)
-    res.send({status: 'OK', text: `команда ${cmd} принята`});
+    // console.log(cmd)
+    res.send(`команда ${cmd} принята`);
 });
-routerService.get('/status', async (req: any, res: any) => {
+router.get('/status', async (req: any, res: any) => {
     // await sendMessage('node-status', status)
     res.send(<TStatus>status);
 });
-
-
-app.use('/in', routerIn);
-app.use('/service', routerService);
+app.use('/', router);
 
 
 let exitTimeoutId: NodeJS.Timeout;
@@ -146,16 +132,3 @@ async function killProcess() {
 }
 
 process.stdin.resume();
-
-// async function messageLoop() {
-//
-//     try {
-//         await axios.post(`http://localhost:${agentPort}/api/v1/service/message/${id}`, {dest: 'node-status', data: status})
-//     } catch (e) {
-//         console.log(e)
-//     } finally {
-//         setTimeout(messageLoop, 2000);
-//     }
-// }
-//
-// messageLoop();

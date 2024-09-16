@@ -6,7 +6,8 @@
     "arrOut": ["y"],
     "cfg": {
         "сеть": [
-            {"name": "hostPort", "type": "host-port", "val": {"host":"localhost", "port": 0}, "title": "Адрес и порт", "arrOption": []}
+            {"name": "hostPort", "type": "host-port", "val": {"host":"localhost", "port": 0}, "title": "Адрес и порт", "arrOption": []},
+            {"name": "taskControl", "type": "task-control", "val": null, "title": "Управление", "arrOption": ["1", "right"]}
         ],
         "общие": [
             {"name": "qwq", "type": "number", "val": 2.2, "title": "Какой-то параметр", "arrOption": []}

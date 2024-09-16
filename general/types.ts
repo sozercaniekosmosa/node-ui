@@ -52,3 +52,17 @@ export interface TStatus {
 export interface TRunningList {
     [key: string]: TStatus;
 }
+
+export interface TChangeProps {
+    name: any;
+    val: any;
+    title: any;
+    key: any;
+    onChange: (name, val) => void;
+    node: any;
+}
+
+export interface TInitData {
+    task: TTask;
+    hosts: THost
+}

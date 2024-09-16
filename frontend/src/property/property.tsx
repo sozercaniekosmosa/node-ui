@@ -5,7 +5,8 @@ import Number from "./components/number/number"
 import HostPort from "./components/host-port/host-port";
 import String from "./components/string/string";
 import CodeEditor from "./components/code-editor/code-editor";
-import {TMessage} from "../../../general/types";
+import {TChangeProps, TMessage} from "../../../general/types";
+import TaskControl from "./components/task-control/task-control";
 
 export type TEventProperty = {
     name: 'property-change' | 'property-open' | 'property-close',
@@ -21,6 +22,7 @@ const listTypeComponent = {
     'string': String,
     'host-port': HostPort,
     'code-editor': CodeEditor,
+    'task-control': TaskControl,
 }
 
 export function Property({node, onEvent}) {
@@ -163,7 +165,7 @@ export function Property({node, onEvent}) {
                                         arrOption.forEach(it => setCSS.has(it) && arrStyle.push('prop__param--' + it))
                                     }
 
-                                    let props = {name, val, title, key: i, onChange: onChangeParam, node: node};
+                                    let props: TChangeProps = {name, val, title, key: i, onChange: onChangeParam, node};
                                     let res: React.ReactElement;
                                     if (isTab) {
                                         res = createElement(comp, props);

@@ -60,8 +60,6 @@ export default function ({name, val, onChange, node}) {
     }
 
     return <div className="host-port__group" ref={refHostPort}>
-        <button onClick={() => startTask(node.id)}>Пуск</button>
-        <button onClick={() => stopTask(node.id)}>Стоп</button>
             <input className="host-port__host" type="text" value={host!}
                    onChange={({target}) => setHost(target.value)}
                    onBlur={changeHandling}

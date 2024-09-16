@@ -27,6 +27,7 @@ import "ace-builds/src-noconflict/snippets/python";
 let code;
 let lang = 'javascript';
 let theme = 'github';
+let isExecButton = true;
 
 export default function ({name, val, onChange, node}) {
     const [update, setUpdate] = useState(new Date())
@@ -35,6 +36,7 @@ export default function ({name, val, onChange, node}) {
         code = val.code
         lang = val.lang ?? lang
         theme = val.theme ?? theme
+        isExecButton = val.isExecButton ?? isExecButton
         setUpdate((v) => v + 1)
     }, [])
 
@@ -46,25 +48,32 @@ export default function ({name, val, onChange, node}) {
     //     }
     // })
 
+    function changeExec({target}) {
+        isExecButton = target.checked;
+        setUpdate(new Date())
+        onChange(name, {code, lang, theme, isExecButton})
+    }
+
     function changeCode(newValue) {
         code = newValue;
-        onChange(name, {code, lang, theme})
+        onChange(name, {code, lang, theme, isExecButton})
     }
 
     function changeTheme({target}) {
         theme = target.value;
         setUpdate(new Date())
-        onChange(name, {code, lang, theme: target.value})
+        onChange(name, {code, lang, theme, isExecButton})
     }
 
     function changeLang({target}) {
         lang = target.value;
         setUpdate(new Date())
-        onChange(name, {code, lang: target.value, theme})
+        onChange(name, {code, lang, theme})
     }
 
     return <div className="code-editor">
         <div className="code-editor__control">
+            Кнопка выполнить<input type="checkbox" checked={isExecButton} onChange={changeExec}/>
             <select name="Theme" onChange={changeTheme} value={theme!}>
                 <option value="monokai">monokai</option>
                 <option value="github">github</option>

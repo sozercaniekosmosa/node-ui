@@ -36,7 +36,7 @@ export function Header({onEvent}) {
         <button onClick={() => eventEmit('delete')} title="Удалить delete">
             <div className="icon-delete"/>
         </button>
-        <button onClick={() => eventEmit('property')} title="Свойства">
+        <button onClick={() => eventEmit('property-open')} title="Свойства">
             <div className="icon-property"/>
         </button>
         <button onClick={() => eventEmit('start')} title="Запустить сервисы">

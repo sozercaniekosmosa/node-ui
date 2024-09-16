@@ -6,6 +6,7 @@
   margin: 1em;
 }
 .code-editor__control {
+  display: flex;
   align-self: end;
   margin-bottom: 0.5em;
 }

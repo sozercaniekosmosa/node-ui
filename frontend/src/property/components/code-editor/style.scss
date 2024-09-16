@@ -9,6 +9,7 @@ $color-gray: rgba(128, 128, 128, 0.5);
   margin: 1em;
 
   &__control {
+    display: flex;
     align-self: end;
     margin-bottom: 0.5em;
   }

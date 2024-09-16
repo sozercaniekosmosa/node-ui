@@ -8,7 +8,7 @@
     "build-back": "tsc && tsc-alias",
     "dev-back": "npx tsx watch ./src",
     "dev-back-bun": "bun --inspect run ./src",
-    "dev-nodes": "npx tsx watch nodes/sum 3000 umWGlpu"
+    "dev-nodes": "npx tsx watch nodes/action 3000 umWGlpu"
   },
   "keywords": [],
   "author": "",

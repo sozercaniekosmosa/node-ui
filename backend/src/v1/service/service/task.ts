@@ -20,7 +20,7 @@ export const killTask = async ({id = null, host = null, port = null}): any => {
             port = hostPort.port;
         }
 
-        const {data: {text}} = await axios.post(`http://${host}:${port}/service/kill`)
+        const {data: {text}} = await axios.post(`http://${host}:${port}/kill`)
         return `Процесс (${host}:${port})` + text;
     } catch (e) {
         return `Процесс (${host}:${port}) не ответил на команду завершения`
@@ -68,7 +68,7 @@ export async function requestStatusTask({id = null, host = null, port = null}): 
             port = hosts[id].port;
         }
 
-        const {data: status}: TStatus = await axios.get(`http://${host}:${port}/service/status`);
+        const {data: status}: TStatus = await axios.get(`http://${host}:${port}/status`);
         return status;
     } catch (e) {
         return <TStatus>{state: 'stop', hostPort: {host, port}, id}
@@ -89,8 +89,9 @@ export async function launchTask(id) {
         //если сервис еще не запущен
         try {
             if (await isAllowHostPortServ(host, portNode)) {
-                const child = spawn('start', ['/B', path, global.port, id], { //запускаем
-                    cwd: './nodes/sum',
+                const child = spawn('start', [path, global.port, id], { //запускаем
+                    // const child = spawn('start', ['/B', path, global.port, id], { //запускаем
+                    cwd: `./nodes/${nodeName}`,
                     shell: true,
                     // detached: true,  // Открепляет процесс
                     stdio: 'ignore'     // Игнорирует стандартные потоки ввода/вывода
@@ -111,14 +112,15 @@ export async function launchTask(id) {
     }
 }
 
-export async function taskCMD(id, cmd, data) {
+export async function taskCMD(id, cmd): Promise<any> {
     const taskList: TTaskList = await readTasks();
     const {nodeName, cfg, in: input, out, hostPort: {host, port: portNode}} = taskList[id];
 
+    console.log(id)
     try {
-        const res = await axios.post(`http://${host}:${portNode}/service/cmd/${cmd}`, {data})
+        const res = await axios.post(`http://${host}:${portNode}/cmd/${cmd}`)
         console.log(res.data)
-        return res.data.text;
+        return res.data;
     } catch (error) {
         if (error?.name == 'AxiosError') throw {status: error.response.status, message: error.message};
         throw error;
