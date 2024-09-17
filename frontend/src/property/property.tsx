@@ -41,6 +41,22 @@ export function Property({node, onEvent}) {
         setStatus(node.dataset.state);
         setArrCfg(JSON.parse(decompressString(node.dataset.cfg)!));
         refProp?.current && refProp?.current.focus();
+
+        eventBus.addEventListener('message-socket', ({type, data}: TMessage) => {
+
+            if (!node && data && node.id != data.id) return;
+
+            switch (type) {
+                case "log":
+                    break;
+                case "server-init":
+                    setStatus('stop');
+                    break;
+                case "node-status":
+                    setStatus(data.state);
+                    break;
+            }
+        });
     }, [])
 
     function setStatus(state) {
@@ -52,22 +68,6 @@ export function Property({node, onEvent}) {
         }
         setStatusColor(fill);
     }
-
-
-    eventBus.addEventListener('message-socket', ({type, data}: TMessage) => {
-        if (!node && data && node.id != data.id) return;
-
-        switch (type) {
-            case "log":
-                break;
-            case "server-init":
-                setStatus('stop');
-                break;
-            case "node-status":
-                setStatus(data.state);
-                break;
-        }
-    });
 
     const onChangeParam = (name, val) => {
         Object.entries(arrCfg).forEach(([tabName, arrParam]) => {

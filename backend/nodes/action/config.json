@@ -4,7 +4,7 @@
     "color": "#d2d4df",
     "arrIn": ["in"],
     "arrOut": ["out"],
-    "arrButton": ["Действие"],
+    "arrButton": ["►"],
     "cfg": {
         "сеть": [
             {"name": "hostPort", "type": "host-port", "val": {"host":"localhost", "port": 3000}, "title": "Адрес и порт", "arrOption": []},

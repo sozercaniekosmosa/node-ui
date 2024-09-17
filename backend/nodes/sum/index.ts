@@ -22,8 +22,7 @@ const agentPort = process.argv[2];
 const id = process.argv[3];
 const {task, hosts}: TInitData = await getInitData();
 
-const routerIn = express.Router();
-const routerService = express.Router();
+const router = express.Router();
 
 app.use(bodyParser.json());
 app.use(bodyParser.raw());
@@ -54,7 +53,6 @@ const update = debounce(() => {
 
     }
 }, 1000);
-if (task && hosts) update();
 
 async function sendMessage<TMessage>(type, data = null) {
     try {
@@ -93,7 +91,7 @@ async function getInitData(): Promise<TInitData> {
     }
 }
 
-routerIn.post('/:name', (req: any, res: any) => {
+router.post('in/:name', (req: any, res: any) => {
     const name = req.params.name.toLocaleLowerCase();
     try {
         const {body: {data}} = req
@@ -109,7 +107,7 @@ routerIn.post('/:name', (req: any, res: any) => {
     }
 });
 
-routerService.post('/kill', async (req: any, res: any) => {
+router.post('/kill', async (req: any, res: any) => {
     status.state = 'stop';
     try {
         await sendMessage('node-status', status)
@@ -119,30 +117,27 @@ routerService.post('/kill', async (req: any, res: any) => {
     res.send({status: 'OK', text: 'команда на завершение принята'});
     process.exit(0);
 });
-routerService.post('/cmd', (req: any, res: any) => {
+router.post('/cmd', (req: any, res: any) => {
     const cmd = req.params.cmd
     const {body: data} = req;
     console.log(cmd)
     res.send({status: 'OK', text: `команда ${cmd} принята`});
 });
-routerService.get('/status', async (req: any, res: any) => {
+router.get('/status', async (req: any, res: any) => {
     // await sendMessage('node-status', status)
     res.send(<TStatus>status);
 });
+app.use('/', router);
 
 
-app.use('/in', routerIn);
-app.use('/service', routerService);
+let exitTimeoutId: NodeJS.Timeout;
+[`exit`, `SIGINT`, `SIGUSR1`, `SIGUSR2`, `uncaughtException`, `SIGTERM`].forEach((eventType) => process.on(eventType, killProcess))
 
-// async function messageLoop() {
-//
-//     try {
-//         await axios.post(`http://localhost:${agentPort}/api/v1/service/message/${id}`, {dest: 'node-status', data: status})
-//     } catch (e) {
-//         console.log(e)
-//     } finally {
-//         setTimeout(messageLoop, 2000);
-//     }
-// }
-//
-// messageLoop();
+async function killProcess() {
+    if (exitTimeoutId) return;
+    exitTimeoutId = setTimeout(() => process.exit(0), 2000);
+    status.state = 'stop';
+    await sendMessage('node-status', status)
+}
+
+process.stdin.resume();

@@ -89,8 +89,8 @@ export async function launchTask(id) {
         //если сервис еще не запущен
         try {
             if (await isAllowHostPortServ(host, portNode)) {
-                const child = spawn('start', [path, global.port, id], { //запускаем
-                    // const child = spawn('start', ['/B', path, global.port, id], { //запускаем
+                // const child = spawn('start', [path, global.port, id], { //запускаем
+                    const child = spawn('start', ['/B', path, global.port, id], { //запускаем
                     cwd: `./nodes/${nodeName}`,
                     shell: true,
                     // detached: true,  // Открепляет процесс

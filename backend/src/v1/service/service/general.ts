@@ -94,7 +94,7 @@ export const addMess = async (mess: TMessage) => {
     return `Сообщение добавлено`;
 };
 
-export const updateStatesRunningNow = async () => {
+export const updateStatesRunning = async () => {
     let running: TRunningList = await readRunning() || {};
     let hosts = await readHosts() || {};
 
@@ -118,9 +118,9 @@ export const updateStatesRunningNow = async () => {
     await writeRunning(running)
 };
 
-export const updateStatesRunning = debounce(updateStatesRunningNow, 2000)
-
 export const setStateRunning = async (status: TStatus) => {
+    await updateStatesRunning();
+
     let running: TRunningList = await readRunning() ?? {};
     const {id, hostPort, state} = status;
 
@@ -131,8 +131,6 @@ export const setStateRunning = async (status: TStatus) => {
         delete running[id];
     }
     await writeRunning(running)
-
-    await updateStatesRunning();
 }
 
 

@@ -19,7 +19,7 @@ function getComponentStruct(node, nodeProject): TTask {
 
     const arrCfg = JSON.parse(decompressString(node.dataset.cfg)!);
 
-    const excludeFields = new Set(['description']);
+    const excludeFields = new Set(['description', 'taskControl']);
     (Object.entries(arrCfg) as [TArrCfg]).forEach(([tabName, arrParam]) =>
         arrParam.forEach(({name, type, val}) => {
             if (name === 'hostPort') {

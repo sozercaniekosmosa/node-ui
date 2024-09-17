@@ -116,7 +116,13 @@ export class NodeUI extends Svg {
         const boxNodeDesc: DOMRect = this.calculateTextBox(nodeName!, NodeSelector.nodeText)
 
         if (arrButton) {
-            arrButton.forEach(item => midHtml += `<button data-cmd="${item}">${item}</button>`);
+            arrButton.forEach(item => {
+                if (item.startsWith('icon')) {
+                    midHtml += `<button data-cmd="${item}"><div class="${item}"></div></button>`;
+                } else {
+                    midHtml += `<button data-cmd="${item}">${item}</button>`;
+                }
+            });
 
             midDimCalc = this.calculateHtmlBox(`<div class="button-panel">${midHtml}</div>`)
             midWidth = midDimCalc.width;

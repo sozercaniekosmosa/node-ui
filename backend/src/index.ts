@@ -6,17 +6,15 @@ import bodyParser from "body-parser";
 import apicache from "apicache";
 import v1ServiceRouter from "./v1/service/routes";
 import global from "./global";
-import {readData, WEBSocket} from "./utils";
-import {TTaskList} from "../../general/types";
-import {requestStatusTask} from "./v1/service/service/task";
-import {addMess, readRunning, readTasks, updateStatesRunningNow} from "./v1/service/service/general";
+import {WEBSocket} from "./utils";
+import {addMess, readRunning, updateStatesRunning} from "./v1/service/service/general";
 
 
 const {parsed: {PORT}} = config();
 const port = +process.env.PORT || +PORT;
 
 global.port = port
-await updateStatesRunningNow();
+await updateStatesRunning();
 
 createWebServer(global.port);
 
@@ -42,6 +40,7 @@ function createWebServer(port): any | null {
     global.messageSocket = new WEBSocket(webServ, {
         clbAddConnection: async () => {
             try {
+                await updateStatesRunning();
                 const runningList = await readRunning();
                 await addMess({type: 'server-init'});
                 for (const status of Object.values(runningList)) { // не отправляет статусы выключено

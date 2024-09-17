@@ -8,7 +8,7 @@ import {TInitData, TLink, TStatus} from "../../../general/types";
 
 const app = express();
 
-let input;
+
 let status: TStatus = {id: '', hostPort: undefined, state: "stop"};
 
 const agentPort = process.argv[2];
@@ -28,23 +28,35 @@ export const debounce = (func, ms) => {
         timeout = setTimeout(() => func.apply(this, arguments), ms);
     };
 };
-const update = debounce(() => {
+const evaluation = (codeEditor, val) => {
+    try {
+        const fn = eval(codeEditor.code)
+        return fn(val)
+    } catch (e) {
+        console.log(e)
+    }
+}
+
+const update = (input) => {
+    const data = evaluation(task.cfg[0][1], input);
     try {
         Object.entries(task.out as TLink).forEach(([key, arrHostConsumer]) => {
-            (arrHostConsumer as []).forEach(async (host: string) => {
-                const [id, inputName] = host.split('.');
-                const {ip, port} = hosts[id]
-
-                const res = await axios.post(`http://${ip}:${port}/in/${inputName}`, {data: input})
-                console.log(res.data)
-                console.log(id, inputName)
+            (arrHostConsumer as []).forEach(async (path: string) => {
+                const [id, inputName] = path.split('.');
+                const {host, port} = hosts[id];
+                try {
+                    const res = await axios.post(`http://${host}:${port}/in/${inputName}`, {data})
+                    console.log(res.data)
+                    console.log(id, inputName)
+                } catch (e) {
+                    console.log(e)
+                }
             })
         });
     } catch (e) {
-
+        console.log(e)
     }
-}, 1000);
-if (task && hosts) update();
+};
 
 async function sendMessage<TMessage>(type, data = null) {
     try {
@@ -89,11 +101,10 @@ router.post('in/:name', (req: any, res: any) => {
 
 
         if (name == 'in')
-            input = data;
+            update(data);
 
         res.send({status: 'OK', text: 'привет из сервиса ' + data});
         // console.log(data)
-        update();
     } catch (e) {
 
     }
@@ -111,8 +122,14 @@ router.post('/kill', async (req: any, res: any) => {
 router.post('/cmd/:cmd', (req: any, res: any) => {
     const cmd = req.params.cmd
     const {body: data} = req;
-    // console.log(cmd)
-    res.send(`команда ${cmd} принята`);
+    try {
+
+        console.log(cmd)
+        update(null)
+        res.send(`команда ${cmd} принята`);
+    } catch (e) {
+        console.log(e)
+    }
 });
 router.get('/status', async (req: any, res: any) => {
     // await sendMessage('node-status', status)
