@@ -7,14 +7,15 @@ import String from "./components/string/string";
 import CodeEditor from "./components/code-editor/code-editor";
 import {TChangeProps, TMessage} from "../../../general/types";
 import TaskControl from "./components/task-control/task-control";
+import Checkbox from "./components/checkbox/checkbox";
 
 export type TEventProperty = {
     name: 'property-change' | 'property-open' | 'property-close',
     data?: any
 }
 let arrKey = {};
-// let node = null;
 let nodeName: string = '';
+let nodeID: string = '';
 
 const noType = (typeName) => () => <b style={{color: "#cc0000"}}>[{typeName}]</b>
 const listTypeComponent = {
@@ -23,11 +24,15 @@ const listTypeComponent = {
     'host-port': HostPort,
     'code-editor': CodeEditor,
     'task-control': TaskControl,
+    'checkbox': Checkbox,
 }
+
+
+let mess: ({type, data}: TMessage) => void;
+eventBus.addEventListener('message-socket', param => mess && mess(param));
 
 export function Property({node, onEvent}) {
 
-    // const [show, setShow] = useState(false);
     let [statusColor, setStatusColor] = useState('#fff');
     let [isChanged, setIsChanged] = useState(false); //флаг -- компонент изменен
     let [arrCfg, setArrCfg] = useState([]);
@@ -42,9 +47,8 @@ export function Property({node, onEvent}) {
         setArrCfg(JSON.parse(decompressString(node.dataset.cfg)!));
         refProp?.current && refProp?.current.focus();
 
-        eventBus.addEventListener('message-socket', ({type, data}: TMessage) => {
-
-            if (!node && data && node.id != data.id) return;
+        mess = ({type, data}: TMessage) => {
+            if (!node && data || node.id != data.id) return;
 
             switch (type) {
                 case "log":
@@ -56,10 +60,11 @@ export function Property({node, onEvent}) {
                     setStatus(data.state);
                     break;
             }
-        });
+        };
+
     }, [])
 
-    function setStatus(state) {
+    function setStatus(state: string) {
         let fill = '#dcdcdc';
         if (state) {
             (state === 'run') && (fill = '#b6ffc8');
@@ -83,13 +88,14 @@ export function Property({node, onEvent}) {
         })
     }
 
-    let onApply = () => {
+    let onApply = (isClose = true) => {
         if (isChanged) {
             // console.log('apply')
             node.dataset.cfg = compressString(JSON.stringify(arrCfg));
             onEvent({name: 'property-change', data: node})
+            setIsChanged(false);
         }
-        onEvent({name: 'property-close'})
+        if (isClose) onEvent({name: 'property-close'})
     };
     let onCancel = () => {
         if (isChanged) {
@@ -127,6 +133,10 @@ export function Property({node, onEvent}) {
         }
 
         if (arrKey?.['control-left'] && (arrKey?.['enter'] || arrKey?.['numpad-enter'])) onApply()
+        if (arrKey?.['control-left'] && arrKey?.['key-s']) {
+            onApply(false);
+            e.preventDefault();
+        }
         // console.log(e.code.toLowerCase())
     }
 
@@ -183,8 +193,9 @@ export function Property({node, onEvent}) {
                 </div>
 
                 <div className="prop__footer">
-                    <button onClick={onApply}>Применить</button>
+                    <button onClick={() => onApply()}>Применить</button>
                     <button onClick={onCancel}>Отмена</button>
+                    <button onClick={() => onApply(false)}>Сохранить</button>
                 </div>
             </div>
         </div>

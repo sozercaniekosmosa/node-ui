@@ -119,7 +119,7 @@ export async function getToolbox() {
 export async function startTask(id) {
     try {
         let text = await post(routService + 'task/start/' + id ?? '', 'text/plain')
-        console.log(text);
+        // console.log(text);
     } catch (error) {
         console.error('Error fetching data:', error);
     }
@@ -128,7 +128,7 @@ export async function startTask(id) {
 export async function stopTask(id) {
     try {
         let text = await post(routService + 'task/stop/' + id ?? '', 'text/plain')
-        console.log(text);
+        // console.log(text);
     } catch (error) {
         console.error('Error fetching data:', error);
     }

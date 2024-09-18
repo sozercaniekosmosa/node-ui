@@ -201,3 +201,14 @@ export const writeData = (path: string, data: any): any => {
         throw error;
     }
 };
+
+export async function checkFileExists(filePath) {
+    try {
+        await fsPromises.access(filePath);
+        console.log(`Файл ${filePath} существует.`);
+        return true;
+    } catch (error) {
+        console.log(`Файл ${filePath} не существует.`);
+        return false;
+    }
+}

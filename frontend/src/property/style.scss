@@ -41,6 +41,8 @@ $color-gray: rgba(128, 128, 128, 0.5);
 
     padding: .2em .4em;
     border-bottom: 1px solid $color-gray;
+
+    border-radius: 3px 3px 0 0;
   }
 
   &__param--1 {

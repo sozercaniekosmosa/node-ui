@@ -22,7 +22,7 @@ export default function ({name, val, onChange, node}: TChangeProps) {
     useEffect(() => {
         setStatus(node.dataset.state)
         eventBus.addEventListener('message-socket', ({type, data}: TMessage) => {
-            if (!node && data && node.id != data.id) return;
+            if (!node && data || node.id != data.id) return;
 
             switch (type) {
                 case "server-init":

@@ -6,6 +6,7 @@ export class EditorLinkRemove {
     public nodeStart: SVGElement | null = null;
     private nodeRemove: SVGElement | null = null;
     private readonly svg: SVGElement;
+    private arrKey = [];
 
     constructor(private nu: NodeUI) {
         this.svg = nu.svg;
@@ -13,6 +14,8 @@ export class EditorLinkRemove {
         this.svg.addEventListener('svgmousedown', (e: CustomEventInit) => this.handlerMouseDown(e.detail));
         this.svg.addEventListener('svgmouseup', (e: CustomEventInit) => this.handlerMouseUp(e.detail));
         this.svg.addEventListener('svgmousemove', (e: CustomEventInit) => this.handlerMouseMove(e.detail));
+        document.addEventListener('keydown', (e) => this.arrKey[e.code.toLowerCase()] = true);
+        document.addEventListener('keyup', (e) => this.arrKey[e.code.toLowerCase()] = false);
     }
 
     public removeNode(node: SVGElement) {
@@ -28,12 +31,12 @@ export class EditorLinkRemove {
             setEnd.delete(startConnId);
             nodeDestConn.dataset.to = [...setEnd].join(' ');
         }
-        const gpath = this.svg.querySelector('.'+NodeSelector.path)
+        const gpath = this.svg.querySelector('.' + NodeSelector.path)
         node && gpath.removeChild(node as Element);
     }
 
     public handlerMouseDown({p, target}: TMouseEvent): void {
-        if (this.nu.key['altleft']) this.nu.setMode('link-remove');
+        if (this.arrKey['altleft']) this.nu.setMode('link-remove');
         if (!this.nu.isMode('link-remove')) return;
 
         if (target == this.svg) {
@@ -42,7 +45,7 @@ export class EditorLinkRemove {
     }
 
     public handlerMouseMove({p, start: s}: TMouseEvent): void {
-        if (!this.nu.key['altleft']) this.nu.resetMode('link-remove');
+        if (!this.arrKey['altleft']) this.nu.resetMode('link-remove');
         if (!this.nu.isMode('link-remove')) return;
 
         if (this.nodeRemove) {

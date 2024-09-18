@@ -1,9 +1,9 @@
 import {spawn} from "child_process";
 import global from "../../../global"
 import axios from "axios";
-import {TMessage, TRunningList, TStatus, TTaskList} from "../../../../../general/types";
+import {TCfg, TMessage, TRunningList, TStatus, TTaskList} from "../../../../../general/types";
 import {addMess, isAllowHostPortServ, readHosts, readRunning, readTasks, writeHosts, writeTasks} from "./general";
-import {pathResolveRoot} from "../../../utils";
+import {checkFileExists, pathResolveRoot} from "../../../utils";
 
 
 export const killTask = async ({id = null, host = null, port = null}): any => {
@@ -78,9 +78,14 @@ export async function requestStatusTask({id = null, host = null, port = null}): 
 export async function launchTask(id) {
     const taskList: TTaskList = await readTasks();
     const {nodeName, cfg, in: input, out, hostPort: {host, port: portNode}} = taskList[id];
+    let pfx = '';
 
-    let path = pathResolveRoot(`./nodes/${nodeName}/launch.bat`)
 
+    cfg.forEach(([title, val, type]) => {
+        (type == 'code-editor') && (pfx = '.' + val.lang);
+    })
+
+    let path = pathResolveRoot(`./nodes/${nodeName}/launch${pfx}.bat`)
 
     let {state} = await requestStatusTask({host, port: portNode});
     if (state == 'run') {
@@ -89,8 +94,10 @@ export async function launchTask(id) {
         //если сервис еще не запущен
         try {
             if (await isAllowHostPortServ(host, portNode)) {
+                if (!await checkFileExists(path))
+                    throw {status: 500, message: `Файл [${path}] не существует`};
                 // const child = spawn('start', [path, global.port, id], { //запускаем
-                    const child = spawn('start', ['/B', path, global.port, id], { //запускаем
+                const child = spawn('start', ['/B', path, global.port, id], { //запускаем
                     cwd: `./nodes/${nodeName}`,
                     shell: true,
                     // detached: true,  // Открепляет процесс
@@ -107,7 +114,7 @@ export async function launchTask(id) {
             }
         } catch (e) {
             console.log(e)
-            throw {status: 500, message: `Сервис ${id} запустить не удалось`};
+            throw {status: 500, message: `Сервис [${id}] запустить не удалось ${e}`};
         }
     }
 }
