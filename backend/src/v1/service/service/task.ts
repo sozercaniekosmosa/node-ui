@@ -1,7 +1,7 @@
 import {spawn} from "child_process";
 import global from "../../../global"
 import axios from "axios";
-import {TCfg, TMessage, TRunningList, TStatus, TTaskList} from "../../../../../general/types";
+import {TMessage, TRunningList, TStatus, TTaskList} from "../../../../../general/types";
 import {addMess, isAllowHostPortServ, readHosts, readRunning, readTasks, writeHosts, writeTasks} from "./general";
 import {checkFileExists, pathResolveRoot} from "../../../utils";
 
@@ -81,9 +81,9 @@ export async function launchTask(id) {
     let pfx = '';
 
 
-    cfg.forEach(([title, val, type]) => {
-        (type == 'code-editor') && (pfx = '.' + val.lang);
-    })
+    // cfg.forEach(([title, val, type]) => {
+    //     (type == 'code-editor') && (pfx = '.' + val.lang);
+    // })
 
     let path = pathResolveRoot(`./nodes/${nodeName}/launch${pfx}.bat`)
 

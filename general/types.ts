@@ -66,3 +66,7 @@ export interface TInitData {
     task: TTask;
     hosts: THost
 }
+
+export interface TCallback {
+    (task: TTask, data: { [key: string]: any }): any
+}

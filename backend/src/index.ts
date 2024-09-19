@@ -8,6 +8,7 @@ import v1ServiceRouter from "./v1/service/routes";
 import global from "./global";
 import {WEBSocket} from "./utils";
 import {addMess, readRunning, updateStatesRunning} from "./v1/service/service/general";
+import {loadPyodide} from "pyodide";
 
 
 const {parsed: {PORT}} = config();
@@ -54,3 +55,12 @@ function createWebServer(port): any | null {
 // console.log(env.parsed)
 }
 
+async function main() {
+    let pyodide = await loadPyodide();
+    // Pyodide is now ready to use...
+    console.log(pyodide.runPython(`
+    import sys
+    sys.version
+  `));
+};
+main();
