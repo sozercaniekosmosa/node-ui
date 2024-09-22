@@ -1,11 +1,14 @@
 import Node from "./Node";
 import {loadPyodide} from "pyodide";
 
+const {sendMessage} = await Node(evalJS)
+
 let pyodide;
-const evalJS = async (task, data) => {
+
+async function evalJS(task, data) {
+    const debug = task.cfg.debug[0];
     try {
-        const debug = task.cfg[0][1];
-        const {code, lang} = task.cfg[1][1];
+        const {code, lang} = task.cfg.codeEditor[0];
 
         if (!code) return;
 
@@ -17,10 +20,9 @@ const evalJS = async (task, data) => {
         }
     } catch (e) {
         console.log(e)
+        debug && await sendMessage('node-log-error', {id: task.id, message:e.toString()});
     }
-};
-
-await Node(evalJS)
+}
 
 
 

@@ -3,11 +3,33 @@
 <head>
     <meta charset="UTF-8"/>
     <link rel="icon" type="image/svg+xml" href="./favicon.svg"/>
+    <link rel="stylesheet" type="text/css" href="./style.css"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Капсула</title>
+
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            outline: 1px solid #cccccc;
+        }
+
+        header, footer {
+            height: 40px; /* Скролл, прощай! */
+            outline: 1px solid #cccccc;
+        }
+
+        .content {
+            flex-grow: 1;
+            outline: 1px solid #cccccc;
+            overflow: auto;
+        }
+    </style>
 </head>
 <body>
-    <div class="root"></div>
-    <script type="module" src="/src/root.tsx"></script>
+<div class="root"></div>
+<script type="module" src="/src/root.tsx"></script>
+
 </body>
 </html>

@@ -9,10 +9,10 @@ let routService: string = `http://localhost:${port}/api/v1/service/`;
 
 function getComponentStruct(node, nodeProject): TTask {
 
-    let data: TTask = {cfg: [], hostPort: {host: "", port: 0}, id: "", nodeName: ""};
+    let data: TTask = {cfg: {}, hostPort: undefined, id: "", nodeName: ""};
     data.id = node.id;
     data.nodeName = node.dataset.nodeName;
-    data.cfg = [];
+    data.cfg = {};
 
     type TParam = { name: string, type: string, val: any, title: string, arrOption: [string] }
     type TArrCfg = [string, [TParam]]
@@ -26,7 +26,8 @@ function getComponentStruct(node, nodeProject): TTask {
                 data.hostPort = val;
                 return;
             }
-            !excludeFields.has(name) && (data.cfg.push([name, val, type]));
+            // !excludeFields.has(name) && (data.cfg.push([name, val, type]));
+            !excludeFields.has(name) && (data.cfg[name] = [val, type]);
         }));
 
     var arrIn = [...node.querySelectorAll('.' + NodeSelector.pinIn) as NodeListOf<HTMLElement>];
@@ -116,6 +117,24 @@ export async function getToolbox() {
     }
 }
 
+export async function startTasks() {
+    try {
+        let text = await post(routService + 'task/start', 'text/plain')
+        console.log(text);
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+}
+
+export async function stopTasks() {
+    try {
+        let text = await post(routService + 'task/stop', 'text/plain')
+        console.log(text);
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+}
+
 export async function startTask(id) {
     try {
         let text = await post(routService + 'task/start/' + id ?? '', 'text/plain')
@@ -137,7 +156,7 @@ export async function stopTask(id) {
 export async function sendCmd(id, cmd) {
     try {
         let text = await post(routService + `cmd/${id}`, 'text/plain', cmd)
-        console.log(text);
+        // console.log(text);
     } catch (error) {
         console.error(`Ошибка команды: ${id}.${cmd}`, error);
     }

@@ -1,4 +1,4 @@
-.header {
+.footer {
   flex-shrink: 0;
   height: 36px;
   border: 1px solid gray;
@@ -6,14 +6,14 @@
   padding: 0.2em;
   box-shadow: 0 0 11px -6px rgb(0, 0, 0);
 }
-.header, .header *, .header * * {
+.footer, .footer *, .footer * * {
   user-select: none;
 }
-.header > * {
+.footer > * {
   margin-right: 0.2em;
   background-color: rgba(0, 0, 0, 0.03);
 }
-.header-highlight {
+.footer-highlight {
   background-color: #b3ffb9;
 }
 

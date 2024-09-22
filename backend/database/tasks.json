@@ -1,0 +1,48 @@
+{
+  "uoKabJR": {
+    "cfg": {
+      "qwq": [
+        2.2,
+        "number"
+      ]
+    },
+    "hostPort": {
+      "host": "localhost",
+      "port": 3002
+    },
+    "id": "uoKabJR",
+    "nodeName": "sum",
+    "in": {
+      "A": [
+        "up1R7qk.out"
+      ]
+    }
+  },
+  "up1R7qk": {
+    "cfg": {
+      "debug": [
+        true,
+        "checkbox"
+      ],
+      "codeEditor": [
+        {
+          "code": "(data)=>{\n    \n    var res = '';\n    for (var i = 0; i < 6; i++) {\n        res += i+','\n    }\n    \n    return res;\n    \n}",
+          "lang": "javascript",
+          "theme": "monokai"
+        },
+        "code-editor"
+      ]
+    },
+    "hostPort": {
+      "host": "localhost",
+      "port": 3001
+    },
+    "id": "up1R7qk",
+    "nodeName": "action",
+    "out": {
+      "out": [
+        "uoKabJR.A"
+      ]
+    }
+  }
+}

@@ -8,6 +8,7 @@ import CodeEditor from "./components/code-editor/code-editor";
 import {TChangeProps, TMessage} from "../../../general/types";
 import TaskControl from "./components/task-control/task-control";
 import Checkbox from "./components/checkbox/checkbox";
+import {Tab} from "../tab/tab";
 
 export type TEventProperty = {
     name: 'property-change' | 'property-open' | 'property-close',
@@ -48,8 +49,6 @@ export function Property({node, onEvent}) {
         refProp?.current && refProp?.current.focus();
 
         mess = ({type, data}: TMessage) => {
-            if (!node && data || node.id != data.id) return;
-
             switch (type) {
                 case "log":
                     break;
@@ -57,6 +56,7 @@ export function Property({node, onEvent}) {
                     setStatus('stop');
                     break;
                 case "node-status":
+                    if (!node && data || node.id != data?.id) break;
                     setStatus(data.state);
                     break;
             }
@@ -140,6 +140,32 @@ export function Property({node, onEvent}) {
         // console.log(e.code.toLowerCase())
     }
 
+
+    const arrTab = Object.entries(arrCfg).map(([tabName, arrParam], iTab) => {
+        const isTab = arrParam?.[0]?.arrOption?.[0] == 'tab';
+        return [tabName, arrParam.map(({name, type, val, title, arrOption}, i) => {
+            let comp = listTypeComponent[type] ? listTypeComponent[type] : noType(type);
+            let arrStyle = [];
+            if (arrOption) {
+                let setCSS = new Set(['center', 'right', 'left', '1', '2', '3', 'hr', 'tab'])
+                arrOption.forEach(it => setCSS.has(it) && arrStyle.push('prop__param--' + it))
+            }
+
+            let props: TChangeProps = {name, val, title, key: i, onChange: onChangeParam, node};
+            let res: React.ReactElement;
+            if (isTab) {
+                res = createElement(comp, props);
+            } else {
+                res = <div className={"prop__param " + arrStyle.join(' ')} key={i}>
+                    {title ? <div className="prop__param__name">{title + ':'}</div> : ''}
+                    {createElement(comp, props)}
+                </div>;
+            }
+            return res
+        }), isTab ? 'tab__body__item--contents' : '']
+    });
+
+
     return (
         <div className="prop" ref={refProp} tabIndex={-1} onKeyDown={onKeyDown} onKeyUp={onKeyUp}
              onClick={({target}) => (target as Element).classList.contains('prop') && onCancel()}>
@@ -153,44 +179,8 @@ export function Property({node, onEvent}) {
                         <div className="icon-cross" style={{width: '16px', height: '16px'}}></div>
                     </button>
                 </div>
-                <div className="tab__header" onClick={onClickTab}>
-                    {Object.entries(arrCfg).map(([tabName, arrParam], iTab) => {
-                        return <div
-                            className={"tab__header__item " + (iTab == 0 ? 'tab__header__item--active' : '')}
-                            key={iTab}
-                            data-index={iTab}>{tabName}</div>
-                    })}
-                </div>
-                <div className="tab__body" ref={refPropTabs}>
-                    {Object.entries(arrCfg).map(([tabName, arrParam], iTab) => {
-                        const isTab = arrParam?.[0]?.arrOption?.[0] == 'tab';
-                        return (
-                            <div className={"tab__body__item" + (isTab ? " tab__body__item--contents" : "")} key={iTab}
-                                 style={iTab !== 0 ? {display: 'none'} : {}}>
-                                {arrParam.map(({name, type, val, title, arrOption}, i) => {
-                                    let comp = listTypeComponent[type] ? listTypeComponent[type] : noType(type);
-                                    let arrStyle = [];
-                                    if (arrOption) {
-                                        let setCSS = new Set(['center', 'right', 'left', '1', '2', '3', 'hr', 'tab'])
-                                        arrOption.forEach(it => setCSS.has(it) && arrStyle.push('prop__param--' + it))
-                                    }
 
-                                    let props: TChangeProps = {name, val, title, key: i, onChange: onChangeParam, node};
-                                    let res: React.ReactElement;
-                                    if (isTab) {
-                                        res = createElement(comp, props);
-                                    } else {
-                                        res = <div className={"prop__param " + arrStyle.join(' ')} key={i}>
-                                            {title ? <div className="prop__param__name">{title + ':'}</div> : ''}
-                                            {createElement(comp, props)}
-                                        </div>;
-                                    }
-                                    return res
-                                })}
-                            </div>)
-
-                    })}
-                </div>
+                <Tab arrTab={arrTab}/>
 
                 <div className="prop__footer">
                     <button onClick={() => onApply()}>Применить</button>
@@ -201,6 +191,68 @@ export function Property({node, onEvent}) {
         </div>
 
     )
+
+    // return (
+    //     <div className="prop" ref={refProp} tabIndex={-1} onKeyDown={onKeyDown} onKeyUp={onKeyUp}
+    //          onClick={({target}) => (target as Element).classList.contains('prop') && onCancel()}>
+    //         <div className="prop__menu">
+    //             <div className="prop__header" ref={refHeader} style={{backgroundColor: statusColor}}>
+    //                 <div>
+    //                     Конфигуратор: {nodeName}
+    //                     <div style={{display: 'inline'}}>{isChanged ? '*' : ''}</div>
+    //                 </div>
+    //                 <button onClick={onCancel}>
+    //                     <div className="icon-cross" style={{width: '16px', height: '16px'}}></div>
+    //                 </button>
+    //             </div>
+    //             <div className="tab__header" onClick={onClickTab}>
+    //                 {Object.entries(arrCfg).map(([tabName, arrParam], iTab) => {
+    //                     return <div
+    //                         className={"tab__header__item " + (iTab == 0 ? 'tab__header__item--active' : '')}
+    //                         key={iTab}
+    //                         data-index={iTab}>{tabName}</div>
+    //                 })}
+    //             </div>
+    //             <div className="tab__body" ref={refPropTabs}>
+    //                 {Object.entries(arrCfg).map(([tabName, arrParam], iTab) => {
+    //                     const isTab = arrParam?.[0]?.arrOption?.[0] == 'tab';
+    //                     return (
+    //                         <div className={"tab__body__item" + (isTab ? " tab__body__item--contents" : "")} key={iTab}
+    //                              style={iTab !== 0 ? {display: 'none'} : {}}>
+    //                             {arrParam.map(({name, type, val, title, arrOption}, i) => {
+    //                                 let comp = listTypeComponent[type] ? listTypeComponent[type] : noType(type);
+    //                                 let arrStyle = [];
+    //                                 if (arrOption) {
+    //                                     let setCSS = new Set(['center', 'right', 'left', '1', '2', '3', 'hr', 'tab'])
+    //                                     arrOption.forEach(it => setCSS.has(it) && arrStyle.push('prop__param--' + it))
+    //                                 }
+    //
+    //                                 let props: TChangeProps = {name, val, title, key: i, onChange: onChangeParam, node};
+    //                                 let res: React.ReactElement;
+    //                                 if (isTab) {
+    //                                     res = createElement(comp, props);
+    //                                 } else {
+    //                                     res = <div className={"prop__param " + arrStyle.join(' ')} key={i}>
+    //                                         {title ? <div className="prop__param__name">{title + ':'}</div> : ''}
+    //                                         {createElement(comp, props)}
+    //                                     </div>;
+    //                                 }
+    //                                 return res
+    //                             })}
+    //                         </div>)
+    //
+    //                 })}
+    //             </div>
+    //
+    //             <div className="prop__footer">
+    //                 <button onClick={() => onApply()}>Применить</button>
+    //                 <button onClick={onCancel}>Отмена</button>
+    //                 <button onClick={() => onApply(false)}>Сохранить</button>
+    //             </div>
+    //         </div>
+    //     </div>
+    //
+    // )
 }
 
 //@ts-ignore

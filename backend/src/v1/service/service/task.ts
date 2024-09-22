@@ -2,8 +2,9 @@ import {spawn} from "child_process";
 import global from "../../../global"
 import axios from "axios";
 import {TMessage, TRunningList, TStatus, TTaskList} from "../../../../../general/types";
-import {addMess, isAllowHostPortServ, readHosts, readRunning, readTasks, writeHosts, writeTasks} from "./general";
+import {addMess, isAllowHostPort} from "./general";
 import {checkFileExists, pathResolveRoot} from "../../../utils";
+import {readHosts, readRunning, readTasks, writeHosts, writeTasks} from "./database";
 
 
 export const killTask = async ({id = null, host = null, port = null}): any => {
@@ -27,7 +28,7 @@ export const killTask = async ({id = null, host = null, port = null}): any => {
     }
 }
 
-export const storeTasks = async (tasks: TTaskList): any => {
+export const writeTasks = async (tasks: TTaskList): any => {
     let oldHosts = await readHosts();
 
     try {
@@ -52,15 +53,22 @@ export const storeTasks = async (tasks: TTaskList): any => {
     }
 };
 
-export async function launchTasks() {
+export async function startTasks() {
     const taskList: TTaskList = await readTasks();
-    Object.values(taskList).forEach(({id, nodeName, cfg, in: input, out}) => {
-
+    Object.values(taskList).forEach(({id}) => {
+        launchTask(id)
+    })
+    return;
+}
+export async function killTasks() {
+    const taskList: TTaskList = await readTasks();
+    Object.values(taskList).forEach(({id}) => {
+        killTask({id})
     })
     return;
 }
 
-export async function requestStatusTask({id = null, host = null, port = null}): Promise<TStatus> {
+/*export async function requestStatusTask({id = null, host = null, port = null}): Promise<TStatus> {
     try {
         if (id && !(host || port)) {
             const hosts = readHosts();
@@ -73,27 +81,26 @@ export async function requestStatusTask({id = null, host = null, port = null}): 
     } catch (e) {
         return <TStatus>{state: 'stop', hostPort: {host, port}, id}
     }
-}
+}*/
 
 export async function launchTask(id) {
     const taskList: TTaskList = await readTasks();
-    const {nodeName, cfg, in: input, out, hostPort: {host, port: portNode}} = taskList[id];
+    const {nodeName, cfg, in: input, out, hostPort: {host, port}} = taskList[id];
+
     let pfx = '';
-
-
     // cfg.forEach(([title, val, type]) => {
     //     (type == 'code-editor') && (pfx = '.' + val.lang);
     // })
 
     let path = pathResolveRoot(`./nodes/${nodeName}/launch${pfx}.bat`)
 
-    let {state} = await requestStatusTask({host, port: portNode});
-    if (state == 'run') {
+    let runningList = await <TRunningList>readRunning();
+    if (runningList?.[id]) {
         return `Сервис ${id} уже запущен`
     } else {
         //если сервис еще не запущен
         try {
-            if (await isAllowHostPortServ(host, portNode)) {
+            if (await isAllowHostPort(host, port, id)) {
                 if (!await checkFileExists(path))
                     throw {status: 500, message: `Файл [${path}] не существует`};
                 // const child = spawn('start', [path, global.port, id], { //запускаем
@@ -101,15 +108,26 @@ export async function launchTask(id) {
                     cwd: `./nodes/${nodeName}`,
                     shell: true,
                     // detached: true,  // Открепляет процесс
-                    stdio: 'ignore'     // Игнорирует стандартные потоки ввода/вывода
+                    // stdio: ['ignore', 'inherit', 'inherit']
+                    // stdio: 'ignore'     // Игнорирует стандартные потоки ввода/вывода
                 });
+                child.on("close", async function (code) {
+                    await addMess({type: 'node-status', data: <TStatus>{state: 'stop', hostPort: {host, port}, id}});
+                    console.log('stop:' + id);
+                });
+                child.on("exit", async function (code) {
+                    await addMess({type: 'node-status', data: <TStatus>{state: 'run', hostPort: {host, port}, id}});
+                    console.log('closing code: ' + code);
+                    return
+                });
+
                 child.unref();
                 console.log(child)
                 return `Команда на запуск сервиса ${id} принята`;
             } else {
                 await addMess(<TMessage>{
                     type: 'log',
-                    data: `Сервис:${id} запустить не удалось ${host}:${portNode} заняты`
+                    data: `Сервис:${id} запустить не удалось ${host}:${port} заняты`
                 })
             }
         } catch (e) {

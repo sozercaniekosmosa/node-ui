@@ -1,10 +1,14 @@
 import {validationResult} from "express-validator";
-import {killTask, launchTask, launchTasks, readTask, storeTasks, taskCMD} from "./service/task";
-import {addMess, isAllowHostPortServ, readProject, readRunning, readToolbox, writeProject} from "./service/general";
+import {killTask, killTasks, launchTask, startTasks, readTask, writeTasks, taskCMD} from "./service/task";
+import {addMess, isAllowHostPort, readToolbox} from "./service/general";
+import {readProject, readRunning, writeProject} from "./service/database";
 
 export const getReadToolbox = async (req: any, res: any) => {
     try {
         let arrData = await readToolbox();
+        // for (let i = 0; i < 28; i++)
+        arrData.push(arrData.at(-1))
+
         res.send(arrData);
 
     } catch (error: any) {
@@ -46,7 +50,7 @@ export const getReadTask = async (req: any, res: any) => {
 export const putWriteTasks = (req: any, res: any) => {
     const {body: tasks} = req;
     try {
-        storeTasks(tasks)
+        writeTasks(tasks)
         res.send('task written');
     } catch (error: any) {
         res.status(error?.status || 500).send({error: error?.message || error});
@@ -54,7 +58,16 @@ export const putWriteTasks = (req: any, res: any) => {
 };
 export const postStartTasks = async (req: any, res: any) => {
     try {
-        await launchTasks()
+        await startTasks()
+        console.log('start')
+        res.send('start');
+    } catch (error: any) {
+        res.status(error?.status || 500).send({error: error?.message || error});
+    }
+};
+export const postStopTasks = async (req: any, res: any) => {
+    try {
+        await killTasks()
         console.log('start')
         res.send('start');
     } catch (error: any) {
@@ -117,7 +130,7 @@ export const postAddMessage = (req: any, res: any) => {
 export const getIsAllowHostPort = async (req: any, res: any) => {
     const {host, port, id} = req.params;
     try {
-        let isUse = await isAllowHostPortServ(host, port, id);
+        let isUse = await isAllowHostPort(host, port, id);
         res.send(isUse);
     } catch (error: any) {
         res.status(error?.status || 500).send({error: error?.message || error});

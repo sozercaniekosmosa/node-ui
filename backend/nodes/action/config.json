@@ -9,7 +9,7 @@
         "сеть": [
             {"name": "hostPort", "type": "host-port", "val": {"host":"localhost", "port": 3000}, "title": "Адрес и порт", "arrOption": []},
             {"name": "taskControl", "type": "task-control", "val": null, "title": "Управление", "arrOption": ["1", "right", "hr"]},
-            {"name": "checkbox", "type": "checkbox", "val": false, "title": "Отладка", "arrOption": ["1", "right"]}
+            {"name": "debug", "type": "checkbox", "val": false, "title": "Отладка", "arrOption": ["1", "right"]}
         ],
         "общие": [
             {"name": "codeEditor", "type": "code-editor", "val": {"code": ""}, "title": "", "arrOption": ["tab"]}

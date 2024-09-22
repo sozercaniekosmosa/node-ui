@@ -1,78 +1,13 @@
-import {config} from "dotenv";
-import {debounce, getDataFromArrayPath, getDirectories, readData, throttle, WEBSocket, writeData} from "../../../utils";
-import {requestStatusTask, killTask} from "./task";
-import zlib, {InputType} from "node:zlib"
-import * as Buffer from "buffer";
+import {getDataFromArrayPath, getDirectories, WEBSocket} from "../../../utils";
+import {killTask} from "./task";
 
 import global from "../../../global"
 import axios from "axios";
-import {THost, THostPort, TMessage, TRunningList, TStatus, TTaskList} from "../../../../../general/types";
+import {THost, TMessage, TRunningList, TStatus} from "../../../../../general/types";
 import isLocalhost from "is-localhost-ip";
 import {domainToASCII} from "node:url";
 import net from "net";
-
-const {parsed: {MAX_MESSAGE_TASK, TIME_MESSAGE_CYCLE}} = config();
-
-
-export async function decompressGzip(buffer: Buffer): Promise<Buffer> {
-    try {
-        return new Promise((resolve, reject) => zlib.gunzip(<InputType>buffer, (err, result) => err ? reject(err) : resolve(result)));
-    } catch (error) {
-        throw error;
-    }
-}
-
-const _cashFileData = {};
-export const getCashFileData = async <T>(path, asString = false): Promise<T> => {
-    let data;
-    try {
-        if (_cashFileData[path]) {
-            data = _cashFileData[path]
-        } else {
-            const strData = await readData(path, 'utf-8');
-            data = asString ? strData : JSON.parse(strData);
-            _cashFileData[path] = data;
-        }
-    } catch (e) {
-        console.log(e)
-    }
-
-    return <T>data;
-}
-
-let listQueue = {};
-export const setCashFileDataWait = throttle(async (list): Promise<void> => {
-    let strData: string;
-    try {
-        for (const {path, data, asString = false} of Object.values(list)) {
-            _cashFileData[path] = data;
-            strData = asString ? data : JSON.stringify(data, null, 2);
-            await writeData(path, strData);
-            console.log('файл:' + path, 'сохранен')
-        }
-        listQueue = {}
-    } catch (e) {
-        console.log(e)
-    }
-}, 2000)
-
-export const setCashFileData = async (path, data, asString = false): Promise<void> => {
-    listQueue[path] = {path, data, asString};
-    _cashFileData[path] = data;
-    await setCashFileDataWait(<any>listQueue)
-};
-
-export const readTasks = async (): Promise<TTaskList> => await getCashFileData('./database/tasks.json',)
-export const writeTasks = async (tasks): Promise<void> => await setCashFileData('./database/tasks.json', tasks)
-
-export const readHosts = async (): Promise<THost> => await getCashFileData('./database/hosts.json',)
-export const writeHosts = async (hosts): Promise<void> => await setCashFileData('./database/hosts.json', hosts)
-
-export const readRunning = async (): Promise<TRunningList> => await getCashFileData('./database/running.json',)
-export const writeRunning = async (running): Promise<void> => await setCashFileData('./database/running.json', running)
-
-export const readProject = async (): Promise<string> => await getCashFileData('./database/project.db', true)
-export const writeProject = async (str): Promise<void> => await setCashFileData('./database/project.db', str, true)
+import {readHosts, readRunning, writeRunning} from "./database";
 
 export const readToolbox = async () => {
     let arrDir = await getDirectories('./nodes/');
@@ -106,14 +41,6 @@ export const updateStatesRunning = async () => {
             delete running[id];
         }
     }
-    for (const [id, {host, port}] of Object.entries(hosts)) {
-        const status = await requestStatusTask({host, port});
-        if (status.state == 'stop') {
-            delete running[id];
-        } else { //если не stop значит запущен (run или error)
-            running[id] = status;
-        }
-    }
 
     await writeRunning(running)
 };
@@ -134,12 +61,17 @@ export const setStateRunning = async (status: TStatus) => {
 }
 
 
-export const isAllowHostPortServ = async (host, portNode, id = null): Promise<boolean> => {
+export const isAllowHostPort = async (host, port, id = null): Promise<boolean> => {
     try {
         if (id) {
-            const hosts = await readHosts();
+            const hosts: THost = await readHosts();
+            //если хост с портом уже используются
+            if (Object.entries(hosts).some(([_id, {host: h, port: p}]) => _id != id && h == host && p == port))
+                return new Promise<boolean>(r => r(false))
+
             const running = await readRunning();
-            if (running[id] && hosts[id].host == host && hosts[id].port == portNode) { //если сервис запущен и хост с портом совпадают то true
+            //если сервис запущен и хост с портом совпадают то true
+            if (running[id] && hosts[id].host == host && hosts[id].port == port) {
                 return new Promise<boolean>(r => r(true))
             }
         }
@@ -161,12 +93,12 @@ export const isAllowHostPortServ = async (host, portNode, id = null): Promise<bo
                     resolve(true)
                 });
 
-                server.listen(portNode);
+                server.listen(port);
             });
         } else {
             try { // когда поняли что это не локальный хост запрашиваем данные у агентов извне
                 //TODO: global.port - порт заменить на значение порта из карты агентов
-                const {data: isAllow} = await axios.get(`http://${host}:${global.port}/api/v1/service/host-port/${host}/${portNode}`)
+                const {data: isAllow} = await axios.get(`http://${host}:${global.port}/api/v1/service/host-port/${host}/${port}`)
                 return isAllow;
             } catch (e) {
                 return false;

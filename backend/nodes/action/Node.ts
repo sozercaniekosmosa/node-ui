@@ -1,6 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
-import {TCallback, TInitData, TLink, TStatus} from "../../../general/types";
+import {TCallback, TInitData, TLink} from "../../../general/types";
 import axios from "axios";
 
 export default async (callback: TCallback) => {
@@ -8,11 +8,10 @@ export default async (callback: TCallback) => {
     const app = express();
     const router = express.Router();
 
-    let status: TStatus = {id: '', hostPort: undefined, state: "stop"};
-
     const agentPort = process.argv[2];
     const id = process.argv[3];
     const {task, hosts}: TInitData = await getInitData();
+    const debug = task.cfg?.debug?.[0] ?? true;
 
     let inputData = {};
 
@@ -20,27 +19,22 @@ export default async (callback: TCallback) => {
     app.use(bodyParser.raw());
     app.use(bodyParser.text());
 
-    router.post('in/:name', (req: any, res: any) => {
+    router.post('/in/:name', async (req: any, res: any) => {
         const name = req.params.name.toLocaleLowerCase();
         try {
             const {body: {data}} = req
             inputData[name] = data;
+            debug && await sendMessage('node-log-input', {id, name, data});
             const resData = callback(task, inputData);
+            debug && await sendMessage('node-log-output', {id, data});
             sendData(resData);
-
-            res.send({status: 'OK', text: 'привет из сервиса ' + data});
+            res.send({status: 'OK'});
             // console.log(data)
         } catch (e) {
 
         }
     });
     router.post('/kill', async (req: any, res: any) => {
-        status.state = 'stop';
-        try {
-            await sendMessage('node-status', status)
-        } catch (e) {
-            console.log(e)
-        }
         res.send({status: 'OK', text: 'команда на завершение принята'});
         process.exit(0);
     });
@@ -50,31 +44,15 @@ export default async (callback: TCallback) => {
         try {
             // console.log(cmd)
             const data = await callback(task, null);
-            // sendData(data);
+            debug && await sendMessage('node-log-output', {id, data});
+            sendData(data);
             res.send(`команда ${cmd} принята`);
         } catch (e) {
             // console.log(e)
         }
     });
-    router.get('/status', async (req: any, res: any) => {
-        // await sendMessage('node-status', status)
-        res.send(<TStatus>status);
-    });
+
     app.use('/', router);
-
-
-    let exitTimeoutId: NodeJS.Timeout;
-    [`exit`, `SIGINT`, `SIGUSR1`, `SIGUSR2`, `uncaughtException`, `SIGTERM`].forEach((eventType) => process.on(eventType, killProcess))
-
-    async function killProcess() {
-        if (exitTimeoutId) return;
-        exitTimeoutId = setTimeout(() => process.exit(0), 2000);
-        status.state = 'stop';
-        await sendMessage('node-status', status)
-    }
-
-    process.stdin.resume();
-
 
     function sendData(data) {
         Object.entries(task.out as TLink).forEach(([key, arrHostConsumer]) => {
@@ -85,8 +63,15 @@ export default async (callback: TCallback) => {
                     const res = await axios.post(`http://${host}:${port}/in/${inputName}`, {data})
                     // console.log(res.data)
                     // console.log(id, inputName)
-                } catch (e) {
-                    console.log(e)
+                } catch (error) {
+                    if (error?.name == 'AxiosError') {
+                        await sendMessage('node-log-error', `status: ${error.response.status}, message: ${error.message}`);
+                        console.log('node-log-error', `status: ${error.response.status}, message: ${error.message}`)
+                    }
+                    if (error?.name == 'AggregateError') {
+                        await sendMessage('node-log-error', `status: ${error.code}, message: ${error.errors.map(({message}) => message)}`);
+                        console.log('node-log-error', `status: ${error.code}, message: ${error.errors.map(({message}) => message)}`)
+                    }
                 }
             })
         });
@@ -109,24 +94,21 @@ export default async (callback: TCallback) => {
             console.log(task.cfg)
 
             app.listen(task.hostPort.port, async () => {
-                status.state = 'run';
-                status.hostPort = task.hostPort;
-                status.id = id;
-                await sendMessage('node-status', status)
                 console.log(`Сервис запущен на порте ${task.hostPort.port}`);
             });
-
-            // console.log(agentPort)
-            // console.log(id)
 
             return {task, hosts} as TInitData;
         } catch (error) {
             console.log(error);
             if (error?.name == 'AxiosError')
-                sendMessage('log', `status: ${error.response.status}, message: ${error.message}`);
-            sendMessage('log', error);
+                await sendMessage('log', `status: ${error.response.status}, message: ${error.message}`);
+            await sendMessage('log', error);
 
             process.exit(0); //если при иницализации произошла ошибка то убиваем процесс
         }
+    }
+
+    return {
+        sendMessage
     }
 }

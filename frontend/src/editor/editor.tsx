@@ -37,33 +37,34 @@ export function Editor({newNode, onEvent}) {
         eventEmit({name: 'init', data: nuiRef.current})
 
         eventBus.addEventListener('message-socket', ({type, data}: TMessage) => {
+
             switch (type) {
                 case "server-init":
-                    [...nui.svg.querySelectorAll('.' + NodeSelector.node)].forEach(node => {
-                        nui.setProperty(node, {data: {state: 'stop'}})
-                        nui.setProperty(node.querySelector('.' + NodeSelector.nodeStatus), {fill: '#dcdcdc'})
-                    })
+                    [...nui.svg.querySelectorAll('.' + NodeSelector.node)].forEach(node => setStatus(node, 'stop'))
                     break;
                 case "node-status":
-                    const {id, state} = data as TStatus;
-                    const node = nui.svg.querySelector(`#${id}`);
-                    if (node) {
-                        const nodeDest = node.querySelector(`.` + NodeSelector.nodeStatus)
-                        let fill = '#dcdcdc';
-                        if (state) {
-                            (state === 'run') && (fill = '#00ff3c');
-                            (state === 'error') && (fill = '#ff006a');
-                            (state === 'stop') && (fill = '#dcdcdc');
-                        }
-                        nui.setProperty(nodeDest, {fill})
-                        nui.setProperty(node, {data: {state}})
-                    } else {
-                        console.log(type, state)
-                    }
+                    const node = nui.svg.querySelector(`#${data.id}`);
+                    setStatus(node, data.state);
                     break;
             }
         })
     }, []);
+
+    function setStatus(node, state: string) {
+        if (node) {
+            const nodeDest = node.querySelector(`.` + NodeSelector.nodeStatus)
+            let fill = '#dcdcdc';
+            if (state) {
+                (state === 'run') && (fill = '#00ff3c');
+                (state === 'error') && (fill = '#ff006a');
+                (state === 'stop') && (fill = '#dcdcdc');
+            }
+            nuiRef.current.setProperty(nodeDest, {fill})
+            nuiRef.current.setProperty(node, {data: {state}})
+        } else {
+            console.log(state)
+        }
+    }
 
     function onMouseDown(e) {
         if (nuiRef.current && newNode) {

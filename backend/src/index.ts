@@ -7,14 +7,15 @@ import apicache from "apicache";
 import v1ServiceRouter from "./v1/service/routes";
 import global from "./global";
 import {WEBSocket} from "./utils";
-import {addMess, readRunning, updateStatesRunning} from "./v1/service/service/general";
-import {loadPyodide} from "pyodide";
+import {addMess, updateStatesRunning} from "./v1/service/service/general";
+import {readRunning, writeRunning} from "./v1/service/service/database";
 
 
 const {parsed: {PORT}} = config();
 const port = +process.env.PORT || +PORT;
 
 global.port = port
+await writeRunning({})
 await updateStatesRunning();
 
 createWebServer(global.port);
@@ -54,13 +55,3 @@ function createWebServer(port): any | null {
     })
 // console.log(env.parsed)
 }
-
-async function main() {
-    let pyodide = await loadPyodide();
-    // Pyodide is now ready to use...
-    console.log(pyodide.runPython(`
-    import sys
-    sys.version
-  `));
-};
-main();

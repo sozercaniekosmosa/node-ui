@@ -18,13 +18,13 @@ export interface THost {
     [key: string]: THostPort;
 }
 
-export type TCfg = [string, any, string];
+export type TCfg = { [key: string]: [any, string] };
 
 export interface TTask {
     id: string,
     hostPort: THostPort,
     nodeName: string,
-    cfg: TCfg[],
+    cfg: TCfg,
     in?: {},
     out?: {},
 }

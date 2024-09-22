@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import ReactDOM from 'react-dom/client';
 import './style.css';
 import './auxiliary/icon/style.css';
@@ -10,10 +10,12 @@ import History from './service/history'
 import {MenuConfirm} from "./auxiliary/menu/menu-confirm";
 import {camelToKebab, eventBus} from "./utils"
 import {
-    createMessageSocket, getToolbox, readProject, sendCmd, startTask, stopTask, writeProject
+    createMessageSocket, getToolbox, readProject, sendCmd, startTask, startTasks, stopTask, stopTasks, writeProject
 } from './service/service-backend'
 import {copy, cut, past} from "./service/cpc";
 import {NodeSelector} from "./editor/node-ui/node-ui";
+import {Footer} from "./footer/footer";
+import {Right} from "./right/right";
 
 // if (!import.meta.env.PROD) import listNode from "../../nodes/src/nodes"
 
@@ -31,10 +33,11 @@ console.log(import.meta.env.VITE_SOME_KEY)
 
 function Root() {
 
-
     let [nodeProperty, setNodeProperty] = useState(null);
     let [listNode, setListNode] = useState([]);
     const [nodeCreate, setNodeCreate] = useState(null);
+
+    const refEditor = useRef(null);
 
     useEffect(() => {
         (async () => setListNode(await getToolbox() as [Object]))()
@@ -42,7 +45,6 @@ function Root() {
         document.addEventListener('keydown', onKeyDown, true);
         document.addEventListener('blur', () => arrKey = [], true);
         document.addEventListener('focus', ({target}) => nodeFocus = target, true);
-
     }, [])
 
     function onKeyDown(e) {
@@ -147,14 +149,14 @@ function Root() {
                 writeProject(nui.svg);
                 break;
             case 'start':
-                eventBus.dispatchEvent('confirm', (isYes) => isYes /*&& startTask()*/, 'Запустить стстему?')
+                eventBus.dispatchEvent('confirm', (isYes) => isYes && startTasks(), 'Запустить стстему?')
                 break;
             case 'stop':
-                eventBus.dispatchEvent('confirm', (isYes) => isYes /*&& stopTask()*/, 'Остановить стстему?')
+                eventBus.dispatchEvent('confirm', (isYes) => isYes && stopTasks(), 'Остановить стстему?')
                 break;
             case 'node-cmd':
                 sendCmd(data.id, data.cmd)
-                console.log(name, data)
+                // console.log(name, data)
                 break;
         }
     }
@@ -169,7 +171,9 @@ function Root() {
             <Toolbox onNodeSelect={(data) => setNodeCreate(data)} listNode={listNode}/>
             <Editor newNode={nodeCreate} onEvent={onEventHandler}/>
             {nodeProperty ? <Property node={nodeProperty} onEvent={onEventHandler}/> : null}
+            <Right/>
         </div>
+        <Footer/>
         <MenuConfirm name={'confirm'}/>
     </>
 }
