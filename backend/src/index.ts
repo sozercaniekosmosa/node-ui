@@ -7,17 +7,14 @@ import apicache from "apicache";
 import v1ServiceRouter from "./v1/service/routes";
 import global from "./global";
 import {WEBSocket} from "./utils";
-import {addMess, updateStatesRunning} from "./v1/service/service/general";
-import {readRunning, writeRunning} from "./v1/service/service/database";
+import {addMess} from "./v1/service/service/general";
+import {sendListRan} from "./v1/service/service/task";
 
 
 const {parsed: {PORT}} = config();
 const port = +process.env.PORT || +PORT;
 
 global.port = port
-await writeRunning({})
-await updateStatesRunning();
-
 createWebServer(global.port);
 
 
@@ -39,15 +36,16 @@ function createWebServer(port): any | null {
         console.log(`API is listening on port ${port}`);
     });
 
+    //@ts-ignore
     global.messageSocket = new WEBSocket(webServ, {
         clbAddConnection: async () => {
             try {
-                await updateStatesRunning();
-                const runningList = await readRunning();
+                await sendListRan();
                 await addMess({type: 'server-init'});
-                for (const status of Object.values(runningList)) { // не отправляет статусы выключено
-                    await addMess({type: 'node-status', data: status});
-                }
+                //TODO: добавить отправку статусов -- run
+                // for (const status of Object.values(global.listRunning)) { // не отправляет статусы выключено
+                //     await addMess({type: 'node-status', data: status});
+                // }
             } catch (e) {
                 console.log(e)
             }

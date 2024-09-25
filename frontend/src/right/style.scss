@@ -1,12 +1,12 @@
+.right-tab {
+  display: contents;
+}
+
 .right {
+  font-size: 0.8em;
   user-select: none;
   min-width: 30vw;
   width: 8em;
-  //noinspection CssInvalidPropertyValue
-  //height: -webkit-fill-available;
-  //height: 80vh;
-  //height: inherit;
-  //flex: auto 1 1;
 
   flex-grow: 1;
   outline: 1px solid #cccccc;
@@ -15,50 +15,6 @@
   border-right: 1px solid gray;
   box-shadow: 0 0 11px -6px rgb(0, 0, 0);
   background-color: #fcfcfc;
-
-  //scrollbar-width: thin;
-
-  &__item {
-    border: 1px solid gray;
-    border-radius: 4px;
-    //border-bottom-left-radius: 100%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin: 4px;
-    height: 25px;
-    box-shadow: 1px 1px 3px -2px rgba(0, 0, 0, .8);
-
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.07);
-    }
-
-    &--press {
-      border: 1px solid rgba(0, 0, 0, 0.8);
-      box-shadow: inset 5px 5px 1px -3px rgba(0, 0, 0, .4);
-      background-color: rgba(0, 0, 0, 0.1) !important;
-    }
-  }
-
-  &__desc {
-    font-size: .7em;
-    pointer-events: none;
-  }
-
-  &__icon {
-    pointer-events: none;
-    background-size: cover;
-    background-position: initial;
-    background-repeat: no-repeat;
-    background-origin: content-box;
-    box-sizing: border-box;
-    padding: 2px;
-
-    margin: 1px 2px 1px 2px;
-    height: 20px;
-    width: 20px;
-  }
-
 
 }
 

@@ -1,8 +1,9 @@
 import {config} from "dotenv";
-import {readData, throttle, writeData} from "../../../utils";
+import {debounce, readData, throttle, writeData} from "../../../utils";
 import zlib, {InputType} from "node:zlib"
 import * as Buffer from "buffer";
 import {THost, TRunningList, TTaskList} from "../../../../../general/types";
+import {addMess} from "./general";
 
 const {parsed: {MAX_MESSAGE_TASK, TIME_MESSAGE_CYCLE}} = config();
 
@@ -61,8 +62,8 @@ export const writeTasks = async (tasks): Promise<void> => await setCashFileData(
 export const readHosts = async (): Promise<THost> => await getCashFileData('./database/hosts.json',)
 export const writeHosts = async (hosts): Promise<void> => await setCashFileData('./database/hosts.json', hosts)
 
-export const readRunning = async (): Promise<TRunningList> => await getCashFileData('./database/running.json',)
-export const writeRunning = async (running: TRunningList): Promise<void> => await setCashFileData('./database/running.json', running)
+export const readLog = async (): Promise<TRunningList> => await getCashFileData('./database/log.text', true)
+export const writeLog = async (running: TRunningList): Promise<void> => await setCashFileData('./database/log.text', running, true)
 
 export const readProject = async (): Promise<string> => await getCashFileData('./database/project.db', true)
 export const writeProject = async (str): Promise<void> => await setCashFileData('./database/project.db', str, true)

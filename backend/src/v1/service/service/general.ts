@@ -7,7 +7,7 @@ import {THost, TMessage, TRunningList, TStatus} from "../../../../../general/typ
 import isLocalhost from "is-localhost-ip";
 import {domainToASCII} from "node:url";
 import net from "net";
-import {readHosts, readRunning, writeRunning} from "./database";
+import {readHosts} from "./database";
 
 export const readToolbox = async () => {
     let arrDir = await getDirectories('./nodes/');
@@ -19,8 +19,7 @@ export const readToolbox = async () => {
 
 export const addMess = async (mess: TMessage) => {
     try {
-        if (mess.type == 'node-status') await setStateRunning(mess.data as TStatus);
-        (global.messageSocket as WEBSocket).send(mess)
+        if (global.messageSocket) (global.messageSocket as WEBSocket).send(mess)
         console.log(mess)
     } catch (e) {
         throw e;
@@ -28,38 +27,6 @@ export const addMess = async (mess: TMessage) => {
 
     return `Сообщение добавлено`;
 };
-
-export const updateStatesRunning = async () => {
-    let running: TRunningList = await readRunning() || {};
-    let hosts = await readHosts() || {};
-
-    //удаляем все которые не соответствуют настройкам
-    for (const {id, hostPort: {host, port}, state} of Object.values(running)) {
-        const hp = hosts[id];
-        if (!hp || hp.host != host || hp.port != port) {
-            await killTask({host, port});
-            delete running[id];
-        }
-    }
-
-    await writeRunning(running)
-};
-
-export const setStateRunning = async (status: TStatus) => {
-    await updateStatesRunning();
-
-    let running: TRunningList = await readRunning() ?? {};
-    const {id, hostPort, state} = status;
-
-    if (state == "run" || state == "error") {
-        running[id] = status;
-    }
-    if (running?.[id] && state == "stop") {
-        delete running[id];
-    }
-    await writeRunning(running)
-}
-
 
 export const isAllowHostPort = async (host, port, id = null): Promise<boolean> => {
     try {
@@ -69,9 +36,9 @@ export const isAllowHostPort = async (host, port, id = null): Promise<boolean> =
             if (Object.entries(hosts).some(([_id, {host: h, port: p}]) => _id != id && h == host && p == port))
                 return new Promise<boolean>(r => r(false))
 
-            const running = await readRunning();
+            const listRunning = global.listRunning;
             //если сервис запущен и хост с портом совпадают то true
-            if (running[id] && hosts[id].host == host && hosts[id].port == port) {
+            if (listRunning[id] && hosts[id].host == host && hosts[id].port == port) {
                 return new Promise<boolean>(r => r(true))
             }
         }

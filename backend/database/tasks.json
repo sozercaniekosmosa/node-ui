@@ -26,7 +26,7 @@
       ],
       "codeEditor": [
         {
-          "code": "(data)=>{\n    \n    var res = '';\n    for (var i = 0; i < 6; i++) {\n        res += i+','\n    }\n    \n    return res;\n    \n}",
+          "code": "(data)=>{\n    var res = '';\n    for (var i = 0; i < 6; i++) {\n        res += i+','\n    }\n    return res;\n}",
           "lang": "javascript",
           "theme": "monokai"
         },

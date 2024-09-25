@@ -4,31 +4,11 @@ import axios from "axios";
 import {TMessage, TRunningList, TStatus, TTaskList} from "../../../../../general/types";
 import {addMess, isAllowHostPort} from "./general";
 import {checkFileExists, pathResolveRoot} from "../../../utils";
-import {readHosts, readRunning, readTasks, writeHosts, writeTasks} from "./database";
+import {readHosts, readTasks, writeHosts, writeTasks} from "./database";
+import terminate from "terminate";
 
 
-export const killTask = async ({id = null, host = null, port = null}): any => {
-    try {
-        const runningList: TRunningList = await readRunning();
-        if (id) {
-            let runningTask = runningList?.[id];
-            if (!runningTask) {
-                await addMess({type: 'node-log', data: {id, message: 'Задача не запущена'}});
-                return `Процесс id: ${id}:(${host}:${port}) процесс не запущен`
-            }
-            const {hostPort} = runningTask as TStatus;
-            host = hostPort.host;
-            port = hostPort.port;
-        }
-
-        const {data: {text}} = await axios.post(`http://${host}:${port}/kill`)
-        return `Процесс (${host}:${port})` + text;
-    } catch (e) {
-        return `Процесс (${host}:${port}) не ответил на команду завершения`
-    }
-}
-
-export const writeTasks = async (tasks: TTaskList): any => {
+export const writeAllTasks = async (tasks: TTaskList): any => {
     let oldHosts = await readHosts();
 
     try {
@@ -40,7 +20,7 @@ export const writeTasks = async (tasks: TTaskList): any => {
             for (const [oldID, hostPort] of Object.entries(oldHosts)) {//перебераем все старые
                 const newHost = newHosts[oldID];
                 if (!newHost || newHost.host != hostPort.host || newHost.port != hostPort.port) { //если среди новых нет старого ID прибиваем процесс по строму ID
-                    killTask(hostPort)
+                    killTask(oldID)
                 }
             }
         }
@@ -52,38 +32,28 @@ export const writeTasks = async (tasks: TTaskList): any => {
         throw error;
     }
 };
+export const readTask = async (id: string) => {
+    const tasks: TTaskList = await readTasks();
+    const hosts = await readHosts();
 
-export async function startTasks() {
+    let task = tasks[id]
+
+    return {task, hosts};
+};
+
+export const startTasks = async () => {
     const taskList: TTaskList = await readTasks();
-    Object.values(taskList).forEach(({id}) => {
-        launchTask(id)
-    })
-    return;
-}
-export async function killTasks() {
-    const taskList: TTaskList = await readTasks();
-    Object.values(taskList).forEach(({id}) => {
-        killTask({id})
-    })
-    return;
+    Object.values(taskList).forEach(({id}) => startTask(id))
+};
+export const killTasks = async () => Object.values(global.listRunning).forEach(({id}) => killTask(id));
+
+export async function sendListRan() {
+    let data = {}
+    Object.values(global.listRunning).forEach(({name, id}) => data[id] = {name, id})
+    await addMess({type: 'list-run', data});
 }
 
-/*export async function requestStatusTask({id = null, host = null, port = null}): Promise<TStatus> {
-    try {
-        if (id && !(host || port)) {
-            const hosts = readHosts();
-            host = hosts[id].host;
-            port = hosts[id].port;
-        }
-
-        const {data: status}: TStatus = await axios.get(`http://${host}:${port}/status`);
-        return status;
-    } catch (e) {
-        return <TStatus>{state: 'stop', hostPort: {host, port}, id}
-    }
-}*/
-
-export async function launchTask(id) {
+export const startTask = async id => {
     const taskList: TTaskList = await readTasks();
     const {nodeName, cfg, in: input, out, hostPort: {host, port}} = taskList[id];
 
@@ -94,8 +64,7 @@ export async function launchTask(id) {
 
     let path = pathResolveRoot(`./nodes/${nodeName}/launch${pfx}.bat`)
 
-    let runningList = await <TRunningList>readRunning();
-    if (runningList?.[id]) {
+    if (global.listRunning?.[id]) {
         return `Сервис ${id} уже запущен`
     } else {
         //если сервис еще не запущен
@@ -113,15 +82,21 @@ export async function launchTask(id) {
                 });
                 child.on("close", async function (code) {
                     await addMess({type: 'node-status', data: <TStatus>{state: 'stop', hostPort: {host, port}, id}});
+                    delete global.listRunning[id];
+                    await sendListRan();
+
                     console.log('stop:' + id);
                 });
                 child.on("exit", async function (code) {
                     await addMess({type: 'node-status', data: <TStatus>{state: 'run', hostPort: {host, port}, id}});
-                    console.log('closing code: ' + code);
-                    return
-                });
+                    global.listRunning[id] = {id, name: nodeName, child};
+                    await sendListRan();
 
+                    console.log('closing code: ' + code);
+                });
+                console.log(child.pid)
                 child.unref();
+
                 console.log(child)
                 return `Команда на запуск сервиса ${id} принята`;
             } else {
@@ -135,9 +110,25 @@ export async function launchTask(id) {
             throw {status: 500, message: `Сервис [${id}] запустить не удалось ${e}`};
         }
     }
+};
+export const killTask = async (id = null): any => {
+    try {
+
+        if (global.listRunning?.[id]) {
+            terminate(global.listRunning[id].child.pid, async mess => {
+                console.log(mess)
+                await addMess({type: 'node-log', data: {id, message: 'Процесс завершен'}});
+            })
+            return `Процессу id: ${id}: отправлена комманда на завершение`
+        } else {
+            return `Процесс id: ${id}: не запущен`
+        }
+    } catch (e) {
+        return `Процесс ${id}: не ответил на команду завершения`
+    }
 }
 
-export async function taskCMD(id, cmd): Promise<any> {
+export const taskCMD = async (id, cmd): Promise<any> => {
     const taskList: TTaskList = await readTasks();
     const {nodeName, cfg, in: input, out, hostPort: {host, port: portNode}} = taskList[id];
 
@@ -151,13 +142,20 @@ export async function taskCMD(id, cmd): Promise<any> {
         throw error;
     }
 
-}
-
-export const readTask = async (id: string) => {
-    const tasks: TTaskList = await readTasks();
-    const hosts = await readHosts();
-
-    let task = tasks[id]
-
-    return {task, hosts};
 };
+
+
+/*export async function requestStatusTask({id = null, host = null, port = null}): Promise<TStatus> {
+    try {
+        if (id && !(host || port)) {
+            const hosts = readHosts();
+            host = hosts[id].host;
+            port = hosts[id].port;
+        }
+
+        const {data: status}: TStatus = await axios.get(`http://${host}:${port}/status`);
+        return status;
+    } catch (e) {
+        return <TStatus>{state: 'stop', hostPort: {host, port}, id}
+    }
+}*/

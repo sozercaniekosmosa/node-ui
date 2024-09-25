@@ -15,7 +15,7 @@ router.get('/toolbox', getReadToolbox);
 router.get('/project', getReadProject);
 router.put('/project', putWriteProject);
 
-router.get('/running', getRunningTasks);
+router.get('/running', getRunningTasks);//TODO: нигде не используется
 router.get('/task/:id', getReadTask);
 router.put('/task', putWriteTasks);
 router.post('/task/start', postStartTasks);

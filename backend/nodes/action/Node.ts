@@ -34,10 +34,6 @@ export default async (callback: TCallback) => {
 
         }
     });
-    router.post('/kill', async (req: any, res: any) => {
-        res.send({status: 'OK', text: 'команда на завершение принята'});
-        process.exit(0);
-    });
     router.post('/cmd/:cmd', async (req: any, res: any) => {
         const cmd = req.params.cmd
         const {body: data} = req;
@@ -90,8 +86,7 @@ export default async (callback: TCallback) => {
         try {
             const res = await axios.get(`http://localhost:${agentPort}/api/v1/service/task/${id}`)
             const {data: {task, hosts}} = res;
-
-            console.log(task.cfg)
+            // console.log(task.cfg)
 
             app.listen(task.hostPort.port, async () => {
                 console.log(`Сервис запущен на порте ${task.hostPort.port}`);
