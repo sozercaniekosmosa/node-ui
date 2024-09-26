@@ -26,12 +26,8 @@ export default function ({name, val, onChange, node}: TChangeProps) {
             switch (type) {
                 case "log":
                     break;
-                case "server-init":
-                    setStatus('stop');
-                    break;
-                case "node-status":
-                    if (!node && data || node.id != data?.id) break;
-                    setStatus(data.state);
+                case "list-run":
+                    setStatus(data?.[node.id] ? 'run' : 'stop');
                     break;
                 case "node-log":
                     break;

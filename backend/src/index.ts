@@ -41,11 +41,6 @@ function createWebServer(port): any | null {
         clbAddConnection: async () => {
             try {
                 await sendListRan();
-                await addMess({type: 'server-init'});
-                //TODO: добавить отправку статусов -- run
-                // for (const status of Object.values(global.listRunning)) { // не отправляет статусы выключено
-                //     await addMess({type: 'node-status', data: status});
-                // }
             } catch (e) {
                 console.log(e)
             }

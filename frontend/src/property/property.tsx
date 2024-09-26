@@ -52,12 +52,8 @@ export function Property({node, onEvent}) {
             switch (type) {
                 case "log":
                     break;
-                case "server-init":
-                    setStatus('stop');
-                    break;
-                case "node-status":
-                    if (!node && data || node.id != data?.id) break;
-                    setStatus(data.state);
+                case "list-run":
+                    setStatus(data?.[node.id] ? 'run' : 'stop');
                     break;
             }
         };
@@ -68,7 +64,6 @@ export function Property({node, onEvent}) {
         let fill = '#dcdcdc';
         if (state) {
             (state === 'run') && (fill = '#b6ffc8');
-            (state === 'error') && (fill = '#ff5967');
             (state === 'stop') && (fill = '#dcdcdc');
         }
         setStatusColor(fill);

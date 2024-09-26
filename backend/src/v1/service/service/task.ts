@@ -81,14 +81,12 @@ export const startTask = async id => {
                     // stdio: 'ignore'     // Игнорирует стандартные потоки ввода/вывода
                 });
                 child.on("close", async function (code) {
-                    await addMess({type: 'node-status', data: <TStatus>{state: 'stop', hostPort: {host, port}, id}});
                     delete global.listRunning[id];
                     await sendListRan();
 
                     console.log('stop:' + id);
                 });
                 child.on("exit", async function (code) {
-                    await addMess({type: 'node-status', data: <TStatus>{state: 'run', hostPort: {host, port}, id}});
                     global.listRunning[id] = {id, name: nodeName, child};
                     await sendListRan();
 

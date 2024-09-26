@@ -40,14 +40,6 @@ export default function ({name, val, onChange, node}) {
         setUpdate((v) => v + 1)
     }, [])
 
-
-    // eventBus.addEventListener('message-socket', ({type, dest, data}: TMessage) => {
-    //     switch (type) {
-    //         case "node-status":
-    //             break;
-    //     }
-    // })
-
     // function changeExec({target}) {
     //     isExecButton = target.checked;
     //     setUpdate(new Date())

@@ -39,12 +39,8 @@ export function Editor({newNode, onEvent}) {
         eventBus.addEventListener('message-socket', ({type, data}: TMessage) => {
 
             switch (type) {
-                case "server-init":
-                    [...nui.svg.querySelectorAll('.' + NodeSelector.node)].forEach(node => setStatus(node, 'stop'))
-                    break;
-                case "node-status":
-                    const node = nui.svg.querySelector(`#${data.id}`);
-                    setStatus(node, data.state);
+                case "list-run":
+                    [...nui.svg.querySelectorAll('.' + NodeSelector.node)].forEach(node => setStatus(node, data?.[node.id] ? 'run' : 'stop'))
                     break;
             }
         })
@@ -56,7 +52,6 @@ export function Editor({newNode, onEvent}) {
             let fill = '#dcdcdc';
             if (state) {
                 (state === 'run') && (fill = '#00ff3c');
-                (state === 'error') && (fill = '#ff006a');
                 (state === 'stop') && (fill = '#dcdcdc');
             }
             nuiRef.current.setProperty(nodeDest, {fill})
