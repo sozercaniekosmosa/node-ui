@@ -47,7 +47,7 @@ export const startTasks = async () => {
 };
 export const killTasks = async () => Object.values(global.listRunning).forEach(({id}) => killTask(id));
 
-export async function sendListRan() {
+export async function sendListRanning() {
     let data = {}
     Object.values(global.listRunning).forEach(({name, id}) => data[id] = {name, id})
     await addMess({type: 'list-run', data});
@@ -82,13 +82,13 @@ export const startTask = async id => {
                 });
                 child.on("close", async function (code) {
                     delete global.listRunning[id];
-                    await sendListRan();
+                    await sendListRanning();
 
                     console.log('stop:' + id);
                 });
                 child.on("exit", async function (code) {
                     global.listRunning[id] = {id, name: nodeName, child};
-                    await sendListRan();
+                    await sendListRanning();
 
                     console.log('closing code: ' + code);
                 });
