@@ -8,7 +8,7 @@ import v1ServiceRouter from "./v1/service/routes";
 import global from "./global";
 import {WEBSocket} from "./utils";
 import {addMess} from "./v1/service/service/general";
-import {sendListRanning} from "./v1/service/service/task";
+import {sendListRunning} from "./v1/service/service/task";
 
 
 const {parsed: {PORT}} = config();
@@ -40,7 +40,7 @@ function createWebServer(port): any | null {
     global.messageSocket = new WEBSocket(webServ, {
         clbAddConnection: async () => {
             try {
-                await sendListRanning();
+                await sendListRunning();
             } catch (e) {
                 console.log(e)
             }

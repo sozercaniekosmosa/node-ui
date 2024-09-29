@@ -8,9 +8,9 @@ let pyodide;
 async function evalJS(task, data) {
     const debug = task.cfg.debug[0];
     try {
-        while (true){
-            console.log('!')
-        }
+        // while (true){
+        //     console.log('!')
+        // }
 
         const {code, lang} = task.cfg.codeEditor[0];
 

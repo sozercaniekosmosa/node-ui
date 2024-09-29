@@ -7,7 +7,7 @@ import {TMessage, TStatus} from "../../../general/types";
 
 
 export type TEventEditor = {
-    name: 'selected' | 'dragged' | 'link-create' | 'link-remove' | 'add-node' | 'node-remove' | 'init' | 'node-cmd',
+    name: 'selected' | 'dragged' | 'link-create' | 'link-remove' | 'add-node' | 'node-remove' | 'init' | 'node-cmd' | 'node-select',
     data?: any
 }
 
@@ -18,7 +18,6 @@ export function Editor({newNode, onEvent}) {
     function eventEmit(eventData: TEventEditor) {
         onEvent && onEvent(eventData as TEventEditor)
     }
-
 
     useEffect(() => {
         const nui = new NodeUI(editorRef.current! as HTMLElement)

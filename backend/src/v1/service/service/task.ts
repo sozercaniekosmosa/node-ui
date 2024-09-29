@@ -47,7 +47,7 @@ export const startTasks = async () => {
 };
 export const killTasks = async () => Object.values(global.listRunning).forEach(({id}) => killTask(id));
 
-export async function sendListRanning() {
+export async function sendListRunning() {
     let data = {}
     Object.values(global.listRunning).forEach(({name, id}) => data[id] = {name, id})
     await addMess({type: 'list-run', data});
@@ -82,13 +82,13 @@ export const startTask = async id => {
                 });
                 child.on("close", async function (code) {
                     delete global.listRunning[id];
-                    await sendListRanning();
+                    await sendListRunning();
 
                     console.log('stop:' + id);
                 });
                 child.on("exit", async function (code) {
                     global.listRunning[id] = {id, name: nodeName, child};
-                    await sendListRanning();
+                    await sendListRunning();
 
                     console.log('closing code: ' + code);
                 });
@@ -117,7 +117,7 @@ export const killTask = async (id = null): any => {
                 console.log(mess)
                 await addMess({type: 'node-log', data: {id, message: 'Процесс завершен'}});
             })
-            return `Процессу id: ${id}: отправлена комманда на завершение`
+            return `Процессу id: ${id}: отправлена команда на завершение`
         } else {
             return `Процесс id: ${id}: не запущен`
         }

@@ -1,0 +1,35 @@
+@keyframes slide-up {
+  0% {
+    transform: translateY(0px);
+  }
+  100% {
+    transform: translateY(100px);
+  }
+}
+.log {
+  overflow-y: scroll;
+  height: inherit;
+  font-family: monospace;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+.log__error {
+  background: #ffdbe7;
+  color: #2c2c2c;
+}
+.log__warning {
+  background: #ffc400;
+  color: black;
+}
+.log > span {
+  /*width: inherit;*/
+  /*padding: 0 1em;*/
+}
+.log > span:hover {
+  background-color: lightgray;
+  color: #414141;
+  cursor: default;
+}
+
+/*# sourceMappingURL=style.css.map */

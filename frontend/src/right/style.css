@@ -15,4 +15,8 @@
   background-color: #fcfcfc;
 }
 
+.service--selected {
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
 /*# sourceMappingURL=style.css.map */

@@ -1,5 +1,5 @@
 import {NodeSelector} from "../editor/node-ui/node-ui";
-import {apiRequest, ContentType, debounce, decompressString, eventBus, webSocket} from "../utils";
+import {apiRequest, ContentType, debounce, decompressString, eventBus, throttle, webSocket} from "../utils";
 import {TMessage, TTask, TTaskList} from "../../../general/types"
 
 
@@ -93,7 +93,7 @@ const writeProjectNow = async (node: HTMLElement) => {
         console.error('Error fetching data:', error);
     }
 };
-export const writeProject = <(node: HTMLElement) => void>debounce(writeProjectNow, 1000)
+export const writeProject = <(node: HTMLElement) => void>throttle(writeProjectNow, 2000)
 
 export async function readProject() {
     try {
@@ -226,3 +226,10 @@ export async function createMessageSocket() {
         // setTimeout(() => messageSocket(nui), 2000);
     }
 }
+
+let cnt = 200;
+const loop = () => {
+    eventBus.dispatchEvent('message-socket', {type: 'log', data: new Date()})
+    if(cnt-->0)setTimeout(loop, 0);
+}
+loop();

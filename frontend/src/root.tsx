@@ -16,6 +16,7 @@ import {copy, cut, past} from "./service/cpc";
 import {NodeSelector} from "./editor/node-ui/node-ui";
 import {Footer} from "./footer/footer";
 import {Right} from "./right/right";
+import SplitPane from "react-split-pane";
 
 // if (!import.meta.env.PROD) import listNode from "../../nodes/src/nodes"
 
@@ -36,7 +37,6 @@ function Root() {
     let [nodeProperty, setNodeProperty] = useState(null);
     let [listNode, setListNode] = useState([]);
     const [nodeCreate, setNodeCreate] = useState(null);
-
     const refEditor = useRef(null);
 
     useEffect(() => {
@@ -156,13 +156,15 @@ function Root() {
                 break;
             case 'node-cmd':
                 sendCmd(data.id, data.cmd)
-                // console.log(name, data)
+                break;
+            case 'node-select':
+                let selectIdNode: string = data;
+                arrSelected[0] = nui.svg.querySelector('#' + selectIdNode)
+                let arrNode = [...nui.svg.querySelectorAll('.' + NodeSelector.selected)];
+                arrNode.forEach(node => node.classList.remove(NodeSelector.selected));
+                arrSelected[0].classList.add(NodeSelector.selected)
                 break;
         }
-    }
-
-    function onChange(newValue) {
-        console.log("change", newValue);
     }
 
     return <>
@@ -171,7 +173,7 @@ function Root() {
             <Toolbox onNodeSelect={(data) => setNodeCreate(data)} listNode={listNode}/>
             <Editor newNode={nodeCreate} onEvent={onEventHandler}/>
             {nodeProperty ? <Property node={nodeProperty} onEvent={onEventHandler}/> : null}
-            <Right/>
+            <Right onEvent={onEventHandler}/>
         </div>
         <Footer/>
         <MenuConfirm name={'confirm'}/>

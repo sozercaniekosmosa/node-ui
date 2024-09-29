@@ -41,7 +41,7 @@ export class EditorSelection {
         if (!this.arrKey['controlleft']) this.isControlLeft = false;
     }
 
-    public handlerMouseDown({target, p, start: s, button}: TMouseEvent): void {
+    public handlerMouseDown({target, p, button}: TMouseEvent): void {
         if (!button[0]) return
 
         this.targetDown = (target as Element);
@@ -50,18 +50,22 @@ export class EditorSelection {
         const isHandle = this.targetDown.classList.contains(NodeSelector.handle);
 
         if (targetDown && isHandle) { //select
-            this.dragTarget = targetDown;
             this.startSelection(p);
-            this.wasSelected = targetDown.classList.contains(NodeSelector.selected);
-            if (!this.wasSelected) {
-                if (!this.isControlLeft) this.clearSelection();
-                targetDown.classList.add(NodeSelector.selected);
-            }
+            this.selectNode(targetDown);
         } else if (isEmpty) {//reset|new selection
             this.startSelection(p);
             this.clearSelection();
         }
 
+    }
+
+    public selectNode(targetDown: Element) {
+        this.dragTarget = targetDown;
+        this.wasSelected = targetDown.classList.contains(NodeSelector.selected);
+        if (!this.wasSelected) {
+            if (!this.isControlLeft) this.clearSelection();
+            targetDown.classList.add(NodeSelector.selected);
+        }
     }
 
     public handlerMouseMove({distance, start: s, p, button}: TMouseEvent): void {
